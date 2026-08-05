@@ -1,0 +1,24 @@
+[
+  {
+    "event_id": "EVT-002",
+    "event_type": "PLATFORM_MANEUVER",
+    "first_seen": "00:12.480",
+    "last_seen": "00:15.900",
+    "critical_moment": true,
+    "description_tr": "Platform manevrası video modülü tarafından işaretlendi.",
+    "confidence": 0.91,
+    "track_id": "TRK-747-01",
+    "source": "VIDEO_EVENT_MODULE"
+  },
+  {
+    "event_id": "EVT-001",
+    "event_type": "PLATFORM_APPEARANCE",
+    "first_seen": "00:03.125",
+    "last_seen": "00:08.750",
+    "critical_moment": false,
+    "description_tr": "Platform ilk kez görüntü alanına girdi.",
+    "confidence": 0.87,
+    "track_id": "TRK-747-01",
+    "source": "VIDEO_EVENT_MODULE"
+  }
+]

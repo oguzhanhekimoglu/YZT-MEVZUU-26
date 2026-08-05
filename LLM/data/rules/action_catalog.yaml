@@ -1,0 +1,40 @@
+actions:
+  - code: CONTINUE_TRACKING
+    title_tr: Takibi sürdür
+    allowed_risks: [LOW, MEDIUM, HIGH, CRITICAL, UNKNOWN]
+
+  - code: REQUEST_OPERATOR_REVIEW
+    title_tr: Operatör incelemesi iste
+    allowed_risks: [MEDIUM, HIGH, CRITICAL, UNKNOWN]
+
+  - code: VERIFY_PLATFORM_MANUALLY
+    title_tr: Platform hipotezini manuel doğrula
+    allowed_risks: [MEDIUM, HIGH, CRITICAL, UNKNOWN]
+
+  - code: CHECK_PERMISSION_RECORDS
+    title_tr: Uçuş izni kayıtlarını kontrol et
+    allowed_risks: [MEDIUM, HIGH, CRITICAL, UNKNOWN]
+
+  - code: CHECK_FLIGHT_PLAN_RECORDS
+    title_tr: Uçuş planı kayıtlarını kontrol et
+    allowed_risks: [MEDIUM, HIGH, CRITICAL, UNKNOWN]
+
+  - code: REVIEW_ACTIVE_NOTAM
+    title_tr: Aktif NOTAM ayrıntılarını incele
+    allowed_risks: [MEDIUM, HIGH, CRITICAL, UNKNOWN]
+
+  - code: REQUEST_ADDITIONAL_VISUAL_EVIDENCE
+    title_tr: Ek görsel kanıt iste
+    allowed_risks: [MEDIUM, HIGH, UNKNOWN]
+
+  - code: ESCALATE_TO_AUTHORIZED_UNIT
+    title_tr: Yetkili birime ilet
+    allowed_risks: [HIGH, CRITICAL]
+
+  - code: MARK_AS_NON_AIRCRAFT
+    title_tr: Hava aracı olmayan hedef olarak işaretle
+    allowed_risks: [LOW]
+
+  - code: LOG_AND_CLOSE_EVENT
+    title_tr: Olayı kaydet ve kapat
+    allowed_risks: [LOW]

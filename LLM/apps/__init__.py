@@ -1,0 +1,1 @@
+"""Optional manual-test applications."""

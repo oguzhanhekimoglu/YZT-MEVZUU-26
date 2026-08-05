@@ -1,0 +1,668 @@
+{
+  "$defs": {
+    "ConfidenceOrigin": {
+      "description": "Origin of a canonical visual confidence score.",
+      "enum": [
+        "VLM_SELF_REPORTED",
+        "UPSTREAM_RETRIEVAL",
+        "UPSTREAM_FUSION",
+        "CALIBRATED_UPSTREAM"
+      ],
+      "title": "ConfidenceOrigin",
+      "type": "string"
+    },
+    "CropEvidenceSummary": {
+      "additionalProperties": false,
+      "description": "References and upstream quality measures for selected crops.",
+      "properties": {
+        "selected_crop_count": {
+          "minimum": 0,
+          "title": "Selected Crop Count",
+          "type": "integer"
+        },
+        "selected_crop_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Selected Crop Refs",
+          "type": "array"
+        },
+        "crop_quality_scores": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Crop Quality Scores",
+          "type": "array"
+        },
+        "average_crop_quality": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Average Crop Quality"
+        },
+        "view_diversity_score": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "View Diversity Score"
+        }
+      },
+      "required": [
+        "selected_crop_count"
+      ],
+      "title": "CropEvidenceSummary",
+      "type": "object"
+    },
+    "EventExtractionStatus": {
+      "description": "Availability state of the external video event extractor.",
+      "enum": [
+        "PENDING_VIDEO_EVENT_INTEGRATION",
+        "AVAILABLE"
+      ],
+      "title": "EventExtractionStatus",
+      "type": "string"
+    },
+    "EvidenceSourceMode": {
+      "description": "Upstream evidence composition modes.",
+      "enum": [
+        "VLM_ONLY",
+        "VLM_PLUS_RETRIEVAL",
+        "FUSED"
+      ],
+      "title": "EvidenceSourceMode",
+      "type": "string"
+    },
+    "ProducerMetadata": {
+      "additionalProperties": false,
+      "description": "Version and provenance metadata supplied by the visual producer.",
+      "properties": {
+        "visual_pipeline_version": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Visual Pipeline Version",
+          "type": "string"
+        },
+        "vlm_model": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Vlm Model",
+          "type": "string"
+        },
+        "retrieval_model": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retrieval Model"
+        },
+        "created_at_utc": {
+          "format": "date-time",
+          "title": "Created At Utc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "visual_pipeline_version",
+        "vlm_model",
+        "created_at_utc"
+      ],
+      "title": "ProducerMetadata",
+      "type": "object"
+    },
+    "TimestampedVideoEvent": {
+      "additionalProperties": false,
+      "description": "Validated event whose producer timestamps are retained verbatim.",
+      "properties": {
+        "event_id": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Event Type",
+          "type": "string"
+        },
+        "first_seen": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "First Seen"
+        },
+        "last_seen": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Seen"
+        },
+        "critical_moment": {
+          "default": false,
+          "title": "Critical Moment",
+          "type": "boolean"
+        },
+        "description_tr": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Description Tr",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "track_id": {
+          "anyOf": [
+            {
+              "maxLength": 150,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Track Id"
+        },
+        "source": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "event_type",
+        "first_seen",
+        "description_tr",
+        "confidence",
+        "source"
+      ],
+      "title": "TimestampedVideoEvent",
+      "type": "object"
+    },
+    "TrackMetrics": {
+      "additionalProperties": false,
+      "description": "Tracking metrics supplied by the upstream tracking subsystem.",
+      "properties": {
+        "track_duration_seconds": {
+          "minimum": 0.0,
+          "title": "Track Duration Seconds",
+          "type": "number"
+        },
+        "track_stability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Track Stability",
+          "type": "number"
+        },
+        "detection_count": {
+          "minimum": 1,
+          "title": "Detection Count",
+          "type": "integer"
+        },
+        "average_detection_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Average Detection Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "track_duration_seconds",
+        "track_stability",
+        "detection_count",
+        "average_detection_confidence"
+      ],
+      "title": "TrackMetrics",
+      "type": "object"
+    },
+    "TrackTiming": {
+      "additionalProperties": false,
+      "description": "Observation offsets relative to video start.",
+      "properties": {
+        "first_seen_offset_seconds": {
+          "minimum": 0.0,
+          "title": "First Seen Offset Seconds",
+          "type": "number"
+        },
+        "last_seen_offset_seconds": {
+          "minimum": 0.0,
+          "title": "Last Seen Offset Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "first_seen_offset_seconds",
+        "last_seen_offset_seconds"
+      ],
+      "title": "TrackTiming",
+      "type": "object"
+    },
+    "UncertaintyLevel": {
+      "description": "Canonical visual uncertainty levels.",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "title": "UncertaintyLevel",
+      "type": "string"
+    },
+    "UntimestampedVisualAssessment": {
+      "additionalProperties": false,
+      "description": "Raw visual assessment kept separate from timestamped events.",
+      "properties": {
+        "type": {
+          "const": "VISUAL_PLATFORM_ASSESSMENT",
+          "default": "VISUAL_PLATFORM_ASSESSMENT",
+          "title": "Type",
+          "type": "string"
+        },
+        "timestamp": {
+          "default": null,
+          "title": "Timestamp",
+          "type": "null"
+        },
+        "source": {
+          "const": "RAW_VLM",
+          "default": "RAW_VLM",
+          "title": "Source",
+          "type": "string"
+        },
+        "critical": {
+          "const": false,
+          "default": false,
+          "title": "Critical",
+          "type": "boolean"
+        },
+        "description_tr": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Description Tr",
+          "type": "string"
+        }
+      },
+      "required": [
+        "description_tr"
+      ],
+      "title": "UntimestampedVisualAssessment",
+      "type": "object"
+    },
+    "UpstreamVLMOutput": {
+      "additionalProperties": false,
+      "description": "Validate the only supported raw upstream VLM payload version.",
+      "properties": {
+        "schema_version": {
+          "const": "upstream-vlm/1.0",
+          "default": "upstream-vlm/1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "arac_sinifi": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Arac Sinifi",
+          "type": "string"
+        },
+        "tehdit_seviyesi": {
+          "anyOf": [
+            {
+              "maxLength": 50,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tehdit Seviyesi"
+        },
+        "tahmini_hedef_tipi": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tahmini Hedef Tipi"
+        },
+        "ulke_orjini": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ulke Orjini"
+        },
+        "hedef_modeli": {
+          "anyOf": [
+            {
+              "maxLength": 150,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hedef Modeli"
+        },
+        "gidis_yeri": {
+          "anyOf": [
+            {
+              "maxLength": 250,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gidis Yeri"
+        },
+        "gorsel_analiz": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Gorsel Analiz",
+          "type": "string"
+        },
+        "guven_skoru": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Guven Skoru",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "arac_sinifi",
+        "gorsel_analiz",
+        "guven_skoru"
+      ],
+      "title": "UpstreamVLMOutput",
+      "type": "object"
+    },
+    "VideoEventProjection": {
+      "additionalProperties": false,
+      "description": "UI projection isolated from operational decision facts.",
+      "properties": {
+        "timestamped_events": {
+          "items": {
+            "$ref": "#/$defs/TimestampedVideoEvent"
+          },
+          "title": "Timestamped Events",
+          "type": "array"
+        },
+        "timestamps_available": {
+          "default": false,
+          "title": "Timestamps Available",
+          "type": "boolean"
+        },
+        "event_extraction_status": {
+          "$ref": "#/$defs/EventExtractionStatus",
+          "default": "PENDING_VIDEO_EVENT_INTEGRATION"
+        },
+        "untimestamped_visual_assessment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UntimestampedVisualAssessment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "VideoEventProjection",
+      "type": "object"
+    },
+    "VisualCandidate": {
+      "additionalProperties": false,
+      "description": "One ranked upstream visual retrieval candidate.",
+      "properties": {
+        "rank": {
+          "minimum": 1,
+          "title": "Rank",
+          "type": "integer"
+        },
+        "candidate_name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Candidate Name",
+          "type": "string"
+        },
+        "score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "source_ref": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Ref"
+        }
+      },
+      "required": [
+        "rank",
+        "candidate_name",
+        "score"
+      ],
+      "title": "VisualCandidate",
+      "type": "object"
+    },
+    "VisualClass": {
+      "description": "Canonical visual target classes.",
+      "enum": [
+        "FIGHTER_JET",
+        "UAV",
+        "UCAV",
+        "HELICOPTER",
+        "TRANSPORT_AIRCRAFT",
+        "CIVILIAN_AIRCRAFT",
+        "MICRO_DRONE",
+        "UNKNOWN_AIRCRAFT",
+        "NON_AIRCRAFT"
+      ],
+      "title": "VisualClass",
+      "type": "string"
+    },
+    "VisualEvidenceStatus": {
+      "description": "Support level of canonical visual evidence.",
+      "enum": [
+        "SUPPORTED",
+        "PARTIALLY_SUPPORTED",
+        "WEAK",
+        "CONFLICTING",
+        "INSUFFICIENT"
+      ],
+      "title": "VisualEvidenceStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Canonical visual wrapper accepted by the analyze endpoint.",
+  "properties": {
+    "schema_version": {
+      "const": "visual-evidence/1.1",
+      "default": "visual-evidence/1.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "evidence_source_mode": {
+      "$ref": "#/$defs/EvidenceSourceMode"
+    },
+    "track_id": {
+      "maxLength": 150,
+      "minLength": 1,
+      "title": "Track Id",
+      "type": "string"
+    },
+    "visual_class": {
+      "$ref": "#/$defs/VisualClass"
+    },
+    "final_visual_hypothesis": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Final Visual Hypothesis"
+    },
+    "candidate_matches": {
+      "items": {
+        "$ref": "#/$defs/VisualCandidate"
+      },
+      "title": "Candidate Matches",
+      "type": "array"
+    },
+    "visual_evidence_status": {
+      "$ref": "#/$defs/VisualEvidenceStatus"
+    },
+    "visual_confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Visual Confidence",
+      "type": "number"
+    },
+    "confidence_origin": {
+      "$ref": "#/$defs/ConfidenceOrigin"
+    },
+    "uncertainty_level": {
+      "$ref": "#/$defs/UncertaintyLevel"
+    },
+    "uncertainty_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Uncertainty Flags",
+      "type": "array"
+    },
+    "human_visual_review_required": {
+      "title": "Human Visual Review Required",
+      "type": "boolean"
+    },
+    "track_metrics": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TrackMetrics"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "crop_evidence_summary": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CropEvidenceSummary"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "timing": {
+      "$ref": "#/$defs/TrackTiming"
+    },
+    "upstream_vlm_output": {
+      "$ref": "#/$defs/UpstreamVLMOutput"
+    },
+    "producer_metadata": {
+      "$ref": "#/$defs/ProducerMetadata"
+    },
+    "video_event_projection": {
+      "$ref": "#/$defs/VideoEventProjection"
+    }
+  },
+  "required": [
+    "evidence_source_mode",
+    "track_id",
+    "visual_class",
+    "visual_evidence_status",
+    "visual_confidence",
+    "confidence_origin",
+    "uncertainty_level",
+    "human_visual_review_required",
+    "timing",
+    "upstream_vlm_output",
+    "producer_metadata"
+  ],
+  "title": "FinalVisualEvidencePackage",
+  "type": "object"
+}

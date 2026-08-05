@@ -1,0 +1,11 @@
+{
+  "schema_version": "upstream-vlm/1.0",
+  "arac_sinifi": "SAVAS_UCAGI",
+  "tehdit_seviyesi": "YUKSEK",
+  "tahmini_hedef_tipi": "MUHARIP_JET",
+  "ulke_orjini": "ABD",
+  "hedef_modeli": "F-16",
+  "gidis_yeri": null,
+  "gorsel_analiz": "Görüntüde F-16 benzeri bir muharip jet görülmektedir.",
+  "guven_skoru": 85
+}

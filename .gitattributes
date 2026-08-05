@@ -1,0 +1,25 @@
+# ============================================================
+# Git LFS — büyük ikili dosyalar burada takip edilir, normal git
+# geçmişini şişirmesinler diye. Herkesin `git lfs install` çalıştırmış
+# olması gerekir (bkz. README kurulum adımları).
+# ============================================================
+
+# VRAG referans görselleri (veriler/<kategori>/<model>/*.jpg|png|jpeg)
+veriler/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+veriler/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+veriler/**/*.png filter=lfs diff=lfs merge=lfs -text
+veriler/**/*.JPG filter=lfs diff=lfs merge=lfs -text
+veriler/**/*.JPEG filter=lfs diff=lfs merge=lfs -text
+veriler/**/*.PNG filter=lfs diff=lfs merge=lfs -text
+
+# İndekslenmiş VRAG vektör veritabanı (Qdrant embedded/local)
+output/qdrant_db/** filter=lfs diff=lfs merge=lfs -text
+
+# YOLO model ağırlıkları
+models/*.pt filter=lfs diff=lfs merge=lfs -text
+
+# LLM metin gömme (embedding) modeli — RAG için yerel bundle edilmiş
+LLM/data/models/qwen3-embedding-0.6b/*.safetensors filter=lfs diff=lfs merge=lfs -text
+LLM/data/models/qwen3-embedding-0.6b/tokenizer.json filter=lfs diff=lfs merge=lfs -text
+LLM/data/models/qwen3-embedding-0.6b/vocab.json filter=lfs diff=lfs merge=lfs -text
+LLM/data/models/qwen3-embedding-0.6b/merges.txt filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,1 @@
+"""Local deterministic Text RAG ingestion and retrieval."""

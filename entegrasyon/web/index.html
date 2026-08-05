@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>UAV-VRAG — Web Viewer (Kokpit yerine)</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 16px; background: #0b0f14; color: #e6edf3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .alt { color: #8b949e; font-size: 13px; margin-bottom: 16px; }
+  .durum { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .durum.bagli { background: #113a24; color: #4ade80; }
+  .durum.kopuk { background: #3a1414; color: #f87171; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: #11161c; border: 1px solid #232b34; border-radius: 10px; padding: 12px; }
+  .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #8b949e; margin: 0 0 10px; }
+  #video { width: 100%; border-radius: 6px; background: #000; display: block; min-height: 200px; }
+  .kontrol { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  input[type=text] { flex: 1; min-width: 200px; background: #0b0f14; border: 1px solid #2d3743; color: #e6edf3;
+    border-radius: 6px; padding: 8px 10px; font-size: 13px; }
+  button { background: #1f6feb; color: #fff; border: none; border-radius: 6px; padding: 8px 14px;
+    font-size: 13px; cursor: pointer; font-weight: 600; }
+  button.dur { background: #da3633; }
+  button:hover { opacity: .9; }
+  button:disabled { opacity: .5; cursor: default; }
+  .bos { color: #6e7681; font-style: italic; padding: 12px 0; }
+  code { background: #0b0f14; padding: 1px 5px; border-radius: 4px; }
+  .mesaj { font-size: 12px; margin-top: 8px; min-height: 16px; }
+  .mesaj.hata { color: #f87171; }
+  .mesaj.ok { color: #4ade80; }
+
+  .etiket { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .risk-yuksek { background: #3a1414; color: #f87171; }
+  .risk-orta { background: #3a2e14; color: #fbbf24; }
+  .risk-dusuk { background: #113a24; color: #4ade80; }
+
+  /* --- Hedef kartı: Kokpit'teki gibi tek hedef için üstte başlık, altında
+     sırayla VRAG → VLM → LLM blokları --- */
+  .hedef-karti { border: 1px solid #232b34; border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+  .hedef-basligi { background: #161c24; padding: 10px 12px; display: flex; justify-content: space-between;
+    align-items: center; border-bottom: 1px solid #232b34; }
+  .hedef-basligi .ad { font-weight: 700; font-size: 14px; }
+  .hedef-basligi .alt-bilgi { color: #8b949e; font-size: 11px; }
+
+  .blok { padding: 10px 12px; border-bottom: 1px solid #1c232b; }
+  .blok:last-child { border-bottom: none; }
+  .blok-basligi { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .blok-basligi .ad { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #8b949e; }
+
+  .vrag-govde { display: flex; gap: 10px; }
+  .vrag-foto { width: 64px; height: 64px; border-radius: 6px; object-fit: cover; background: #0b0f14;
+    border: 1px solid #232b34; flex-shrink: 0; }
+  .vrag-detay { flex: 1; min-width: 0; }
+  .vrag-model { font-weight: 700; font-size: 13px; }
+  .aday-satir { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-top: 4px; color: #8b949e; }
+  .aday-bar { flex: 1; height: 5px; background: #1c232b; border-radius: 3px; overflow: hidden; }
+  .aday-bar-ic { height: 100%; background: #1f6feb; }
+
+  .satir { display: flex; gap: 6px; font-size: 12px; margin-top: 4px; }
+  .satir .k { color: #8b949e; min-width: 90px; flex-shrink: 0; }
+  .satir .v { color: #e6edf3; }
+
+  .bos-blok { color: #6e7681; font-style: italic; font-size: 12px; }
+  .sure-etiketi { font-size: 10px; color: #6e7681; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<h1>UAV-VRAG — Web Viewer</h1>
+<div class="alt">
+  Aynı sunucudan (127.0.0.1:8000) servis edilir — CORS/origin sorunu yok.
+  <span id="ws-durum" class="durum kopuk">bağlanıyor…</span>
+</div>
+
+<div class="panel" style="margin-bottom:16px;">
+  <h2>Oturum Kontrolü</h2>
+  <div class="kontrol">
+    <input id="videoYolu" type="text" placeholder="/Users/berra/Desktop/UAV-VRAG/data/videos/test.mp4">
+    <button id="btnBaslat" onclick="oturumBaslat()">Başlat</button>
+    <button id="btnDurdur" class="dur" onclick="oturumDurdur()">Durdur</button>
+  </div>
+  <div id="mesaj" class="mesaj"></div>
+</div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>Canlı Video</h2>
+    <img id="video" src="/video" alt="video akışı — oturum başlatılınca görünür">
+  </div>
+  <div class="panel">
+    <h2>Hedefler (canlı, <span id="frameNo">0</span>. kare)</h2>
+    <div id="hedefKapsayici"><div class="bos">Henüz hedef yok. Oturum başlatın.</div></div>
+  </div>
+</div>
+
+<script>
+function mesajGoster(metin, tip) {
+  const el = document.getElementById("mesaj");
+  el.textContent = metin;
+  el.className = "mesaj " + (tip || "");
+}
+
+async function oturumBaslat() {
+  const yol = document.getElementById("videoYolu").value.trim();
+  if (!yol) { mesajGoster("Video yolu girin.", "hata"); return; }
+  const btn = document.getElementById("btnBaslat");
+  btn.disabled = true;
+  mesajGoster("Başlatılıyor…");
+  try {
+    const res = await fetch("/oturum/baslat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ video_yolu: yol }),
+    });
+    const veri = await res.json();
+    if (res.ok && veri.ok) {
+      mesajGoster("Başlatıldı: " + veri.kaynak, "ok");
+      // Video akışını sıfırdan bağla (yeni oturumun ilk karesini yakalasın).
+      const img = document.getElementById("video");
+      img.src = "/video?_=" + Date.now();
+    } else {
+      mesajGoster("Hata: " + (veri.hata || JSON.stringify(veri)), "hata");
+    }
+  } catch (e) {
+    mesajGoster("İstek başarısız: " + e, "hata");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function oturumDurdur() {
+  mesajGoster("Durduruluyor…");
+  try {
+    await fetch("/oturum/durdur", { method: "POST" });
+    mesajGoster("Durduruldu.", "ok");
+  } catch (e) {
+    mesajGoster("İstek başarısız: " + e, "hata");
+  }
+}
+
+function baglan() {
+  const ws = new WebSocket(`ws://${location.host}/hedefler`);
+  const durumEl = document.getElementById("ws-durum");
+
+  ws.onopen = () => { durumEl.textContent = "bağlı"; durumEl.className = "durum bagli"; };
+  ws.onclose = () => {
+    durumEl.textContent = "koptu, 2sn sonra tekrar denenecek";
+    durumEl.className = "durum kopuk";
+    setTimeout(baglan, 2000);
+  };
+  ws.onerror = () => ws.close();
+
+  ws.onmessage = (ev) => {
+    const paket = JSON.parse(ev.data);
+    document.getElementById("frameNo").textContent = paket.frame ?? 0;
+    render(paket.hedefler || []);
+  };
+}
+
+function riskEtiket(tehdit) {
+  const t = (tehdit || "").toLowerCase();
+  if (t.includes("yuksek") || t.includes("yüksek") || t.includes("kritik")) return "risk-yuksek";
+  if (t.includes("orta")) return "risk-orta";
+  if (t) return "risk-dusuk";
+  return "";
+}
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+
+// --- "X saniye önce güncellendi" takibi: her hedef+katman için içerik
+// gerçekten değiştiğinde zaman damgası sıfırlanır, aynı kalırsa sayaç artmaya
+// devam eder. Bu sayede VLM/LLM'in yeni sonucu ne kadar sürede ürettiğini
+// gözle görebilirsiniz. ---
+const _degisimGecmisi = {}; // { [hedefId]: { vlm: {imza, zaman}, llm: {imza, zaman} } }
+
+function guncellemeSuresi(hedefId, katman, imza) {
+  if (!_degisimGecmisi[hedefId]) _degisimGecmisi[hedefId] = {};
+  const onceki = _degisimGecmisi[hedefId][katman];
+  const simdi = Date.now();
+  if (!onceki || onceki.imza !== imza) {
+    _degisimGecmisi[hedefId][katman] = { imza, zaman: simdi };
+    return 0;
+  }
+  return (simdi - onceki.zaman) / 1000;
+}
+
+function sureEtiketi(saniye) {
+  if (saniye < 1) return "az önce güncellendi";
+  return `${saniye.toFixed(0)}sn önce güncellendi`;
+}
+
+// --- VRAG bloğu: eşleşen model, referans fotoğraf, aday listesi ---
+function vragBlok(h) {
+  if (!h.model) {
+    return `<div class="blok">
+      <div class="blok-basligi"><span class="ad">VRAG — Model Tanıma</span></div>
+      <div class="bos-blok">Henüz eşleşme yok.</div>
+    </div>`;
+  }
+  const skor = h.model_skor != null ? (h.model_skor * 100).toFixed(0) + "%" : "-";
+  const adaylar = (h.adaylar || []).slice(0, 3).map((a) => `
+    <div class="aday-satir">
+      <span style="min-width:110px">${esc(a.model)}</span>
+      <div class="aday-bar"><div class="aday-bar-ic" style="width:${Math.round((a.skor || 0) * 100)}%"></div></div>
+      <span>${Math.round((a.skor || 0) * 100)}%</span>
+    </div>`).join("");
+
+  return `<div class="blok">
+    <div class="blok-basligi">
+      <span class="ad">VRAG — Model Tanıma</span>
+      ${h.dusuk_guven ? '<span class="etiket risk-orta">düşük güven ⚠️</span>' : ""}
+    </div>
+    <div class="vrag-govde">
+      <img class="vrag-foto" src="/referans?model=${encodeURIComponent(h.model)}" alt=""
+           onerror="this.style.visibility='hidden'">
+      <div class="vrag-detay">
+        <div class="vrag-model">${esc(h.model)} <span style="color:#8b949e;font-weight:400">(${skor})</span></div>
+        <div class="satir"><span class="k">Ülke</span><span class="v">${esc(h.ulke || "Bilinmiyor")}</span></div>
+        <div class="satir"><span class="k">Üretici</span><span class="v">${esc(h.uretici || "Bilinmiyor")}</span></div>
+        <div class="satir"><span class="k">Rol</span><span class="v">${esc(h.rol || "Bilinmiyor")}</span></div>
+        ${adaylar}
+      </div>
+    </div>
+  </div>`;
+}
+
+// --- VLM bloğu: görsel istihbarat / doğrulama ---
+function vlmBlok(h) {
+  const v = h.vlm;
+  if (!v) {
+    return `<div class="blok">
+      <div class="blok-basligi"><span class="ad">VLM — Görsel İstihbarat</span></div>
+      <div class="bos-blok">Henüz analiz yok.</div>
+    </div>`;
+  }
+  const tehdit = v.tehdit_seviyesi || "-";
+  const sure = guncellemeSuresi(h.id, "vlm", JSON.stringify(v));
+  return `<div class="blok">
+    <div class="blok-basligi">
+      <span class="ad">VLM — Görsel İstihbarat</span>
+      <span style="display:flex; align-items:center; gap:6px;">
+        <span class="sure-etiketi">${sureEtiketi(sure)}</span>
+        <span class="etiket ${riskEtiket(tehdit)}">${esc(tehdit)}</span>
+      </span>
+    </div>
+    <div class="satir"><span class="k">Tahmin</span><span class="v">${esc(v.gercek_tahmin || "-")}</span></div>
+    <div class="satir"><span class="k">Araç Sınıfı</span><span class="v">${esc(v.arac_sinifi || "-")}</span></div>
+    <div class="satir"><span class="k">Ülke Orijini</span><span class="v">${esc(v.ulke_orjini || "Bilinmiyor")}</span></div>
+    <div class="satir"><span class="k">Doğrulama</span><span class="v">${esc(v.dogrulama || "-")}</span></div>
+    ${v.gorsel_analiz ? `<div class="satir" style="margin-top:6px"><span class="v" style="color:#8b949e">${esc(v.gorsel_analiz)}</span></div>` : ""}
+  </div>`;
+}
+
+// --- LLM bloğu: stratejik/karar destek analizi ---
+// Backend'in gerçek LLM çıktısı şu şekilde geliyor: {summary, events, risk, actions}
+function llmBlok(h) {
+  const l = h.llm;
+  if (!l) {
+    return `<div class="blok">
+      <div class="blok-basligi"><span class="ad">LLM — Stratejik Analiz</span></div>
+      <div class="bos-blok">Henüz karar yok.</div>
+    </div>`;
+  }
+  const risk = l.risk || "-";
+  const ozet = l.summary || "";
+  const aksiyonlar = (l.actions || []).map((a) => `<li>${esc(a)}</li>`).join("");
+  const sure = guncellemeSuresi(h.id, "llm", JSON.stringify(l));
+  return `<div class="blok">
+    <div class="blok-basligi">
+      <span class="ad">LLM — Stratejik Analiz</span>
+      <span style="display:flex; align-items:center; gap:6px;">
+        <span class="sure-etiketi">${sureEtiketi(sure)}</span>
+        <span class="etiket ${riskEtiket(risk)}">${esc(risk)}</span>
+      </span>
+    </div>
+    ${ozet ? `<div class="satir"><span class="v" style="color:#8b949e">${esc(ozet)}</span></div>` : ""}
+    ${aksiyonlar ? `<ul style="margin:6px 0 0 18px; padding:0; font-size:12px;">${aksiyonlar}</ul>` : ""}
+  </div>`;
+}
+
+function render(hedefler) {
+  const kap = document.getElementById("hedefKapsayici");
+  if (!hedefler.length) { kap.innerHTML = '<div class="bos">Şu an takip edilen hedef yok.</div>'; return; }
+
+  let html = "";
+  for (const h of hedefler) {
+    html += `<div class="hedef-karti">
+      <div class="hedef-basligi">
+        <span class="ad">Hedef #${esc(h.id)} — ${esc(h.sinif || "?")}</span>
+        <span class="alt-bilgi">güven ${h.guven != null ? (h.guven * 100).toFixed(0) + "%" : "-"}</span>
+      </div>
+      ${vragBlok(h)}
+      ${vlmBlok(h)}
+      ${llmBlok(h)}
+    </div>`;
+  }
+  kap.innerHTML = html;
+}
+
+baglan();
+</script>
+
+</body>
+</html>

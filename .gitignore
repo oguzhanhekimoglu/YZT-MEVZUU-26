@@ -1,18 +1,60 @@
-# Qdrant embedded indeksi (ingest ile üretilir)
-qdrant_db/
-
-# Web arayüzünden yüklenen geçici sorgu görselleri
-yuklemeler/
-
+# ============================================================
 # Python
+# ============================================================
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ============================================================
+# Sanal ortamlar — herkes kendi venv'ini kurar (uv sync / pip install)
+# ============================================================
 .venv/
+.venv-*/
 venv/
+env/
 
-# HF model önbelleği (varsa yerelde)
-.cache/
+# ============================================================
+# .NET / Visual Studio (Kokpit masaüstü uygulaması) build çıktıları
+# ============================================================
+**/bin/
+**/obj/
+.vs/
 
-# Editör/araç yapılandırması
-.claude/
+# ============================================================
+# IDE ve işletim sistemi
+# ============================================================
 .vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# Çalışma zamanında üretilen / yeniden üretilebilir veriler
+# ============================================================
+pipeline_output/
+output/debug_vlm/
+output/debug_rag/
+output/*.avi
+debug_vlm/
+debug_rag/
+*.log
+LLM/reports/runtime/
+LLM/llm_crash.log
+data/databases/*.db
+yuklemeler/
+
+# ============================================================
+# Test videoları (referans veri değil — VRAG referans görselleri
+# 'veriler/' altında ayrı ve Git LFS ile takip ediliyor, bkz. .gitattributes)
+# ============================================================
+data/videos/*.mp4
+data/videos/*.avi
+data/videos/*.mkv
+VİDEOLAR/
+
+# ============================================================
+# Geçici / ajan klasörleri
+# ============================================================
+.agents/

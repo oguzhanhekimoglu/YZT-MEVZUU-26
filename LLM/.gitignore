@@ -1,0 +1,54 @@
+# Runtime SQLite databases and sidecar files
+data/databases/*.db
+data/databases/*.db-wal
+data/databases/*.db-shm
+data/databases/archive/
+
+# Generated Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+pytest-cache-files-*/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Local environments and tool caches
+.venv/
+.uv-cache/
+.uv-python/
+build/
+dist/
+*.egg-info/
+
+# Runtime RAG index binaries (yeniden üretilebilir; embedding modeli hariç —
+# o Git LFS ile takip ediliyor, bkz. kök .gitattributes, dokümantasyon
+# 'repodaki yerel model' olarak zaten bunu varsayıyor)
+data/rag/index/
+
+# Generated acceptance and test reports
+reports/
+
+# Local historical documentation excluded from the GitHub distribution
+docs/archive/
+docs/reports/
+
+# Local configuration, IDE, OS, and logs
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+scratch/
+.pytest-tmp/
+phase3_test_runtime/
+*.tmp
+*.bak
+*.orig

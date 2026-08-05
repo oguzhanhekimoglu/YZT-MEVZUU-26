@@ -1,0 +1,186 @@
+[
+  {
+    "scenario_id": "SCN-01",
+    "name": "Doğrulanmış operasyon",
+    "description": "Beklenen platform, geçerli izin ve dosyalanmış uçuş planı içeren deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "VERIFIED",
+    "expected_risk_level": "LOW",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-02",
+    "name": "İzinsiz dosyalanmış uçuş planı",
+    "description": "Uçuş planı bulunan fakat izin kaydı bulunmayan deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "MEDIUM",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-03",
+    "name": "Beklenmeyen izinsiz platform",
+    "description": "Operasyon alanında beklenmeyen ve izin kaydı bulunmayan deterministik DEMO_MOCK platform senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-04",
+    "name": "Süresi dolmuş izin",
+    "description": "Dosyalanmış uçuş planına karşılık izin süresi dolmuş deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-05",
+    "name": "Kısıtlayıcı NOTAM",
+    "description": "Geçerli kayıtlarla birlikte operasyonu kısıtlayan NOTAM içeren deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-06",
+    "name": "Çözümlenemeyen platform",
+    "description": "Platform kimliğinin çözümlenemediği ve izin kontrolünün atlandığı deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "INDETERMINATE",
+    "expected_risk_level": "UNKNOWN",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-07",
+    "name": "Kritik tool hatası",
+    "description": "Permission ve flight plan doğrulamasında kontrollü tool hatası oluşturan deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "INDETERMINATE",
+    "expected_risk_level": "UNKNOWN",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-08",
+    "name": "Güçlü non-aircraft",
+    "description": "RAG ve LLM çağrılmadan erken çıkış üreten güçlü non-aircraft deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "NOT_APPLICABLE",
+    "expected_risk_level": "LOW",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-09",
+    "name": "İptal edilmiş uçuş planı",
+    "description": "Geçerli izne karşılık uçuş planı iptal edilmiş deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-10",
+    "name": "Kullanılamayan context",
+    "description": "Operational context aktif olmadığı için araç doğrulamalarının atlandığı deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "INDETERMINATE",
+    "expected_risk_level": "UNKNOWN",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-11",
+    "name": "Operasyonu yasaklayan NOTAM",
+    "description": "Operasyonu açıkça yasaklayan aktif NOTAM içeren deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "CRITICAL",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-12",
+    "name": "Beklenmeyen fakat izinli platform",
+    "description": "Geçerli izin ve plana rağmen alanda beklenmeyen platform içeren deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "PARTIALLY_VERIFIED",
+    "expected_risk_level": "MEDIUM",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-13",
+    "name": "Boeing 747 envanter dışı doğrulanmış operasyon",
+    "description": "Boeing 747 için Inventory NOT_LISTED kalırken geçerli Permission, dosyalanmış Flight Plan ve kısıtlayıcı NOTAM bulunmayan deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "VERIFIED",
+    "expected_risk_level": "LOW",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-14",
+    "name": "Bayraktar TB2 SİHA doğrulanmış operasyon",
+    "description": "Bayraktar TB2 için Inventory CONFIRMED, geçerli permission, dosyalanmış flight plan ve aktif NOTAM bulunmayan başarılı DEMO_MOCK senaryosu.",
+    "expected_verification_status": "VERIFIED",
+    "expected_risk_level": "LOW",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-15",
+    "name": "Bayraktar AKINCI Ağır sınıf SİHA permission bulunamadı",
+    "description": "Inventory içinde bulunan Bayraktar AKINCI için uçuş planı mevcutken geçerli Permission kaydı bulunmayan kontrollü DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "MEDIUM",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-16",
+    "name": "TUSAŞ ANKA Orta irtifa uzun havada kalışlı İHA NOTAM kısıtı",
+    "description": "TUSAŞ ANKA için geçerli Permission ve Flight Plan bulunmasına rağmen aktif NOTAM\u0027ın operasyonu kısıtladığı kontrollü DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-17",
+    "name": "F-35A Lightning II savaş uçağı Inventory kapsam dışı",
+    "description": "Registry tarafından çözümlenen yabancı menşeli askerî modelin mevcut DEMO_MOCK Turkey Inventory veri setinde bulunmadığı kontrollü senaryo.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-18",
+    "name": "MQ-9 Reaper Orta irtifa uzun havada kalışlı SİHA ham VLM",
+    "description": "Ham VLM JSON girdisinin adapter üzerinden canonical isteğe dönüştürüldüğü ve MQ-9 Reaper için Inventory NOT_LISTED dalına ulaştığı kontrollü DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-19",
+    "name": "Bayraktar AKINCI iptal edilmiş Permission",
+    "description": "Inventory CONFIRMED Bayraktar AKINCI için Permission REVOKED ve Flight Plan FILED sonuçlarını üreten deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-20",
+    "name": "Bayraktar TB2 süresi dolmuş Permission",
+    "description": "Inventory CONFIRMED Bayraktar TB2 için Permission EXPIRED ve Flight Plan FILED sonuçlarını üreten deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-21",
+    "name": "F-16 operasyonu yasaklayan NOTAM",
+    "description": "Inventory CONFIRMED ve geçerli operasyon kayıtlarına sahip F-16 uçuşunu senaryoya özgü aktif NOTAM\u0027ın yasakladığı deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "CRITICAL",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-22",
+    "name": "TUSAŞ ANKA Permission ile çelişen NOTAM",
+    "description": "Inventory CONFIRMED ve geçerli operasyon kayıtlarına sahip TUSAŞ ANKA uçuşunda senaryoya özgü NOTAM\u0027ın Permission ile çeliştiği deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  },
+  {
+    "scenario_id": "SCN-23",
+    "name": "Boeing 747 ILS bakım NOTAM kısıtı",
+    "description": "CIVIL ve Inventory NOT_LISTED Boeing 747 için geçerli Permission, dosyalanmış Flight Plan ve zaman, meydan, alan ile irtifa kapsamı eşleşen ILS bakım NOTAM kaydı.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "HIGH",
+    "source_type": "DEMO_MOCK"
+  }
+]

@@ -1,0 +1,3279 @@
+{
+  "schema_version": "platform-registry/1.1",
+  "platforms": [
+    {
+      "platform_id": "PLT_F16",
+      "canonical_name": "F-16 Fighting Falcon",
+      "aliases": [
+        "F-16",
+        "F16",
+        "F-16-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "default_expectation": "EXPECTED",
+      "context_overrides": {
+        "DEMO_CONTEXT_B": "NOT_EXPECTED"
+      },
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BOEING_747",
+      "canonical_name": "Boeing 747",
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "WIDEBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "B747",
+        "Boeing-747",
+        "Boeing 747-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BAYRAKTAR_TB2",
+      "canonical_name": "Bayraktar TB2",
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "TACTICAL_UAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "Bayraktar TB-2",
+        "TB2",
+        "TB-2",
+        "Bayraktar TB2-like"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BAYRAKTAR_AKINCI",
+      "canonical_name": "Bayraktar AKINCI",
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "HEAVY_UCAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "AKINCI",
+        "Bayraktar Akıncı",
+        "Akıncı",
+        "Bayraktar AKINCI-like"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_TUSAS_ANKA",
+      "canonical_name": "TUSAŞ ANKA",
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR",
+        "operational_class": "MALE_UAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "TUSAS ANKA",
+        "TUSAŞ ANKA-like",
+        "ANKA"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F35A",
+      "canonical_name": "F-35A Lightning II",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "aliases": [
+        "F-35A",
+        "F35A",
+        "F-35A-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F35B",
+      "canonical_name": "F-35B Lightning II",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE",
+          "STOVL"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "aliases": [
+        "F-35B",
+        "F35B"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F35C",
+      "canonical_name": "F-35C Lightning II",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE",
+          "CARRIER_CAPABLE"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "aliases": [
+        "F-35C",
+        "F35C"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F35_GENERIC",
+      "canonical_name": "F-35 Lightning II",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "EXPLICIT_CHILD_RECORDS"
+      },
+      "aliases": [
+        "F-35",
+        "F35",
+        "F-35-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_MQ9_REAPER",
+      "canonical_name": "MQ-9 Reaper",
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "MALE_UCAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "MQ-9",
+        "MQ9",
+        "MQ-9 Reaper-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_T129_ATAK",
+      "canonical_name": "T129 ATAK",
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ATTACK",
+        "operational_class": "ATTACK_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "T-129 ATAK",
+        "ATAK",
+        "T129 ATAK-like"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_T625_GOKBEY",
+      "canonical_name": "T625 GÖKBEY",
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "UTILITY_TRANSPORT",
+        "operational_class": "UTILITY_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "T-625 GÖKBEY",
+        "T625 Gokbey",
+        "GÖKBEY",
+        "Gokbey",
+        "T625 GÖKBEY-like"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_A400M",
+      "canonical_name": "Airbus A400M Atlas",
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "MILITARY_TRANSPORT",
+        "operational_class": "TACTICAL_AIRLIFTER",
+        "traits": [
+          "MANNED",
+          "TURBOPROP_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "A400M",
+        "A400M Atlas",
+        "Airbus A400M",
+        "Airbus A400M Atlas-like"
+      ],
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_HURKUS",
+      "canonical_name": "TUSAŞ HÜRKUŞ",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "TRAINING_LIGHT_ATTACK",
+        "operational_class": "ADVANCED_TRAINER",
+        "traits": [
+          "MANNED",
+          "TURBOPROP_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "HÜRKUŞ",
+        "HURKUS",
+        "TUSAS HURKUS",
+        "TUSAŞ HÜRKUŞ-like"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_C130",
+      "canonical_name": "C-130 Hercules",
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "MILITARY_TRANSPORT",
+        "operational_class": "TACTICAL_AIRLIFTER",
+        "traits": [
+          "MANNED",
+          "TURBOPROP_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "C130",
+        "C-130",
+        "Hercules",
+        "C-130 Hercules-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_CN235",
+      "canonical_name": "CASA CN-235",
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "MILITARY_TRANSPORT",
+        "operational_class": "LIGHT_TACTICAL_AIRLIFTER",
+        "traits": [
+          "MANNED",
+          "TURBOPROP_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "CN-235",
+        "CN235",
+        "CASA CN235",
+        "CASA CN-235-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "ES",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BOEING_E7",
+      "canonical_name": "Boeing E-7",
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIRBORNE_EARLY_WARNING",
+        "operational_class": "AEW_C_AIRCRAFT",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "SURVEILLANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "E-7",
+        "E7",
+        "Boeing E-7 Wedgetail",
+        "Boeing E-7-like",
+        "Boeing E-7T Barış Kartalı"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_TUSAS_AKSUNGUR",
+      "canonical_name": "TUSAŞ AKSUNGUR",
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "MALE_UAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "AKSUNGUR",
+        "TUSAS AKSUNGUR",
+        "TUSAŞ AKSUNGUR-like"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_STM_KARGU",
+      "canonical_name": "STM KARGU",
+      "category": "MICRO_DRONE",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "LOITERING_MUNITION",
+        "operational_class": "ROTARY_WING_MINI_UAS",
+        "traits": [
+          "UNMANNED",
+          "ROTARY_WING",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "STM KARGU-like",
+        "KARGU"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_STM_TOGAN",
+      "canonical_name": "STM TOGAN",
+      "category": "MICRO_DRONE",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR",
+        "operational_class": "ROTARY_WING_MINI_UAS",
+        "traits": [
+          "UNMANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "STM TOGAN-like",
+        "TOGAN"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_STM_ALPAGU",
+      "canonical_name": "STM ALPAGU",
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "LOITERING_MUNITION",
+        "operational_class": "FIXED_WING_MINI_UCAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "STM ALPAGU-like",
+        "ALPAGU"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F4E_2020",
+      "canonical_name": "F-4E 2020 Terminator",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "aliases": [
+        "F-4E 2020",
+        "F-4E",
+        "F4E",
+        "F-4E Terminator",
+        "F-4E 2020 Terminator-like",
+        "F-4E Phantom II Terminator"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BAYRAKTAR_TB3",
+      "canonical_name": "Bayraktar TB3",
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "TACTICAL_UAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "SHIPBORNE_CAPABLE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "TB3",
+        "TB-3",
+        "Bayraktar TB-3",
+        "Bayraktar TB3-like"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_TUSAS_SIMSEK",
+      "canonical_name": "TUSAŞ ŞİMŞEK",
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "TARGET_DRONE",
+        "operational_class": "HIGH_SPEED_UAS",
+        "traits": [
+          "UNMANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "ŞİMŞEK",
+        "SIMSEK",
+        "TUSAS SIMSEK",
+        "TUSAŞ ŞİMŞEK-like",
+        "Tusaş Şimşek"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_TUSAS_SUPER_SIMSEK",
+      "canonical_name": "TUSAŞ SÜPER ŞİMŞEK",
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "TARGET_DRONE",
+        "operational_class": "HIGH_SPEED_UAS",
+        "traits": [
+          "UNMANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "SÜPER ŞİMŞEK",
+        "SUPER SIMSEK",
+        "TUSAS SUPER SIMSEK",
+        "TUSAŞ SÜPER ŞİMŞEK-like"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_VESTEL_KARAYEL",
+      "canonical_name": "Vestel KARAYEL",
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR",
+        "operational_class": "TACTICAL_UAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "Vestel KARAYEL-like",
+        "KARAYEL"
+      ],
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_EUROFIGHTER_TYPHOON",
+      "canonical_name": "Eurofighter Typhoon",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "Eurofighter",
+        "Typhoon",
+        "EF-2000",
+        "Eurofighter Typhoon-like"
+      ],
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_SU35",
+      "canonical_name": "Sukhoi Su-35",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "Su35",
+        "Sukhoi Su-35-like",
+        "Su-35"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_RAFALE",
+      "canonical_name": "Dassault Rafale",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "Rafale",
+        "Dassault-Rafale",
+        "Rafale C",
+        "Dassault Rafale-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "FR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AIRBUS_A320",
+      "canonical_name": "Airbus A320",
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "NARROWBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "A320",
+        "Airbus A-320",
+        "A320 Family",
+        "Airbus A320-like"
+      ],
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F22_RAPTOR",
+      "canonical_name": "F-22 Raptor",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "F-22",
+        "F22",
+        "Raptor",
+        "F-22 Raptor-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_SU57",
+      "canonical_name": "Sukhoi Su-57",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "Su57",
+        "Sukhoi Su-57-like",
+        "Su-57"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_MIG29",
+      "canonical_name": "Mikoyan MiG-29",
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "MiG-29",
+        "MiG29",
+        "Mikoyan MiG-29-like",
+        "MiG-29 Fulcrum"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AIRBUS_A330",
+      "canonical_name": "Airbus A330",
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "WIDEBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "A330",
+        "Airbus A-330",
+        "A330 Family",
+        "Airbus A330-like"
+      ],
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BOEING_777",
+      "canonical_name": "Boeing 777",
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "WIDEBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "aliases": [
+        "B777",
+        "Boeing-777",
+        "777 Family",
+        "Boeing 777-like"
+      ],
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_INACTIVE_DEMO",
+      "canonical_name": "Inactive Demo Aircraft",
+      "aliases": [
+        "INACTIVE-AIRCRAFT"
+      ],
+      "category": "FIGHTER_JET",
+      "platform_origin": "UNKNOWN",
+      "manufacturer_country_code": null,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "active": false,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F15_EAGLE",
+      "canonical_name": "F-15 Eagle",
+      "aliases": [
+        "F-15",
+        "F15",
+        "F-15 Eagle-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F15EX_EAGLE_II",
+      "canonical_name": "F-15EX Eagle II",
+      "aliases": [
+        "F-15EX",
+        "F15EX",
+        "Eagle II",
+        "F-15EX Eagle II-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BOEING_737_NG",
+      "canonical_name": "Boeing 737 NG",
+      "aliases": [
+        "B737 NG",
+        "737 NG",
+        "Boeing 737 Next Generation",
+        "Boeing 737 NG-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "NARROWBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BOEING_737_MAX",
+      "canonical_name": "Boeing 737 MAX",
+      "aliases": [
+        "B737 MAX",
+        "737 MAX",
+        "Boeing 737 MAX-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "NARROWBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AH64E_APACHE_GUARDIAN",
+      "canonical_name": "Boeing AH-64E Apache Guardian",
+      "aliases": [
+        "AH-64E",
+        "AH64E",
+        "AH-64E Apache Guardian",
+        "Apache Guardian",
+        "Boeing AH-64E Apache Guardian-like"
+      ],
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ATTACK",
+        "operational_class": "ATTACK_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F5_FREEDOM_FIGHTER",
+      "canonical_name": "F-5 Freedom Fighter",
+      "aliases": [
+        "F-5",
+        "F5",
+        "Freedom Fighter",
+        "F-5 Freedom Fighter-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_NF5_TURK_YILDIZLARI",
+      "canonical_name": "NF-5 Türk Yıldızları",
+      "aliases": [
+        "NF-5",
+        "NF5",
+        "Türk Yıldızları NF-5",
+        "Turk Yildizlari NF-5",
+        "NF-5 Türk Yıldızları-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AEROBATIC_DISPLAY",
+        "operational_class": "AEROBATIC_TRAINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_T38_TALON",
+      "canonical_name": "T-38 Talon",
+      "aliases": [
+        "T-38",
+        "T38",
+        "Talon",
+        "T-38 Talon-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "TRAINING",
+        "operational_class": "ADVANCED_JET_TRAINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_SIKORSKY_S70",
+      "canonical_name": "Sikorsky S-70 Black Hawk",
+      "aliases": [
+        "S-70",
+        "S70",
+        "Sikorsky S-70",
+        "Black Hawk",
+        "Sikorsky S-70 Black Hawk-like"
+      ],
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "UTILITY_TRANSPORT",
+        "operational_class": "UTILITY_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_CH47F_CHINOOK",
+      "canonical_name": "Boeing CH-47F Chinook",
+      "aliases": [
+        "CH-47F",
+        "CH47F",
+        "Chinook",
+        "Boeing CH-47F",
+        "Boeing CH-47F Chinook-like"
+      ],
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "MILITARY_TRANSPORT",
+        "operational_class": "HEAVY_LIFT_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AS532_COUGAR",
+      "canonical_name": "Airbus AS532 Cougar",
+      "aliases": [
+        "AS532",
+        "AS532 Cougar",
+        "Cougar",
+        "Airbus AS532",
+        "Airbus AS532 Cougar-like"
+      ],
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "UTILITY_TRANSPORT",
+        "operational_class": "UTILITY_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_UH1_HUEY",
+      "canonical_name": "Bell UH-1 Huey",
+      "aliases": [
+        "UH-1",
+        "UH1",
+        "Huey",
+        "Bell UH-1",
+        "Bell UH-1 Huey-like"
+      ],
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "UTILITY_TRANSPORT",
+        "operational_class": "UTILITY_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AH1_SUPER_COBRA",
+      "canonical_name": "Bell AH-1 Super Cobra",
+      "aliases": [
+        "AH-1",
+        "AH1",
+        "Super Cobra",
+        "Bell AH-1",
+        "Bell AH-1 Super Cobra-like",
+        "AH-1 Super Cobra"
+      ],
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ATTACK",
+        "operational_class": "ATTACK_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_A10_THUNDERBOLT_II",
+      "canonical_name": "A-10 Thunderbolt II",
+      "aliases": [
+        "A-10",
+        "A10",
+        "Thunderbolt II",
+        "Warthog",
+        "A-10 Thunderbolt II-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_FA18EF_SUPER_HORNET",
+      "canonical_name": "F/A-18E/F Super Hornet",
+      "aliases": [
+        "F/A-18E/F",
+        "FA-18E/F",
+        "Super Hornet",
+        "F/A-18 Super Hornet",
+        "F/A-18E/F Super Hornet-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_J10",
+      "canonical_name": "Chengdu J-10",
+      "aliases": [
+        "J-10",
+        "J10",
+        "Chengdu J10",
+        "Chengdu J-10-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "CN",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_J20",
+      "canonical_name": "Chengdu J-20",
+      "aliases": [
+        "J-20",
+        "J20",
+        "Chengdu J20",
+        "Chengdu J-20-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "CN",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_JAS39_GRIPEN",
+      "canonical_name": "Saab JAS 39 Gripen",
+      "aliases": [
+        "JAS 39",
+        "JAS39",
+        "Gripen",
+        "Saab Gripen",
+        "Saab JAS 39 Gripen-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "SE",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_JF17_THUNDER",
+      "canonical_name": "JF-17 Thunder",
+      "aliases": [
+        "JF-17",
+        "JF17",
+        "Thunder",
+        "JF-17 Thunder-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_MIG35",
+      "canonical_name": "Mikoyan MiG-35",
+      "aliases": [
+        "MiG-35",
+        "MiG35",
+        "Mikoyan MiG-35-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_MIRAGE_2000",
+      "canonical_name": "Mirage 2000",
+      "aliases": [
+        "Mirage-2000",
+        "Mirage2000",
+        "Dassault Mirage 2000",
+        "Mirage 2000-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "FR",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_SU27",
+      "canonical_name": "Sukhoi Su-27 Flanker",
+      "aliases": [
+        "Su-27",
+        "Su27",
+        "Flanker",
+        "Sukhoi Su-27 Flanker-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_SU30",
+      "canonical_name": "Sukhoi Su-30",
+      "aliases": [
+        "Su-30",
+        "Su30",
+        "Sukhoi Su-30-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_TEJAS",
+      "canonical_name": "HAL Tejas",
+      "aliases": [
+        "Tejas",
+        "LCA Tejas",
+        "HAL LCA Tejas",
+        "HAL Tejas-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "IN",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_A330_243_MRTT",
+      "canonical_name": "Airbus A330-243 MRTT",
+      "aliases": [
+        "A330-243 MRTT",
+        "A330 MRTT",
+        "Airbus A330 MRTT",
+        "Airbus A330-243 MRTT-like"
+      ],
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_REFUELING",
+        "operational_class": "AERIAL_REFUELING_TANKER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AN124_RUSLAN",
+      "canonical_name": "Antonov An-124 Ruslan",
+      "aliases": [
+        "An-124",
+        "An124",
+        "Ruslan",
+        "Antonov An-124",
+        "Antonov An-124 Ruslan-like"
+      ],
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "MILITARY_TRANSPORT",
+        "operational_class": "STRATEGIC_AIRLIFTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "UA",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_C17_GLOBEMASTER_III",
+      "canonical_name": "C-17 Globemaster III",
+      "aliases": [
+        "C-17",
+        "C17",
+        "Globemaster III",
+        "Boeing C-17 Globemaster III",
+        "C-17 Globemaster III-like"
+      ],
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "MILITARY_TRANSPORT",
+        "operational_class": "STRATEGIC_AIRLIFTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_C295W",
+      "canonical_name": "Airbus C-295W",
+      "aliases": [
+        "C-295W",
+        "C295W",
+        "Airbus C295W",
+        "Airbus C-295W-like"
+      ],
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "MILITARY_TRANSPORT",
+        "operational_class": "TACTICAL_AIRLIFTER",
+        "traits": [
+          "MANNED",
+          "TURBOPROP_POWERED"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_P8A_POSEIDON",
+      "canonical_name": "Boeing P-8A Poseidon",
+      "aliases": [
+        "P-8A",
+        "P8A",
+        "P-8 Poseidon",
+        "Boeing P8A Poseidon",
+        "Boeing P-8A Poseidon-like",
+        "P-8A Poseidon"
+      ],
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "MARITIME_PATROL",
+        "operational_class": "MARITIME_PATROL_AIRCRAFT",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_V22_OSPREY",
+      "canonical_name": "Bell Boeing V-22 Osprey",
+      "aliases": [
+        "V-22",
+        "V22",
+        "Osprey",
+        "Bell V-22 Osprey",
+        "Bell Boeing V-22 Osprey-like"
+      ],
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "TILTROTOR_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "UTILITY_TRANSPORT",
+        "operational_class": "TILTROTOR_TRANSPORT",
+        "traits": [
+          "MANNED",
+          "VTOL_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AIRBUS_A321",
+      "canonical_name": "Airbus A321",
+      "aliases": [
+        "A321",
+        "Airbus A-321",
+        "A321 Family",
+        "Airbus A321-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "NARROWBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AIRBUS_A350",
+      "canonical_name": "Airbus A350",
+      "aliases": [
+        "A350",
+        "Airbus A-350",
+        "A350 XWB",
+        "Airbus A350-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "WIDEBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_AIRBUS_A380",
+      "canonical_name": "Airbus A380",
+      "aliases": [
+        "A380",
+        "Airbus A-380",
+        "A380 Superjumbo",
+        "Airbus A380-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "WIDEBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_ATR72",
+      "canonical_name": "ATR 72",
+      "aliases": [
+        "ATR-72",
+        "ATR72",
+        "ATR 72 Turboprop",
+        "ATR 72-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "REGIONAL_AIRLINER",
+        "traits": [
+          "MANNED",
+          "TURBOPROP_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BOEING_787",
+      "canonical_name": "Boeing 787 Dreamliner",
+      "aliases": [
+        "B787",
+        "Boeing-787",
+        "787 Dreamliner",
+        "Boeing 787",
+        "Boeing 787 Dreamliner-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "WIDEBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_CESSNA_172",
+      "canonical_name": "Cessna 172 Skyhawk",
+      "aliases": [
+        "Cessna 172",
+        "C172",
+        "172 Skyhawk",
+        "Skyhawk",
+        "Cessna 172 Skyhawk-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "GENERAL_AVIATION",
+        "operational_class": "LIGHT_GENERAL_AVIATION_AIRCRAFT",
+        "traits": [
+          "MANNED",
+          "PISTON_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_PIPER_PA28",
+      "canonical_name": "Piper PA-28 Cherokee",
+      "aliases": [
+        "Piper PA-28",
+        "PA-28",
+        "PA28",
+        "Piper Cherokee",
+        "Piper PA-28 Cherokee-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "GENERAL_AVIATION",
+        "operational_class": "LIGHT_GENERAL_AVIATION_AIRCRAFT",
+        "traits": [
+          "MANNED",
+          "PISTON_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_DJI_AIR_SERIES",
+      "canonical_name": "DJI Air Serisi",
+      "aliases": [
+        "DJI Air",
+        "DJI Air Series",
+        "DJI Air Serisi-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "OBSERVATION",
+        "operational_class": "COMMERCIAL_MULTIROTOR_UAS",
+        "traits": [
+          "UNMANNED",
+          "ELECTRIC_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_DJI_MATRICE_300",
+      "canonical_name": "DJI Matrice 300",
+      "aliases": [
+        "Matrice 300",
+        "DJI M300",
+        "M300 RTK",
+        "DJI Matrice 300-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "OBSERVATION",
+        "operational_class": "COMMERCIAL_MULTIROTOR_UAS",
+        "traits": [
+          "UNMANNED",
+          "ELECTRIC_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_DJI_MATRICE_350",
+      "canonical_name": "DJI Matrice 350",
+      "aliases": [
+        "Matrice 350",
+        "DJI M350",
+        "M350 RTK",
+        "DJI Matrice 350-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "OBSERVATION",
+        "operational_class": "COMMERCIAL_MULTIROTOR_UAS",
+        "traits": [
+          "UNMANNED",
+          "ELECTRIC_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_DJI_MAVIC_2",
+      "canonical_name": "DJI Mavic 2",
+      "aliases": [
+        "Mavic 2",
+        "DJI Mavic 2 Pro",
+        "DJI Mavic 2 Zoom",
+        "DJI Mavic 2-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "OBSERVATION",
+        "operational_class": "COMMERCIAL_MULTIROTOR_UAS",
+        "traits": [
+          "UNMANNED",
+          "ELECTRIC_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_DJI_MAVIC_3",
+      "canonical_name": "DJI Mavic 3",
+      "aliases": [
+        "Mavic 3",
+        "DJI Mavic 3 Pro",
+        "DJI Mavic 3 Enterprise",
+        "DJI Mavic 3-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "OBSERVATION",
+        "operational_class": "COMMERCIAL_MULTIROTOR_UAS",
+        "traits": [
+          "UNMANNED",
+          "ELECTRIC_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_DJI_MINI_SERIES",
+      "canonical_name": "DJI Mini Serisi",
+      "aliases": [
+        "DJI Mini",
+        "DJI Mini Series",
+        "DJI Mini Serisi-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "GENERAL_PURPOSE",
+        "operational_class": "COMMERCIAL_MULTIROTOR_UAS",
+        "traits": [
+          "UNMANNED",
+          "ELECTRIC_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_DJI_PHANTOM_SERIES",
+      "canonical_name": "DJI Phantom Serisi",
+      "aliases": [
+        "DJI Phantom",
+        "DJI Phantom Series",
+        "Phantom Serisi",
+        "DJI Phantom Serisi-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "MULTIROTOR_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "OBSERVATION",
+        "operational_class": "COMMERCIAL_MULTIROTOR_UAS",
+        "traits": [
+          "UNMANNED",
+          "ELECTRIC_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_HAROP",
+      "canonical_name": "IAI Harop",
+      "aliases": [
+        "Harop",
+        "IAI Harop UAV",
+        "Harop Loitering Munition",
+        "IAI Harop-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "LOITERING_MUNITION",
+        "operational_class": "LOITERING_MUNITION",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "ONE_WAY_ATTACK"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_SHAHED136_GERAN2",
+      "canonical_name": "Shahed-136 / Geran-2",
+      "aliases": [
+        "Shahed-136",
+        "Shahed 136",
+        "Geran-2",
+        "Geran 2",
+        "Shahed-136 Geran-2",
+        "Shahed-136 / Geran-2-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ONE_WAY_ATTACK",
+        "operational_class": "LOITERING_MUNITION",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "ONE_WAY_ATTACK"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": null,
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_CH4",
+      "canonical_name": "CASC CH-4",
+      "aliases": [
+        "CH-4",
+        "CH4",
+        "CASC CH4",
+        "CASC CH-4-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "MALE_UCAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "CN",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_FORPOST_R",
+      "canonical_name": "Forpost-R",
+      "aliases": [
+        "Forpost R",
+        "ForpostR",
+        "Forpost-R UAS",
+        "Forpost-R-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "MALE_UCAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_HERMES_450",
+      "canonical_name": "Elbit Hermes 450",
+      "aliases": [
+        "Hermes 450",
+        "Hermes-450",
+        "Elbit Hermes-450",
+        "Elbit Hermes 450-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR",
+        "operational_class": "MALE_UAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "IL",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_HERMES_900",
+      "canonical_name": "Elbit Hermes 900",
+      "aliases": [
+        "Hermes 900",
+        "Hermes-900",
+        "Elbit Hermes-900",
+        "Elbit Hermes 900-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR",
+        "operational_class": "MALE_UAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "IL",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_HERON_TP",
+      "canonical_name": "IAI Heron TP",
+      "aliases": [
+        "Heron TP",
+        "Heron-TP",
+        "IAI Heron-TP",
+        "IAI Heron TP-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR",
+        "operational_class": "MALE_UAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "IL",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_MQ1_PREDATOR",
+      "canonical_name": "MQ-1 Predator",
+      "aliases": [
+        "MQ-1",
+        "MQ1",
+        "Predator",
+        "General Atomics MQ-1 Predator",
+        "MQ-1 Predator-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "MALE_UCAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_MQ9B_SKYGUARDIAN",
+      "canonical_name": "MQ-9B SkyGuardian",
+      "aliases": [
+        "MQ-9B",
+        "MQ9B",
+        "SkyGuardian",
+        "General Atomics MQ-9B SkyGuardian",
+        "MQ-9B SkyGuardian-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR",
+        "operational_class": "MALE_UAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_ORION_UAV",
+      "canonical_name": "Kronstadt Orion İHA",
+      "aliases": [
+        "Orion UAV",
+        "Orion İHA",
+        "Kronstadt Orion",
+        "Orion-RU",
+        "Kronstadt Orion İHA-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "MALE_UCAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_RQ170_SENTINEL",
+      "canonical_name": "RQ-170 Sentinel",
+      "aliases": [
+        "RQ-170",
+        "RQ170",
+        "Sentinel UAV",
+        "Lockheed Martin RQ-170 Sentinel",
+        "RQ-170 Sentinel-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "RECONNAISSANCE",
+        "operational_class": "STEALTH_RECONNAISSANCE_UAS",
+        "traits": [
+          "UNMANNED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_RQ4_GLOBAL_HAWK",
+      "canonical_name": "RQ-4 Global Hawk",
+      "aliases": [
+        "RQ-4",
+        "RQ4",
+        "Global Hawk",
+        "Northrop Grumman RQ-4 Global Hawk",
+        "RQ-4 Global Hawk-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "STRATEGIC_RECONNAISSANCE",
+        "operational_class": "HALE_UAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_WING_LOONG_I",
+      "canonical_name": "Wing Loong I",
+      "aliases": [
+        "Wing Loong 1",
+        "Wing Loong-I",
+        "Chengdu Wing Loong I",
+        "Wing Loong I-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "MALE_UCAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "CN",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_WING_LOONG_II",
+      "canonical_name": "Wing Loong II",
+      "aliases": [
+        "Wing Loong 2",
+        "Wing Loong-II",
+        "Chengdu Wing Loong II",
+        "Wing Loong II-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "MALE_UCAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "CN",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_WZ7_SOARING_DRAGON",
+      "canonical_name": "WZ-7 Soaring Dragon",
+      "aliases": [
+        "WZ-7",
+        "WZ7",
+        "Soaring Dragon",
+        "Guizhou WZ-7 Soaring Dragon",
+        "WZ-7 Soaring Dragon-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "STRATEGIC_RECONNAISSANCE",
+        "operational_class": "HALE_UAS",
+        "traits": [
+          "UNMANNED",
+          "LONG_ENDURANCE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "CN",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_B2_SPIRIT",
+      "canonical_name": "Northrop Grumman B-2 Spirit",
+      "aliases": [
+        "B-2 Spirit",
+        "B-2",
+        "B2 Spirit",
+        "B2",
+        "Northrop B-2 Spirit",
+        "Northrop Grumman B-2 Spirit-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "STRATEGIC_STRIKE",
+        "operational_class": "STRATEGIC_BOMBER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE",
+          "LONG_RANGE_STRIKE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_B52_STRATOFORTRESS",
+      "canonical_name": "Boeing B-52 Stratofortress",
+      "aliases": [
+        "B-52 Stratofortress",
+        "B-52",
+        "B52",
+        "Stratofortress",
+        "Boeing B52 Stratofortress",
+        "Boeing B-52 Stratofortress-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "STRATEGIC_STRIKE",
+        "operational_class": "STRATEGIC_BOMBER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LONG_RANGE_STRIKE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_KA52_ALLIGATOR",
+      "canonical_name": "Kamov Ka-52 Alligator",
+      "aliases": [
+        "Ka-52",
+        "Ka52",
+        "Alligator Helicopter",
+        "Kamov Ka52 Alligator",
+        "Kamov Ka-52 Alligator-like"
+      ],
+      "category": "HELICOPTER",
+      "taxonomy": {
+        "base_category": "ROTARY_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ATTACK",
+        "operational_class": "ATTACK_HELICOPTER",
+        "traits": [
+          "MANNED",
+          "ROTARY_WING",
+          "ARMED_CAPABLE"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "RU",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_ANTONOV_AN225",
+      "canonical_name": "Antonov An-225 Mriya",
+      "aliases": [
+        "An-225",
+        "An225",
+        "Mriya",
+        "Antonov An-225",
+        "Antonov An-225 Mriya-like"
+      ],
+      "category": "TRANSPORT_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "DUAL_USE",
+        "primary_role": "STRATEGIC_AIRLIFT",
+        "operational_class": "SUPER_HEAVY_TRANSPORT_AIRCRAFT",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "UA",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F4E_PHANTOM_II",
+      "canonical_name": "F-4E Phantom II",
+      "aliases": [
+        "Phantom II",
+        "F-4E Phantom II-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIGHTER_BOMBER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_F5E_TIGER_II",
+      "canonical_name": "F-5E Tiger II",
+      "aliases": [
+        "F-5E Tiger 2",
+        "F-5E Tiger 2 Swiss Air Force",
+        "Tiger II",
+        "F-5E",
+        "F-5E Tiger II-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "LIGHT_FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "VARIANT",
+        "variant_policy": "EXACT_IDENTITY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_GULFSTREAM_BUSINESS_JET",
+      "canonical_name": "İş Jeti (Gulfstream)",
+      "aliases": [
+        "Gulfstream",
+        "İş Jeti",
+        "Business Jet",
+        "Gulfstream Jet",
+        "İş Jeti (Gulfstream)-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "EXECUTIVE_TRANSPORT",
+        "operational_class": "BUSINESS_JET",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "GENERIC_CLASS",
+        "variant_policy": "GENERIC_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_KAAN",
+      "canonical_name": "Kaan",
+      "aliases": [
+        "TF-X",
+        "KAAN TF-X",
+        "TAI Kaan",
+        "Kaan-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "FIFTH_GENERATION_FIGHTER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {
+        "LIVE_DEMO_CONTEXT": "EXPECTED"
+      },
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BAYRAKTAR_KIZILELMA",
+      "canonical_name": "Bayraktar Kızılelma",
+      "aliases": [
+        "Kızılelma",
+        "Bayraktar KIZILELMA",
+        "MIUS",
+        "Bayraktar Kızılelma-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "AIR_COMBAT",
+        "operational_class": "COMBAT_UAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "JET_POWERED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_TUSAS_HURJET",
+      "canonical_name": "TUSAŞ HÜRJET",
+      "aliases": [
+        "Hürjet",
+        "TUSAŞ HÜRJET-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "TRAINING",
+        "operational_class": "ADVANCED_JET_TRAINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_TUSAS_ANKA3",
+      "canonical_name": "TUSAŞ ANKA-III",
+      "aliases": [
+        "ANKA-3",
+        "ANKA 3",
+        "Tusaş ANKA 3",
+        "TUSAŞ ANKA-III-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "STEALTH_UAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BAYRAKTAR_DIHA",
+      "canonical_name": "Bayraktar DİHA",
+      "aliases": [
+        "DİHA",
+        "Bayraktar Kalkan DİHA",
+        "Bayraktar DİHA-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "TILTROTOR_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "ISR_STRIKE",
+        "operational_class": "VTOL_TACTICAL_UAS",
+        "traits": [
+          "UNMANNED",
+          "ARMED_CAPABLE",
+          "VTOL"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "DOMESTIC_ORIGIN",
+      "manufacturer_country_code": "TR",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_NEURON_UCAV",
+      "canonical_name": "Dassault nEUROn",
+      "aliases": [
+        "nEUROn",
+        "nEUROn UCAV",
+        "Dassault nEUROn-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "STRIKE_DEMONSTRATOR",
+        "operational_class": "COMBAT_UAS_DEMONSTRATOR",
+        "traits": [
+          "UNMANNED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "MULTINATIONAL_ORIGIN",
+      "manufacturer_country_code": "FR",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_TARANIS_UCAV",
+      "canonical_name": "BAE Systems Taranis",
+      "aliases": [
+        "Taranis",
+        "Taranis UCAV",
+        "BAE Systems Taranis-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "STRIKE_DEMONSTRATOR",
+        "operational_class": "COMBAT_UAS_DEMONSTRATOR",
+        "traits": [
+          "UNMANNED",
+          "LOW_OBSERVABLE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "GB",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_WZ8",
+      "canonical_name": "WZ-8",
+      "aliases": [
+        "WZ8",
+        "Wuzhen-8",
+        "WZ-8-like"
+      ],
+      "category": "UAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "RECONNAISSANCE",
+        "operational_class": "SUPERSONIC_RECON_UAS",
+        "traits": [
+          "UNMANNED"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "CN",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_X47B",
+      "canonical_name": "Northrop Grumman X-47B",
+      "aliases": [
+        "X-47B",
+        "X47B",
+        "Northrop Grumman X-47B-like"
+      ],
+      "category": "UCAV",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "STRIKE_DEMONSTRATOR",
+        "operational_class": "COMBAT_UAS_DEMONSTRATOR",
+        "traits": [
+          "UNMANNED",
+          "LOW_OBSERVABLE",
+          "CARRIER_CAPABLE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_B21_RAIDER",
+      "canonical_name": "B-21 Raider",
+      "aliases": [
+        "B-21",
+        "B21",
+        "Northrop Grumman B-21 Raider",
+        "B-21 Raider-like"
+      ],
+      "category": "FIGHTER_JET",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "MILITARY",
+        "primary_role": "STRATEGIC_STRIKE",
+        "operational_class": "STRATEGIC_BOMBER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED",
+          "LOW_OBSERVABLE",
+          "LONG_RANGE_STRIKE"
+        ],
+        "identity_scope": "MODEL",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    }
+  ]
+}

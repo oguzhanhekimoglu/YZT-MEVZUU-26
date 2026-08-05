@@ -1,0 +1,102 @@
+{
+  "additionalProperties": false,
+  "description": "Validate the only supported raw upstream VLM payload version.",
+  "properties": {
+    "schema_version": {
+      "const": "upstream-vlm/1.0",
+      "default": "upstream-vlm/1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "arac_sinifi": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Arac Sinifi",
+      "type": "string"
+    },
+    "tehdit_seviyesi": {
+      "anyOf": [
+        {
+          "maxLength": 50,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tehdit Seviyesi"
+    },
+    "tahmini_hedef_tipi": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tahmini Hedef Tipi"
+    },
+    "ulke_orjini": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ulke Orjini"
+    },
+    "hedef_modeli": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Hedef Modeli"
+    },
+    "gidis_yeri": {
+      "anyOf": [
+        {
+          "maxLength": 250,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Gidis Yeri"
+    },
+    "gorsel_analiz": {
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Gorsel Analiz",
+      "type": "string"
+    },
+    "guven_skoru": {
+      "maximum": 100,
+      "minimum": 0,
+      "title": "Guven Skoru",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "arac_sinifi",
+    "gorsel_analiz",
+    "guven_skoru"
+  ],
+  "title": "UpstreamVLMOutput",
+  "type": "object"
+}

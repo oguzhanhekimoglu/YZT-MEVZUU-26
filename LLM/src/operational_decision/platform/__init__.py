@@ -1,0 +1,1 @@
+"""Exact-match platform registry."""

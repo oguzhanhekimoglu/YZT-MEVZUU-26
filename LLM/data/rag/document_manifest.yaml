@@ -1,0 +1,144 @@
+documents:
+  - document_id: LT_GEN_1_2
+    filename: LT_GEN_1_2_en.pdf
+    authority: DHMI_AIP
+    document_type: AIP_GEN
+    language: en
+    topics: [flight_permission, permission_application, flight_plan_permission_distinction, permission_validity]
+    source_priority: 100
+    authoritative: true
+    runtime_rag: true
+    role: RUNTIME_RAG
+    revision_date: 2026-04-30
+    effective_date: 2026-06-11
+    sha256: bb0b27e09921709a176a43cf362ae1b8777d5e4a811f3109399a383c9b95629c
+
+  - document_id: SHT_IHA_REV_05
+    filename: SHT-IHA_Rev-05.pdf
+    official_runtime_label: Rev-05
+    internal_change_number: "04"
+    internal_change_date: 2020-07-12
+    official_source_verified: true
+    authority: SHGM
+    document_type: INSTRUCTION
+    language: tr
+    topics: [civil_uav, uav_permission, uav_airspace, uav_risk]
+    source_priority: 95
+    authoritative: true
+    runtime_rag: true
+    role: RUNTIME_RAG
+    revision_date: 2020-07-12
+    effective_date: null
+    sha256: ff67a769b94cee9be4ea552820428f84ba173376b42f97f2c1573a27c2586bf9
+
+  - document_id: LT_GEN_3_1
+    filename: LT_GEN_3_1_en.pdf
+    authority: DHMI_AIP
+    document_type: AIP_GEN
+    language: en
+    topics: [aeronautical_information_service, notam, notam_series, preflight_information]
+    source_priority: 100
+    authoritative: true
+    runtime_rag: true
+    role: RUNTIME_RAG
+    revision_date: 2025-09-29
+    effective_date: 2025-11-27
+    sha256: e9f9cec5a1f29b318a4e2ecb3d6021adc44fd06b42efa62653230e1e68f51471
+
+  - document_id: LT_ENR_1_10
+    filename: LT_ENR_1_10_en.pdf
+    authority: DHMI_AIP
+    document_type: AIP_ENR
+    language: en
+    topics: [flight_planning, flight_plan_submission, flight_plan_fields]
+    source_priority: 100
+    authoritative: true
+    runtime_rag: true
+    role: RUNTIME_RAG
+    revision_date: 2025-07-22
+    effective_date: 2025-09-04
+    sha256: 7602a2872dff037222dc7dfe7840d2c314fb34d16083bb96b56729e58e24d419
+
+  - document_id: LT_GEN_3_3
+    filename: LT_GEN_3_3_en.pdf
+    authority: DHMI_AIP
+    document_type: AIP_GEN
+    language: en
+    topics: [air_traffic_services, responsible_authority, service_scope]
+    source_priority: 100
+    authoritative: true
+    runtime_rag: true
+    role: RUNTIME_RAG
+    revision_date: 2026-03-02
+    effective_date: 2026-04-16
+    sha256: b879de9a2d3b6cc4201c9b81127b4ea58b7efb67c1335ef1afd13e471b08969e
+
+  - document_id: LT_GEN_1_6
+    filename: LT_GEN_1_6_en.pdf
+    authority: DHMI_AIP
+    document_type: AIP_GEN
+    language: en
+    topics: [national_regulations, international_agreements]
+    source_priority: 100
+    authoritative: true
+    runtime_rag: true
+    role: RUNTIME_RAG
+    revision_date: 2024-09-16
+    effective_date: 2024-07-11
+    sha256: a58c1357eaa72ab18cfc90b4ff47567c34a0f1401266c6e10dbef3aca26a8ba5
+
+  - document_id: LT_ENR_5_1
+    filename: LT_ENR_5_1_en.pdf
+    authority: DHMI_AIP
+    document_type: AIP_ENR
+    language: en
+    topics: [prohibited_areas, restricted_areas, danger_areas, notam_domain_model]
+    source_priority: 100
+    authoritative: true
+    runtime_rag: false
+    role: REFERENCE_ONLY
+    revision_date: 2025-11-12
+    effective_date: 2025-12-25
+    sha256: db13ad4f8f4f2d27a3579b886ee32c782b2711b3840846e70d26cc649cccd2e9
+
+  - document_id: LT_ENR_5_3
+    filename: LT_ENR_5_3_en.pdf
+    authority: DHMI_AIP
+    document_type: AIP_ENR
+    language: en
+    topics: [hazardous_activities, operational_area, notam_activation, notam_domain_model]
+    source_priority: 100
+    authoritative: true
+    runtime_rag: false
+    role: REFERENCE_ONLY
+    revision_date: 2025-02-19
+    effective_date: 2025-04-17
+    sha256: 2e8c094dd7a4d60c764ecc3165a4183a00992649003527bcf8099c6e0e575919
+
+  - document_id: UCUS_IZINLERINE_ILISKIN_EL_KITABI
+    filename: ucus_izinlerine_iliskin_el_kitabi.pdf
+    authority: SHGM
+    document_type: HANDBOOK
+    language: tr
+    topics: [flight_permission_background, permission_process, aeronautical_information_background]
+    source_priority: 60
+    authoritative: false
+    runtime_rag: false
+    role: REFERENCE_ONLY
+    revision_date: 2018-08-11
+    effective_date: null
+    sha256: 4d8dd2da7b84ce4a45af7fb8c7a5145330d91a45b673640ee1593086f3b4ce03
+
+  - document_id: UCUS_IZNI_TALEP_FORMU
+    filename: ucus_izni_talep_formu.docx
+    authority: SHGM
+    document_type: FORM_TEMPLATE
+    language: tr
+    topics: [permission_application_fields, operational_area_fields, aircraft_and_operator_fields]
+    source_priority: 70
+    authoritative: false
+    runtime_rag: false
+    role: REFERENCE_ONLY
+    revision_date: 2014-02-14
+    effective_date: null
+    sha256: 74eac891e63cf4e0d8f2819e7100f9eefc0f3c1362e58af36292069aef1072a7

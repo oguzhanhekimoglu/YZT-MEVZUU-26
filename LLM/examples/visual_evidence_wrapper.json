@@ -1,0 +1,48 @@
+{
+  "schema_version": "visual-evidence/1.1",
+  "evidence_source_mode": "VLM_ONLY",
+  "track_id": "TRK_001",
+  "visual_class": "FIGHTER_JET",
+  "final_visual_hypothesis": "F-16-like",
+  "candidate_matches": [],
+  "visual_evidence_status": "PARTIALLY_SUPPORTED",
+  "visual_confidence": 0.85,
+  "confidence_origin": "VLM_SELF_REPORTED",
+  "uncertainty_level": "MEDIUM",
+  "uncertainty_flags": ["VLM_ONLY_NO_RETRIEVAL_CONFIRMATION"],
+  "human_visual_review_required": true,
+  "track_metrics": {
+    "track_duration_seconds": 7.4,
+    "track_stability": 0.84,
+    "detection_count": 26,
+    "average_detection_confidence": 0.76
+  },
+  "crop_evidence_summary": {
+    "selected_crop_count": 3,
+    "selected_crop_refs": ["TRK_001_CROP_01", "TRK_001_CROP_02", "TRK_001_CROP_03"],
+    "crop_quality_scores": [0.81, 0.76, 0.73],
+    "average_crop_quality": 0.767,
+    "view_diversity_score": 0.68
+  },
+  "timing": {
+    "first_seen_offset_seconds": 8.2,
+    "last_seen_offset_seconds": 15.6
+  },
+  "upstream_vlm_output": {
+    "schema_version": "upstream-vlm/1.0",
+    "arac_sinifi": "SAVAS_UCAGI",
+    "tehdit_seviyesi": "YUKSEK",
+    "tahmini_hedef_tipi": "MUHARIP_JET",
+    "ulke_orjini": "ABD",
+    "hedef_modeli": "F-16",
+    "gidis_yeri": null,
+    "gorsel_analiz": "Görüntüde F-16 benzeri bir muharip jet görülmektedir.",
+    "guven_skoru": 85
+  },
+  "producer_metadata": {
+    "visual_pipeline_version": "temporary-contract/1.1",
+    "vlm_model": "UPSTREAM_PROVIDED",
+    "retrieval_model": null,
+    "created_at_utc": "2026-08-10T11:20:08Z"
+  }
+}

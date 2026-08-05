@@ -1,0 +1,262 @@
+"""Canonical enums and strict contract foundations."""
+
+from enum import StrEnum
+
+from pydantic import BaseModel, ConfigDict
+
+
+class StrictContract(BaseModel):
+    """Base for external contracts that reject coercion and unknown fields."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+
+class VisualClass(StrEnum):
+    """Canonical visual target classes."""
+
+    FIGHTER_JET = "FIGHTER_JET"
+    UAV = "UAV"
+    UCAV = "UCAV"
+    HELICOPTER = "HELICOPTER"
+    TRANSPORT_AIRCRAFT = "TRANSPORT_AIRCRAFT"
+    CIVILIAN_AIRCRAFT = "CIVILIAN_AIRCRAFT"
+    MICRO_DRONE = "MICRO_DRONE"
+    UNKNOWN_AIRCRAFT = "UNKNOWN_AIRCRAFT"
+    NON_AIRCRAFT = "NON_AIRCRAFT"
+
+
+class VisualEvidenceStatus(StrEnum):
+    """Support level of canonical visual evidence."""
+
+    SUPPORTED = "SUPPORTED"
+    PARTIALLY_SUPPORTED = "PARTIALLY_SUPPORTED"
+    WEAK = "WEAK"
+    CONFLICTING = "CONFLICTING"
+    INSUFFICIENT = "INSUFFICIENT"
+
+
+class UncertaintyLevel(StrEnum):
+    """Canonical visual uncertainty levels."""
+
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+
+
+class EvidenceSourceMode(StrEnum):
+    """Upstream evidence composition modes."""
+
+    VLM_ONLY = "VLM_ONLY"
+    VLM_PLUS_RETRIEVAL = "VLM_PLUS_RETRIEVAL"
+    FUSED = "FUSED"
+
+
+class ConfidenceOrigin(StrEnum):
+    """Origin of a canonical visual confidence score."""
+
+    VLM_SELF_REPORTED = "VLM_SELF_REPORTED"
+    UPSTREAM_RETRIEVAL = "UPSTREAM_RETRIEVAL"
+    UPSTREAM_FUSION = "UPSTREAM_FUSION"
+    CALIBRATED_UPSTREAM = "CALIBRATED_UPSTREAM"
+
+
+class ContextStatus(StrEnum):
+    """Operational context resolution states."""
+
+    COMPLETE = "COMPLETE"
+    PARTIAL = "PARTIAL"
+    MISSING = "MISSING"
+    INVALID = "INVALID"
+    INACTIVE = "INACTIVE"
+
+
+class ToolExecutionStatus(StrEnum):
+    """Infrastructure execution states for controlled tools."""
+
+    SUCCESS = "SUCCESS"
+    INVALID_INPUT = "INVALID_INPUT"
+    TIMEOUT = "TIMEOUT"
+    ERROR = "ERROR"
+    SKIPPED = "SKIPPED"
+
+
+class PlatformStatus(StrEnum):
+    """Platform registry resolution states."""
+
+    EXPECTED = "EXPECTED"
+    NOT_EXPECTED = "NOT_EXPECTED"
+    UNKNOWN = "UNKNOWN"
+    AMBIGUOUS = "AMBIGUOUS"
+    NON_AIRCRAFT = "NON_AIRCRAFT"
+
+
+class InventoryStatus(StrEnum):
+    """Turkiye inventory scope resolution states."""
+
+    CONFIRMED = "CONFIRMED"
+    NOT_LISTED = "NOT_LISTED"
+    UNKNOWN = "UNKNOWN"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
+class OperationalConsistencyStatus(StrEnum):
+    """Deterministic operational consistency states."""
+
+    CONSISTENT = "CONSISTENT"
+    FLAGGED = "FLAGGED"
+    INDETERMINATE = "INDETERMINATE"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
+class OperationalConsistencyFlag(StrEnum):
+    """Controlled flags emitted by operational consistency checks."""
+
+    INVENTORY_SCOPE_CONFIRMED = "INVENTORY_SCOPE_CONFIRMED"
+    INVENTORY_NOT_LISTED = "INVENTORY_NOT_LISTED"
+    INVENTORY_CHECK_UNAVAILABLE = "INVENTORY_CHECK_UNAVAILABLE"
+    DOWNSTREAM_CHECKS_SKIPPED_INVENTORY_NOT_CONFIRMED = (
+        "DOWNSTREAM_CHECKS_SKIPPED_INVENTORY_NOT_CONFIRMED"
+    )
+    VISUAL_AFFILIATION_INVENTORY_MISMATCH = "VISUAL_AFFILIATION_INVENTORY_MISMATCH"
+    PLATFORM_NOT_EXPECTED_IN_CONTEXT = "PLATFORM_NOT_EXPECTED_IN_CONTEXT"
+    PLATFORM_CONTEXT_MISMATCH = "PLATFORM_CONTEXT_MISMATCH"
+    FLIGHT_PLAN_WITHOUT_VALID_PERMISSION = "FLIGHT_PLAN_WITHOUT_VALID_PERMISSION"
+    INVALID_PERMISSION_WITH_FILED_PLAN = "INVALID_PERMISSION_WITH_FILED_PLAN"
+    VALID_PERMISSION_WITH_INVALID_FLIGHT_PLAN = "VALID_PERMISSION_WITH_INVALID_FLIGHT_PLAN"
+    NOTAM_CONFLICTS_WITH_PERMISSION = "NOTAM_CONFLICTS_WITH_PERMISSION"
+    NOTAM_RESTRICTS_OPERATION = "NOTAM_RESTRICTS_OPERATION"
+    NOTAM_PROHIBITS_OPERATION = "NOTAM_PROHIBITS_OPERATION"
+    REQUIRED_OPERATIONAL_CHECK_UNAVAILABLE = "REQUIRED_OPERATIONAL_CHECK_UNAVAILABLE"
+    CONTEXT_UNAVAILABLE = "CONTEXT_UNAVAILABLE"
+
+
+class PermissionStatus(StrEnum):
+    """Flight permission domain states."""
+
+    VALID = "VALID"
+    NOT_FOUND = "NOT_FOUND"
+    EXPIRED = "EXPIRED"
+    NOT_YET_VALID = "NOT_YET_VALID"
+    REVOKED = "REVOKED"
+    AMBIGUOUS = "AMBIGUOUS"
+    CONFLICTING = "CONFLICTING"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
+class FlightPlanStatus(StrEnum):
+    """Flight-plan domain states."""
+
+    FILED = "FILED"
+    NOT_FOUND = "NOT_FOUND"
+    EXPIRED = "EXPIRED"
+    NOT_YET_ACTIVE = "NOT_YET_ACTIVE"
+    CANCELLED = "CANCELLED"
+    AMBIGUOUS = "AMBIGUOUS"
+    CONFLICTING = "CONFLICTING"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
+class RecordConsistency(StrEnum):
+    """Consistency between permission and flight-plan records."""
+
+    CONSISTENT = "CONSISTENT"
+    PARTIAL = "PARTIAL"
+    CONFLICTING = "CONFLICTING"
+    UNKNOWN = "UNKNOWN"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
+class NotamStatus(StrEnum):
+    """NOTAM domain states."""
+
+    ACTIVE_RELEVANT = "ACTIVE_RELEVANT"
+    ACTIVE_NOT_RELEVANT = "ACTIVE_NOT_RELEVANT"
+    NONE_ACTIVE = "NONE_ACTIVE"
+    EXPIRED_ONLY = "EXPIRED_ONLY"
+    NOT_YET_ACTIVE = "NOT_YET_ACTIVE"
+    AMBIGUOUS = "AMBIGUOUS"
+    CONFLICTING = "CONFLICTING"
+
+
+class NotamOperationEffect(StrEnum):
+    """Controlled operational effects declared by NOTAM records."""
+
+    NO_EFFECT = "NO_EFFECT"
+    INFORMATIONAL = "INFORMATIONAL"
+    REQUIRES_ADDITIONAL_CHECK = "REQUIRES_ADDITIONAL_CHECK"
+    RESTRICTS_OPERATION = "RESTRICTS_OPERATION"
+    PROHIBITS_OPERATION = "PROHIBITS_OPERATION"
+    CONFLICTS_WITH_PERMISSION = "CONFLICTS_WITH_PERMISSION"
+    UNKNOWN = "UNKNOWN"
+
+
+class VerificationStatus(StrEnum):
+    """Deterministic operational verification states."""
+
+    VERIFIED = "VERIFIED"
+    PARTIALLY_VERIFIED = "PARTIALLY_VERIFIED"
+    UNVERIFIED = "UNVERIFIED"
+    INDETERMINATE = "INDETERMINATE"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
+class ToolHealthStatus(StrEnum):
+    """Aggregated health states of required tools."""
+
+    HEALTHY = "HEALTHY"
+    DEGRADED = "DEGRADED"
+    FAILED = "FAILED"
+
+
+class VlmOriginCategory(StrEnum):
+    """Normalized VLM-reported country-of-origin/affiliation hypothesis."""
+
+    TURKEY = "TURKEY"
+    UNKNOWN = "UNKNOWN"
+    FOREIGN = "FOREIGN"
+
+
+class RiskLevel(StrEnum):
+    """Deterministic operational risk levels."""
+
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
+    UNKNOWN = "UNKNOWN"
+
+
+class DecisionCode(StrEnum):
+    """Controlled final decision codes."""
+
+    AUTHORIZED_OPERATIONAL_MATCH = "AUTHORIZED_OPERATIONAL_MATCH"
+    PARTIALLY_VERIFIED_OPERATION = "PARTIALLY_VERIFIED_OPERATION"
+    UNVERIFIED_AIRCRAFT = "UNVERIFIED_AIRCRAFT"
+    OPERATIONAL_AUTHORIZATION_UNVERIFIED = "OPERATIONAL_AUTHORIZATION_UNVERIFIED"
+    UNREGISTERED_MILITARY_AIRCRAFT = "UNREGISTERED_MILITARY_AIRCRAFT"
+    UNEXPECTED_PLATFORM = "UNEXPECTED_PLATFORM"
+    EXPIRED_OR_INVALID_PERMISSION = "EXPIRED_OR_INVALID_PERMISSION"
+    ACTIVE_NOTAM_PROHIBITION = "ACTIVE_NOTAM_PROHIBITION"
+    CONFLICTING_OPERATIONAL_RECORDS = "CONFLICTING_OPERATIONAL_RECORDS"
+    PLATFORM_UNRESOLVED = "PLATFORM_UNRESOLVED"
+    NON_AIRCRAFT = "NON_AIRCRAFT"
+    INDETERMINATE = "INDETERMINATE"
+    REJECTED_OUT_OF_SCOPE = "REJECTED_OUT_OF_SCOPE"
+
+
+class EventStatus(StrEnum):
+    """Persisted event lifecycle states."""
+
+    CREATED = "CREATED"
+    INPUT_VALIDATED = "INPUT_VALIDATED"
+    CONTEXT_RESOLVED = "CONTEXT_RESOLVED"
+    WAITING_FOR_GPU_HANDOFF = "WAITING_FOR_GPU_HANDOFF"
+    TOOLS_RUNNING = "TOOLS_RUNNING"
+    TOOLS_COMPLETED = "TOOLS_COMPLETED"
+    VERIFICATION_COMPLETED = "VERIFICATION_COMPLETED"
+    RISK_ASSESSED = "RISK_ASSESSED"
+    RAG_COMPLETED = "RAG_COMPLETED"
+    LLM_COMPLETED = "LLM_COMPLETED"
+    FINALIZED = "FINALIZED"
+    FAILED = "FAILED"
+    REJECTED_INVALID_INPUT = "REJECTED_INVALID_INPUT"

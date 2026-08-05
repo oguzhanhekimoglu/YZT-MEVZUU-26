@@ -1,0 +1,2240 @@
+{
+  "aliases": [
+    {
+      "alias": "F-16 Fighting Falcon",
+      "platform_id": "PLT_F16"
+    },
+    {
+      "alias": "F-16",
+      "platform_id": "PLT_F16"
+    },
+    {
+      "alias": "F16",
+      "platform_id": "PLT_F16"
+    },
+    {
+      "alias": "F-16-like",
+      "platform_id": "PLT_F16"
+    },
+    {
+      "alias": "Boeing 747",
+      "platform_id": "PLT_BOEING_747"
+    },
+    {
+      "alias": "B747",
+      "platform_id": "PLT_BOEING_747"
+    },
+    {
+      "alias": "Boeing-747",
+      "platform_id": "PLT_BOEING_747"
+    },
+    {
+      "alias": "Boeing 747-like",
+      "platform_id": "PLT_BOEING_747"
+    },
+    {
+      "alias": "Bayraktar TB2",
+      "platform_id": "PLT_BAYRAKTAR_TB2"
+    },
+    {
+      "alias": "Bayraktar TB-2",
+      "platform_id": "PLT_BAYRAKTAR_TB2"
+    },
+    {
+      "alias": "TB2",
+      "platform_id": "PLT_BAYRAKTAR_TB2"
+    },
+    {
+      "alias": "TB-2",
+      "platform_id": "PLT_BAYRAKTAR_TB2"
+    },
+    {
+      "alias": "Bayraktar TB2-like",
+      "platform_id": "PLT_BAYRAKTAR_TB2"
+    },
+    {
+      "alias": "Bayraktar AKINCI",
+      "platform_id": "PLT_BAYRAKTAR_AKINCI"
+    },
+    {
+      "alias": "AKINCI",
+      "platform_id": "PLT_BAYRAKTAR_AKINCI"
+    },
+    {
+      "alias": "Bayraktar Akıncı",
+      "platform_id": "PLT_BAYRAKTAR_AKINCI"
+    },
+    {
+      "alias": "Akıncı",
+      "platform_id": "PLT_BAYRAKTAR_AKINCI"
+    },
+    {
+      "alias": "Bayraktar AKINCI-like",
+      "platform_id": "PLT_BAYRAKTAR_AKINCI"
+    },
+    {
+      "alias": "TUSAŞ ANKA",
+      "platform_id": "PLT_TUSAS_ANKA"
+    },
+    {
+      "alias": "TUSAS ANKA",
+      "platform_id": "PLT_TUSAS_ANKA"
+    },
+    {
+      "alias": "TUSAŞ ANKA-like",
+      "platform_id": "PLT_TUSAS_ANKA"
+    },
+    {
+      "alias": "F-35 Lightning II",
+      "platform_id": "PLT_F35_GENERIC"
+    },
+    {
+      "alias": "F-35",
+      "platform_id": "PLT_F35_GENERIC"
+    },
+    {
+      "alias": "F35",
+      "platform_id": "PLT_F35_GENERIC"
+    },
+    {
+      "alias": "F-35-like",
+      "platform_id": "PLT_F35_GENERIC"
+    },
+    {
+      "alias": "F-35A Lightning II",
+      "platform_id": "PLT_F35A"
+    },
+    {
+      "alias": "F-35A",
+      "platform_id": "PLT_F35A"
+    },
+    {
+      "alias": "F35A",
+      "platform_id": "PLT_F35A"
+    },
+    {
+      "alias": "F-35A-like",
+      "platform_id": "PLT_F35A"
+    },
+    {
+      "alias": "F-35B Lightning II",
+      "platform_id": "PLT_F35B"
+    },
+    {
+      "alias": "F-35B",
+      "platform_id": "PLT_F35B"
+    },
+    {
+      "alias": "F35B",
+      "platform_id": "PLT_F35B"
+    },
+    {
+      "alias": "F-35C Lightning II",
+      "platform_id": "PLT_F35C"
+    },
+    {
+      "alias": "F-35C",
+      "platform_id": "PLT_F35C"
+    },
+    {
+      "alias": "F35C",
+      "platform_id": "PLT_F35C"
+    },
+    {
+      "alias": "MQ-9 Reaper",
+      "platform_id": "PLT_MQ9_REAPER"
+    },
+    {
+      "alias": "MQ-9",
+      "platform_id": "PLT_MQ9_REAPER"
+    },
+    {
+      "alias": "MQ9",
+      "platform_id": "PLT_MQ9_REAPER"
+    },
+    {
+      "alias": "MQ-9 Reaper-like",
+      "platform_id": "PLT_MQ9_REAPER"
+    },
+    {
+      "alias": "T-129 ATAK",
+      "platform_id": "PLT_T129_ATAK"
+    },
+    {
+      "alias": "ATAK",
+      "platform_id": "PLT_T129_ATAK"
+    },
+    {
+      "alias": "T129 ATAK-like",
+      "platform_id": "PLT_T129_ATAK"
+    },
+    {
+      "alias": "T625 GÖKBEY",
+      "platform_id": "PLT_T625_GOKBEY"
+    },
+    {
+      "alias": "T-625 GÖKBEY",
+      "platform_id": "PLT_T625_GOKBEY"
+    },
+    {
+      "alias": "T625 Gokbey",
+      "platform_id": "PLT_T625_GOKBEY"
+    },
+    {
+      "alias": "GÖKBEY",
+      "platform_id": "PLT_T625_GOKBEY"
+    },
+    {
+      "alias": "Gokbey",
+      "platform_id": "PLT_T625_GOKBEY"
+    },
+    {
+      "alias": "T625 GÖKBEY-like",
+      "platform_id": "PLT_T625_GOKBEY"
+    },
+    {
+      "alias": "Airbus A400M Atlas",
+      "platform_id": "PLT_A400M"
+    },
+    {
+      "alias": "A400M",
+      "platform_id": "PLT_A400M"
+    },
+    {
+      "alias": "A400M Atlas",
+      "platform_id": "PLT_A400M"
+    },
+    {
+      "alias": "Airbus A400M",
+      "platform_id": "PLT_A400M"
+    },
+    {
+      "alias": "Airbus A400M Atlas-like",
+      "platform_id": "PLT_A400M"
+    },
+    {
+      "alias": "TUSAŞ HÜRKUŞ",
+      "platform_id": "PLT_HURKUS"
+    },
+    {
+      "alias": "HÜRKUŞ",
+      "platform_id": "PLT_HURKUS"
+    },
+    {
+      "alias": "HURKUS",
+      "platform_id": "PLT_HURKUS"
+    },
+    {
+      "alias": "TUSAS HURKUS",
+      "platform_id": "PLT_HURKUS"
+    },
+    {
+      "alias": "TUSAŞ HÜRKUŞ-like",
+      "platform_id": "PLT_HURKUS"
+    },
+    {
+      "alias": "C-130 Hercules",
+      "platform_id": "PLT_C130"
+    },
+    {
+      "alias": "C130",
+      "platform_id": "PLT_C130"
+    },
+    {
+      "alias": "C-130",
+      "platform_id": "PLT_C130"
+    },
+    {
+      "alias": "Hercules",
+      "platform_id": "PLT_C130"
+    },
+    {
+      "alias": "C-130 Hercules-like",
+      "platform_id": "PLT_C130"
+    },
+    {
+      "alias": "CASA CN-235",
+      "platform_id": "PLT_CN235"
+    },
+    {
+      "alias": "CN-235",
+      "platform_id": "PLT_CN235"
+    },
+    {
+      "alias": "CN235",
+      "platform_id": "PLT_CN235"
+    },
+    {
+      "alias": "CASA CN235",
+      "platform_id": "PLT_CN235"
+    },
+    {
+      "alias": "CASA CN-235-like",
+      "platform_id": "PLT_CN235"
+    },
+    {
+      "alias": "Boeing E-7",
+      "platform_id": "PLT_BOEING_E7"
+    },
+    {
+      "alias": "E-7",
+      "platform_id": "PLT_BOEING_E7"
+    },
+    {
+      "alias": "E7",
+      "platform_id": "PLT_BOEING_E7"
+    },
+    {
+      "alias": "Boeing E-7 Wedgetail",
+      "platform_id": "PLT_BOEING_E7"
+    },
+    {
+      "alias": "Boeing E-7-like",
+      "platform_id": "PLT_BOEING_E7"
+    },
+    {
+      "alias": "AKSUNGUR",
+      "platform_id": "PLT_TUSAS_AKSUNGUR"
+    },
+    {
+      "alias": "TUSAS AKSUNGUR",
+      "platform_id": "PLT_TUSAS_AKSUNGUR"
+    },
+    {
+      "alias": "TUSAŞ AKSUNGUR-like",
+      "platform_id": "PLT_TUSAS_AKSUNGUR"
+    },
+    {
+      "alias": "STM KARGU-like",
+      "platform_id": "PLT_STM_KARGU"
+    },
+    {
+      "alias": "STM TOGAN-like",
+      "platform_id": "PLT_STM_TOGAN"
+    },
+    {
+      "alias": "STM ALPAGU-like",
+      "platform_id": "PLT_STM_ALPAGU"
+    },
+    {
+      "alias": "F-4E 2020 Terminator",
+      "platform_id": "PLT_F4E_2020"
+    },
+    {
+      "alias": "F-4E 2020",
+      "platform_id": "PLT_F4E_2020"
+    },
+    {
+      "alias": "F-4E",
+      "platform_id": "PLT_F4E_2020"
+    },
+    {
+      "alias": "F4E",
+      "platform_id": "PLT_F4E_2020"
+    },
+    {
+      "alias": "F-4E Terminator",
+      "platform_id": "PLT_F4E_2020"
+    },
+    {
+      "alias": "F-4E 2020 Terminator-like",
+      "platform_id": "PLT_F4E_2020"
+    },
+    {
+      "alias": "Bayraktar TB3",
+      "platform_id": "PLT_BAYRAKTAR_TB3"
+    },
+    {
+      "alias": "TB3",
+      "platform_id": "PLT_BAYRAKTAR_TB3"
+    },
+    {
+      "alias": "TB-3",
+      "platform_id": "PLT_BAYRAKTAR_TB3"
+    },
+    {
+      "alias": "Bayraktar TB-3",
+      "platform_id": "PLT_BAYRAKTAR_TB3"
+    },
+    {
+      "alias": "Bayraktar TB3-like",
+      "platform_id": "PLT_BAYRAKTAR_TB3"
+    },
+    {
+      "alias": "TUSAŞ ŞİMŞEK",
+      "platform_id": "PLT_TUSAS_SIMSEK"
+    },
+    {
+      "alias": "ŞİMŞEK",
+      "platform_id": "PLT_TUSAS_SIMSEK"
+    },
+    {
+      "alias": "SIMSEK",
+      "platform_id": "PLT_TUSAS_SIMSEK"
+    },
+    {
+      "alias": "TUSAS SIMSEK",
+      "platform_id": "PLT_TUSAS_SIMSEK"
+    },
+    {
+      "alias": "TUSAŞ ŞİMŞEK-like",
+      "platform_id": "PLT_TUSAS_SIMSEK"
+    },
+    {
+      "alias": "TUSAŞ SÜPER ŞİMŞEK",
+      "platform_id": "PLT_TUSAS_SUPER_SIMSEK"
+    },
+    {
+      "alias": "SÜPER ŞİMŞEK",
+      "platform_id": "PLT_TUSAS_SUPER_SIMSEK"
+    },
+    {
+      "alias": "SUPER SIMSEK",
+      "platform_id": "PLT_TUSAS_SUPER_SIMSEK"
+    },
+    {
+      "alias": "TUSAS SUPER SIMSEK",
+      "platform_id": "PLT_TUSAS_SUPER_SIMSEK"
+    },
+    {
+      "alias": "TUSAŞ SÜPER ŞİMŞEK-like",
+      "platform_id": "PLT_TUSAS_SUPER_SIMSEK"
+    },
+    {
+      "alias": "Vestel KARAYEL-like",
+      "platform_id": "PLT_VESTEL_KARAYEL"
+    },
+    {
+      "alias": "Eurofighter Typhoon",
+      "platform_id": "PLT_EUROFIGHTER_TYPHOON"
+    },
+    {
+      "alias": "Eurofighter",
+      "platform_id": "PLT_EUROFIGHTER_TYPHOON"
+    },
+    {
+      "alias": "Typhoon",
+      "platform_id": "PLT_EUROFIGHTER_TYPHOON"
+    },
+    {
+      "alias": "EF-2000",
+      "platform_id": "PLT_EUROFIGHTER_TYPHOON"
+    },
+    {
+      "alias": "Eurofighter Typhoon-like",
+      "platform_id": "PLT_EUROFIGHTER_TYPHOON"
+    },
+    {
+      "alias": "Sukhoi Su-35",
+      "platform_id": "PLT_SU35"
+    },
+    {
+      "alias": "Su35",
+      "platform_id": "PLT_SU35"
+    },
+    {
+      "alias": "Sukhoi Su-35-like",
+      "platform_id": "PLT_SU35"
+    },
+    {
+      "alias": "Dassault Rafale",
+      "platform_id": "PLT_RAFALE"
+    },
+    {
+      "alias": "Rafale",
+      "platform_id": "PLT_RAFALE"
+    },
+    {
+      "alias": "Dassault-Rafale",
+      "platform_id": "PLT_RAFALE"
+    },
+    {
+      "alias": "Rafale C",
+      "platform_id": "PLT_RAFALE"
+    },
+    {
+      "alias": "Dassault Rafale-like",
+      "platform_id": "PLT_RAFALE"
+    },
+    {
+      "alias": "Airbus A320",
+      "platform_id": "PLT_AIRBUS_A320"
+    },
+    {
+      "alias": "A320",
+      "platform_id": "PLT_AIRBUS_A320"
+    },
+    {
+      "alias": "Airbus A-320",
+      "platform_id": "PLT_AIRBUS_A320"
+    },
+    {
+      "alias": "A320 Family",
+      "platform_id": "PLT_AIRBUS_A320"
+    },
+    {
+      "alias": "Airbus A320-like",
+      "platform_id": "PLT_AIRBUS_A320"
+    },
+    {
+      "alias": "F-22 Raptor",
+      "platform_id": "PLT_F22_RAPTOR"
+    },
+    {
+      "alias": "F-22",
+      "platform_id": "PLT_F22_RAPTOR"
+    },
+    {
+      "alias": "F22",
+      "platform_id": "PLT_F22_RAPTOR"
+    },
+    {
+      "alias": "Raptor",
+      "platform_id": "PLT_F22_RAPTOR"
+    },
+    {
+      "alias": "F-22 Raptor-like",
+      "platform_id": "PLT_F22_RAPTOR"
+    },
+    {
+      "alias": "Sukhoi Su-57",
+      "platform_id": "PLT_SU57"
+    },
+    {
+      "alias": "Su57",
+      "platform_id": "PLT_SU57"
+    },
+    {
+      "alias": "Sukhoi Su-57-like",
+      "platform_id": "PLT_SU57"
+    },
+    {
+      "alias": "Mikoyan MiG-29",
+      "platform_id": "PLT_MIG29"
+    },
+    {
+      "alias": "MiG-29",
+      "platform_id": "PLT_MIG29"
+    },
+    {
+      "alias": "MiG29",
+      "platform_id": "PLT_MIG29"
+    },
+    {
+      "alias": "Mikoyan MiG-29-like",
+      "platform_id": "PLT_MIG29"
+    },
+    {
+      "alias": "Airbus A330",
+      "platform_id": "PLT_AIRBUS_A330"
+    },
+    {
+      "alias": "A330",
+      "platform_id": "PLT_AIRBUS_A330"
+    },
+    {
+      "alias": "Airbus A-330",
+      "platform_id": "PLT_AIRBUS_A330"
+    },
+    {
+      "alias": "A330 Family",
+      "platform_id": "PLT_AIRBUS_A330"
+    },
+    {
+      "alias": "Airbus A330-like",
+      "platform_id": "PLT_AIRBUS_A330"
+    },
+    {
+      "alias": "Boeing 777",
+      "platform_id": "PLT_BOEING_777"
+    },
+    {
+      "alias": "B777",
+      "platform_id": "PLT_BOEING_777"
+    },
+    {
+      "alias": "Boeing-777",
+      "platform_id": "PLT_BOEING_777"
+    },
+    {
+      "alias": "777 Family",
+      "platform_id": "PLT_BOEING_777"
+    },
+    {
+      "alias": "Boeing 777-like",
+      "platform_id": "PLT_BOEING_777"
+    },
+    {
+      "alias": "F-15 Eagle",
+      "platform_id": "PLT_F15_EAGLE"
+    },
+    {
+      "alias": "F-15",
+      "platform_id": "PLT_F15_EAGLE"
+    },
+    {
+      "alias": "F15",
+      "platform_id": "PLT_F15_EAGLE"
+    },
+    {
+      "alias": "F-15 Eagle-like",
+      "platform_id": "PLT_F15_EAGLE"
+    },
+    {
+      "alias": "F-15EX Eagle II",
+      "platform_id": "PLT_F15EX_EAGLE_II"
+    },
+    {
+      "alias": "F-15EX",
+      "platform_id": "PLT_F15EX_EAGLE_II"
+    },
+    {
+      "alias": "F15EX",
+      "platform_id": "PLT_F15EX_EAGLE_II"
+    },
+    {
+      "alias": "Eagle II",
+      "platform_id": "PLT_F15EX_EAGLE_II"
+    },
+    {
+      "alias": "F-15EX Eagle II-like",
+      "platform_id": "PLT_F15EX_EAGLE_II"
+    },
+    {
+      "alias": "Boeing 737 NG",
+      "platform_id": "PLT_BOEING_737_NG"
+    },
+    {
+      "alias": "B737 NG",
+      "platform_id": "PLT_BOEING_737_NG"
+    },
+    {
+      "alias": "737 NG",
+      "platform_id": "PLT_BOEING_737_NG"
+    },
+    {
+      "alias": "Boeing 737 Next Generation",
+      "platform_id": "PLT_BOEING_737_NG"
+    },
+    {
+      "alias": "Boeing 737 NG-like",
+      "platform_id": "PLT_BOEING_737_NG"
+    },
+    {
+      "alias": "Boeing 737 MAX",
+      "platform_id": "PLT_BOEING_737_MAX"
+    },
+    {
+      "alias": "B737 MAX",
+      "platform_id": "PLT_BOEING_737_MAX"
+    },
+    {
+      "alias": "737 MAX",
+      "platform_id": "PLT_BOEING_737_MAX"
+    },
+    {
+      "alias": "Boeing 737 MAX-like",
+      "platform_id": "PLT_BOEING_737_MAX"
+    },
+    {
+      "alias": "Boeing AH-64E Apache Guardian",
+      "platform_id": "PLT_AH64E_APACHE_GUARDIAN"
+    },
+    {
+      "alias": "AH-64E",
+      "platform_id": "PLT_AH64E_APACHE_GUARDIAN"
+    },
+    {
+      "alias": "AH64E",
+      "platform_id": "PLT_AH64E_APACHE_GUARDIAN"
+    },
+    {
+      "alias": "AH-64E Apache Guardian",
+      "platform_id": "PLT_AH64E_APACHE_GUARDIAN"
+    },
+    {
+      "alias": "Apache Guardian",
+      "platform_id": "PLT_AH64E_APACHE_GUARDIAN"
+    },
+    {
+      "alias": "Boeing AH-64E Apache Guardian-like",
+      "platform_id": "PLT_AH64E_APACHE_GUARDIAN"
+    },
+    {
+      "alias": "F-5 Freedom Fighter",
+      "platform_id": "PLT_F5_FREEDOM_FIGHTER"
+    },
+    {
+      "alias": "F-5",
+      "platform_id": "PLT_F5_FREEDOM_FIGHTER"
+    },
+    {
+      "alias": "F5",
+      "platform_id": "PLT_F5_FREEDOM_FIGHTER"
+    },
+    {
+      "alias": "Freedom Fighter",
+      "platform_id": "PLT_F5_FREEDOM_FIGHTER"
+    },
+    {
+      "alias": "F-5 Freedom Fighter-like",
+      "platform_id": "PLT_F5_FREEDOM_FIGHTER"
+    },
+    {
+      "alias": "NF-5 Türk Yıldızları",
+      "platform_id": "PLT_NF5_TURK_YILDIZLARI"
+    },
+    {
+      "alias": "NF-5",
+      "platform_id": "PLT_NF5_TURK_YILDIZLARI"
+    },
+    {
+      "alias": "NF5",
+      "platform_id": "PLT_NF5_TURK_YILDIZLARI"
+    },
+    {
+      "alias": "Türk Yıldızları NF-5",
+      "platform_id": "PLT_NF5_TURK_YILDIZLARI"
+    },
+    {
+      "alias": "Turk Yildizlari NF-5",
+      "platform_id": "PLT_NF5_TURK_YILDIZLARI"
+    },
+    {
+      "alias": "NF-5 Türk Yıldızları-like",
+      "platform_id": "PLT_NF5_TURK_YILDIZLARI"
+    },
+    {
+      "alias": "T-38 Talon",
+      "platform_id": "PLT_T38_TALON"
+    },
+    {
+      "alias": "T-38",
+      "platform_id": "PLT_T38_TALON"
+    },
+    {
+      "alias": "T38",
+      "platform_id": "PLT_T38_TALON"
+    },
+    {
+      "alias": "Talon",
+      "platform_id": "PLT_T38_TALON"
+    },
+    {
+      "alias": "T-38 Talon-like",
+      "platform_id": "PLT_T38_TALON"
+    },
+    {
+      "alias": "Sikorsky S-70 Black Hawk",
+      "platform_id": "PLT_SIKORSKY_S70"
+    },
+    {
+      "alias": "S-70",
+      "platform_id": "PLT_SIKORSKY_S70"
+    },
+    {
+      "alias": "S70",
+      "platform_id": "PLT_SIKORSKY_S70"
+    },
+    {
+      "alias": "Sikorsky S-70",
+      "platform_id": "PLT_SIKORSKY_S70"
+    },
+    {
+      "alias": "Black Hawk",
+      "platform_id": "PLT_SIKORSKY_S70"
+    },
+    {
+      "alias": "Sikorsky S-70 Black Hawk-like",
+      "platform_id": "PLT_SIKORSKY_S70"
+    },
+    {
+      "alias": "Boeing CH-47F Chinook",
+      "platform_id": "PLT_CH47F_CHINOOK"
+    },
+    {
+      "alias": "CH-47F",
+      "platform_id": "PLT_CH47F_CHINOOK"
+    },
+    {
+      "alias": "CH47F",
+      "platform_id": "PLT_CH47F_CHINOOK"
+    },
+    {
+      "alias": "Chinook",
+      "platform_id": "PLT_CH47F_CHINOOK"
+    },
+    {
+      "alias": "Boeing CH-47F",
+      "platform_id": "PLT_CH47F_CHINOOK"
+    },
+    {
+      "alias": "Boeing CH-47F Chinook-like",
+      "platform_id": "PLT_CH47F_CHINOOK"
+    },
+    {
+      "alias": "Airbus AS532 Cougar",
+      "platform_id": "PLT_AS532_COUGAR"
+    },
+    {
+      "alias": "AS532",
+      "platform_id": "PLT_AS532_COUGAR"
+    },
+    {
+      "alias": "AS532 Cougar",
+      "platform_id": "PLT_AS532_COUGAR"
+    },
+    {
+      "alias": "Cougar",
+      "platform_id": "PLT_AS532_COUGAR"
+    },
+    {
+      "alias": "Airbus AS532",
+      "platform_id": "PLT_AS532_COUGAR"
+    },
+    {
+      "alias": "Airbus AS532 Cougar-like",
+      "platform_id": "PLT_AS532_COUGAR"
+    },
+    {
+      "alias": "Bell UH-1 Huey",
+      "platform_id": "PLT_UH1_HUEY"
+    },
+    {
+      "alias": "UH-1",
+      "platform_id": "PLT_UH1_HUEY"
+    },
+    {
+      "alias": "UH1",
+      "platform_id": "PLT_UH1_HUEY"
+    },
+    {
+      "alias": "Huey",
+      "platform_id": "PLT_UH1_HUEY"
+    },
+    {
+      "alias": "Bell UH-1",
+      "platform_id": "PLT_UH1_HUEY"
+    },
+    {
+      "alias": "Bell UH-1 Huey-like",
+      "platform_id": "PLT_UH1_HUEY"
+    },
+    {
+      "alias": "Bell AH-1 Super Cobra",
+      "platform_id": "PLT_AH1_SUPER_COBRA"
+    },
+    {
+      "alias": "AH-1",
+      "platform_id": "PLT_AH1_SUPER_COBRA"
+    },
+    {
+      "alias": "AH1",
+      "platform_id": "PLT_AH1_SUPER_COBRA"
+    },
+    {
+      "alias": "Super Cobra",
+      "platform_id": "PLT_AH1_SUPER_COBRA"
+    },
+    {
+      "alias": "Bell AH-1",
+      "platform_id": "PLT_AH1_SUPER_COBRA"
+    },
+    {
+      "alias": "Bell AH-1 Super Cobra-like",
+      "platform_id": "PLT_AH1_SUPER_COBRA"
+    },
+    {
+      "alias": "A-10 Thunderbolt II",
+      "platform_id": "PLT_A10_THUNDERBOLT_II"
+    },
+    {
+      "alias": "A-10",
+      "platform_id": "PLT_A10_THUNDERBOLT_II"
+    },
+    {
+      "alias": "A10",
+      "platform_id": "PLT_A10_THUNDERBOLT_II"
+    },
+    {
+      "alias": "Thunderbolt II",
+      "platform_id": "PLT_A10_THUNDERBOLT_II"
+    },
+    {
+      "alias": "Warthog",
+      "platform_id": "PLT_A10_THUNDERBOLT_II"
+    },
+    {
+      "alias": "A-10 Thunderbolt II-like",
+      "platform_id": "PLT_A10_THUNDERBOLT_II"
+    },
+    {
+      "alias": "F/A-18E/F Super Hornet",
+      "platform_id": "PLT_FA18EF_SUPER_HORNET"
+    },
+    {
+      "alias": "F/A-18E/F",
+      "platform_id": "PLT_FA18EF_SUPER_HORNET"
+    },
+    {
+      "alias": "FA-18E/F",
+      "platform_id": "PLT_FA18EF_SUPER_HORNET"
+    },
+    {
+      "alias": "Super Hornet",
+      "platform_id": "PLT_FA18EF_SUPER_HORNET"
+    },
+    {
+      "alias": "F/A-18 Super Hornet",
+      "platform_id": "PLT_FA18EF_SUPER_HORNET"
+    },
+    {
+      "alias": "F/A-18E/F Super Hornet-like",
+      "platform_id": "PLT_FA18EF_SUPER_HORNET"
+    },
+    {
+      "alias": "Chengdu J-10",
+      "platform_id": "PLT_J10"
+    },
+    {
+      "alias": "J-10",
+      "platform_id": "PLT_J10"
+    },
+    {
+      "alias": "J10",
+      "platform_id": "PLT_J10"
+    },
+    {
+      "alias": "Chengdu J10",
+      "platform_id": "PLT_J10"
+    },
+    {
+      "alias": "Chengdu J-10-like",
+      "platform_id": "PLT_J10"
+    },
+    {
+      "alias": "Chengdu J-20",
+      "platform_id": "PLT_J20"
+    },
+    {
+      "alias": "J-20",
+      "platform_id": "PLT_J20"
+    },
+    {
+      "alias": "J20",
+      "platform_id": "PLT_J20"
+    },
+    {
+      "alias": "Chengdu J20",
+      "platform_id": "PLT_J20"
+    },
+    {
+      "alias": "Chengdu J-20-like",
+      "platform_id": "PLT_J20"
+    },
+    {
+      "alias": "Saab JAS 39 Gripen",
+      "platform_id": "PLT_JAS39_GRIPEN"
+    },
+    {
+      "alias": "JAS 39",
+      "platform_id": "PLT_JAS39_GRIPEN"
+    },
+    {
+      "alias": "JAS39",
+      "platform_id": "PLT_JAS39_GRIPEN"
+    },
+    {
+      "alias": "Gripen",
+      "platform_id": "PLT_JAS39_GRIPEN"
+    },
+    {
+      "alias": "Saab Gripen",
+      "platform_id": "PLT_JAS39_GRIPEN"
+    },
+    {
+      "alias": "Saab JAS 39 Gripen-like",
+      "platform_id": "PLT_JAS39_GRIPEN"
+    },
+    {
+      "alias": "JF-17 Thunder",
+      "platform_id": "PLT_JF17_THUNDER"
+    },
+    {
+      "alias": "JF-17",
+      "platform_id": "PLT_JF17_THUNDER"
+    },
+    {
+      "alias": "JF17",
+      "platform_id": "PLT_JF17_THUNDER"
+    },
+    {
+      "alias": "Thunder",
+      "platform_id": "PLT_JF17_THUNDER"
+    },
+    {
+      "alias": "JF-17 Thunder-like",
+      "platform_id": "PLT_JF17_THUNDER"
+    },
+    {
+      "alias": "Mikoyan MiG-35",
+      "platform_id": "PLT_MIG35"
+    },
+    {
+      "alias": "MiG-35",
+      "platform_id": "PLT_MIG35"
+    },
+    {
+      "alias": "MiG35",
+      "platform_id": "PLT_MIG35"
+    },
+    {
+      "alias": "Mikoyan MiG-35-like",
+      "platform_id": "PLT_MIG35"
+    },
+    {
+      "alias": "Mirage 2000",
+      "platform_id": "PLT_MIRAGE_2000"
+    },
+    {
+      "alias": "Mirage-2000",
+      "platform_id": "PLT_MIRAGE_2000"
+    },
+    {
+      "alias": "Mirage2000",
+      "platform_id": "PLT_MIRAGE_2000"
+    },
+    {
+      "alias": "Dassault Mirage 2000",
+      "platform_id": "PLT_MIRAGE_2000"
+    },
+    {
+      "alias": "Mirage 2000-like",
+      "platform_id": "PLT_MIRAGE_2000"
+    },
+    {
+      "alias": "Sukhoi Su-27 Flanker",
+      "platform_id": "PLT_SU27"
+    },
+    {
+      "alias": "Su-27",
+      "platform_id": "PLT_SU27"
+    },
+    {
+      "alias": "Su27",
+      "platform_id": "PLT_SU27"
+    },
+    {
+      "alias": "Flanker",
+      "platform_id": "PLT_SU27"
+    },
+    {
+      "alias": "Sukhoi Su-27 Flanker-like",
+      "platform_id": "PLT_SU27"
+    },
+    {
+      "alias": "Sukhoi Su-30",
+      "platform_id": "PLT_SU30"
+    },
+    {
+      "alias": "Su-30",
+      "platform_id": "PLT_SU30"
+    },
+    {
+      "alias": "Su30",
+      "platform_id": "PLT_SU30"
+    },
+    {
+      "alias": "Sukhoi Su-30-like",
+      "platform_id": "PLT_SU30"
+    },
+    {
+      "alias": "HAL Tejas",
+      "platform_id": "PLT_TEJAS"
+    },
+    {
+      "alias": "Tejas",
+      "platform_id": "PLT_TEJAS"
+    },
+    {
+      "alias": "LCA Tejas",
+      "platform_id": "PLT_TEJAS"
+    },
+    {
+      "alias": "HAL LCA Tejas",
+      "platform_id": "PLT_TEJAS"
+    },
+    {
+      "alias": "HAL Tejas-like",
+      "platform_id": "PLT_TEJAS"
+    },
+    {
+      "alias": "Airbus A330-243 MRTT",
+      "platform_id": "PLT_A330_243_MRTT"
+    },
+    {
+      "alias": "A330-243 MRTT",
+      "platform_id": "PLT_A330_243_MRTT"
+    },
+    {
+      "alias": "A330 MRTT",
+      "platform_id": "PLT_A330_243_MRTT"
+    },
+    {
+      "alias": "Airbus A330 MRTT",
+      "platform_id": "PLT_A330_243_MRTT"
+    },
+    {
+      "alias": "Airbus A330-243 MRTT-like",
+      "platform_id": "PLT_A330_243_MRTT"
+    },
+    {
+      "alias": "Antonov An-124 Ruslan",
+      "platform_id": "PLT_AN124_RUSLAN"
+    },
+    {
+      "alias": "An-124",
+      "platform_id": "PLT_AN124_RUSLAN"
+    },
+    {
+      "alias": "An124",
+      "platform_id": "PLT_AN124_RUSLAN"
+    },
+    {
+      "alias": "Ruslan",
+      "platform_id": "PLT_AN124_RUSLAN"
+    },
+    {
+      "alias": "Antonov An-124",
+      "platform_id": "PLT_AN124_RUSLAN"
+    },
+    {
+      "alias": "Antonov An-124 Ruslan-like",
+      "platform_id": "PLT_AN124_RUSLAN"
+    },
+    {
+      "alias": "C-17 Globemaster III",
+      "platform_id": "PLT_C17_GLOBEMASTER_III"
+    },
+    {
+      "alias": "C-17",
+      "platform_id": "PLT_C17_GLOBEMASTER_III"
+    },
+    {
+      "alias": "C17",
+      "platform_id": "PLT_C17_GLOBEMASTER_III"
+    },
+    {
+      "alias": "Globemaster III",
+      "platform_id": "PLT_C17_GLOBEMASTER_III"
+    },
+    {
+      "alias": "Boeing C-17 Globemaster III",
+      "platform_id": "PLT_C17_GLOBEMASTER_III"
+    },
+    {
+      "alias": "C-17 Globemaster III-like",
+      "platform_id": "PLT_C17_GLOBEMASTER_III"
+    },
+    {
+      "alias": "Airbus C-295W",
+      "platform_id": "PLT_C295W"
+    },
+    {
+      "alias": "C-295W",
+      "platform_id": "PLT_C295W"
+    },
+    {
+      "alias": "C295W",
+      "platform_id": "PLT_C295W"
+    },
+    {
+      "alias": "Airbus C295W",
+      "platform_id": "PLT_C295W"
+    },
+    {
+      "alias": "Airbus C-295W-like",
+      "platform_id": "PLT_C295W"
+    },
+    {
+      "alias": "Boeing P-8A Poseidon",
+      "platform_id": "PLT_P8A_POSEIDON"
+    },
+    {
+      "alias": "P-8A",
+      "platform_id": "PLT_P8A_POSEIDON"
+    },
+    {
+      "alias": "P8A",
+      "platform_id": "PLT_P8A_POSEIDON"
+    },
+    {
+      "alias": "P-8 Poseidon",
+      "platform_id": "PLT_P8A_POSEIDON"
+    },
+    {
+      "alias": "Boeing P8A Poseidon",
+      "platform_id": "PLT_P8A_POSEIDON"
+    },
+    {
+      "alias": "Boeing P-8A Poseidon-like",
+      "platform_id": "PLT_P8A_POSEIDON"
+    },
+    {
+      "alias": "Bell Boeing V-22 Osprey",
+      "platform_id": "PLT_V22_OSPREY"
+    },
+    {
+      "alias": "V-22",
+      "platform_id": "PLT_V22_OSPREY"
+    },
+    {
+      "alias": "V22",
+      "platform_id": "PLT_V22_OSPREY"
+    },
+    {
+      "alias": "Osprey",
+      "platform_id": "PLT_V22_OSPREY"
+    },
+    {
+      "alias": "Bell V-22 Osprey",
+      "platform_id": "PLT_V22_OSPREY"
+    },
+    {
+      "alias": "Bell Boeing V-22 Osprey-like",
+      "platform_id": "PLT_V22_OSPREY"
+    },
+    {
+      "alias": "Airbus A321",
+      "platform_id": "PLT_AIRBUS_A321"
+    },
+    {
+      "alias": "A321",
+      "platform_id": "PLT_AIRBUS_A321"
+    },
+    {
+      "alias": "Airbus A-321",
+      "platform_id": "PLT_AIRBUS_A321"
+    },
+    {
+      "alias": "A321 Family",
+      "platform_id": "PLT_AIRBUS_A321"
+    },
+    {
+      "alias": "Airbus A321-like",
+      "platform_id": "PLT_AIRBUS_A321"
+    },
+    {
+      "alias": "Airbus A350",
+      "platform_id": "PLT_AIRBUS_A350"
+    },
+    {
+      "alias": "A350",
+      "platform_id": "PLT_AIRBUS_A350"
+    },
+    {
+      "alias": "Airbus A-350",
+      "platform_id": "PLT_AIRBUS_A350"
+    },
+    {
+      "alias": "A350 XWB",
+      "platform_id": "PLT_AIRBUS_A350"
+    },
+    {
+      "alias": "Airbus A350-like",
+      "platform_id": "PLT_AIRBUS_A350"
+    },
+    {
+      "alias": "Airbus A380",
+      "platform_id": "PLT_AIRBUS_A380"
+    },
+    {
+      "alias": "A380",
+      "platform_id": "PLT_AIRBUS_A380"
+    },
+    {
+      "alias": "Airbus A-380",
+      "platform_id": "PLT_AIRBUS_A380"
+    },
+    {
+      "alias": "A380 Superjumbo",
+      "platform_id": "PLT_AIRBUS_A380"
+    },
+    {
+      "alias": "Airbus A380-like",
+      "platform_id": "PLT_AIRBUS_A380"
+    },
+    {
+      "alias": "ATR 72",
+      "platform_id": "PLT_ATR72"
+    },
+    {
+      "alias": "ATR-72",
+      "platform_id": "PLT_ATR72"
+    },
+    {
+      "alias": "ATR72",
+      "platform_id": "PLT_ATR72"
+    },
+    {
+      "alias": "ATR 72 Turboprop",
+      "platform_id": "PLT_ATR72"
+    },
+    {
+      "alias": "ATR 72-like",
+      "platform_id": "PLT_ATR72"
+    },
+    {
+      "alias": "Boeing 787 Dreamliner",
+      "platform_id": "PLT_BOEING_787"
+    },
+    {
+      "alias": "B787",
+      "platform_id": "PLT_BOEING_787"
+    },
+    {
+      "alias": "Boeing-787",
+      "platform_id": "PLT_BOEING_787"
+    },
+    {
+      "alias": "787 Dreamliner",
+      "platform_id": "PLT_BOEING_787"
+    },
+    {
+      "alias": "Boeing 787",
+      "platform_id": "PLT_BOEING_787"
+    },
+    {
+      "alias": "Boeing 787 Dreamliner-like",
+      "platform_id": "PLT_BOEING_787"
+    },
+    {
+      "alias": "Cessna 172 Skyhawk",
+      "platform_id": "PLT_CESSNA_172"
+    },
+    {
+      "alias": "Cessna 172",
+      "platform_id": "PLT_CESSNA_172"
+    },
+    {
+      "alias": "C172",
+      "platform_id": "PLT_CESSNA_172"
+    },
+    {
+      "alias": "172 Skyhawk",
+      "platform_id": "PLT_CESSNA_172"
+    },
+    {
+      "alias": "Skyhawk",
+      "platform_id": "PLT_CESSNA_172"
+    },
+    {
+      "alias": "Cessna 172 Skyhawk-like",
+      "platform_id": "PLT_CESSNA_172"
+    },
+    {
+      "alias": "Piper PA-28 Cherokee",
+      "platform_id": "PLT_PIPER_PA28"
+    },
+    {
+      "alias": "Piper PA-28",
+      "platform_id": "PLT_PIPER_PA28"
+    },
+    {
+      "alias": "PA-28",
+      "platform_id": "PLT_PIPER_PA28"
+    },
+    {
+      "alias": "PA28",
+      "platform_id": "PLT_PIPER_PA28"
+    },
+    {
+      "alias": "Piper Cherokee",
+      "platform_id": "PLT_PIPER_PA28"
+    },
+    {
+      "alias": "Piper PA-28 Cherokee-like",
+      "platform_id": "PLT_PIPER_PA28"
+    },
+    {
+      "alias": "DJI Air Serisi",
+      "platform_id": "PLT_DJI_AIR_SERIES"
+    },
+    {
+      "alias": "DJI Air",
+      "platform_id": "PLT_DJI_AIR_SERIES"
+    },
+    {
+      "alias": "DJI Air Series",
+      "platform_id": "PLT_DJI_AIR_SERIES"
+    },
+    {
+      "alias": "DJI Air Serisi-like",
+      "platform_id": "PLT_DJI_AIR_SERIES"
+    },
+    {
+      "alias": "DJI Matrice 300",
+      "platform_id": "PLT_DJI_MATRICE_300"
+    },
+    {
+      "alias": "Matrice 300",
+      "platform_id": "PLT_DJI_MATRICE_300"
+    },
+    {
+      "alias": "DJI M300",
+      "platform_id": "PLT_DJI_MATRICE_300"
+    },
+    {
+      "alias": "M300 RTK",
+      "platform_id": "PLT_DJI_MATRICE_300"
+    },
+    {
+      "alias": "DJI Matrice 300-like",
+      "platform_id": "PLT_DJI_MATRICE_300"
+    },
+    {
+      "alias": "DJI Matrice 350",
+      "platform_id": "PLT_DJI_MATRICE_350"
+    },
+    {
+      "alias": "Matrice 350",
+      "platform_id": "PLT_DJI_MATRICE_350"
+    },
+    {
+      "alias": "DJI M350",
+      "platform_id": "PLT_DJI_MATRICE_350"
+    },
+    {
+      "alias": "M350 RTK",
+      "platform_id": "PLT_DJI_MATRICE_350"
+    },
+    {
+      "alias": "DJI Matrice 350-like",
+      "platform_id": "PLT_DJI_MATRICE_350"
+    },
+    {
+      "alias": "DJI Mavic 2",
+      "platform_id": "PLT_DJI_MAVIC_2"
+    },
+    {
+      "alias": "Mavic 2",
+      "platform_id": "PLT_DJI_MAVIC_2"
+    },
+    {
+      "alias": "DJI Mavic 2 Pro",
+      "platform_id": "PLT_DJI_MAVIC_2"
+    },
+    {
+      "alias": "DJI Mavic 2 Zoom",
+      "platform_id": "PLT_DJI_MAVIC_2"
+    },
+    {
+      "alias": "DJI Mavic 2-like",
+      "platform_id": "PLT_DJI_MAVIC_2"
+    },
+    {
+      "alias": "DJI Mavic 3",
+      "platform_id": "PLT_DJI_MAVIC_3"
+    },
+    {
+      "alias": "Mavic 3",
+      "platform_id": "PLT_DJI_MAVIC_3"
+    },
+    {
+      "alias": "DJI Mavic 3 Pro",
+      "platform_id": "PLT_DJI_MAVIC_3"
+    },
+    {
+      "alias": "DJI Mavic 3 Enterprise",
+      "platform_id": "PLT_DJI_MAVIC_3"
+    },
+    {
+      "alias": "DJI Mavic 3-like",
+      "platform_id": "PLT_DJI_MAVIC_3"
+    },
+    {
+      "alias": "DJI Mini Serisi",
+      "platform_id": "PLT_DJI_MINI_SERIES"
+    },
+    {
+      "alias": "DJI Mini",
+      "platform_id": "PLT_DJI_MINI_SERIES"
+    },
+    {
+      "alias": "DJI Mini Series",
+      "platform_id": "PLT_DJI_MINI_SERIES"
+    },
+    {
+      "alias": "DJI Mini Serisi-like",
+      "platform_id": "PLT_DJI_MINI_SERIES"
+    },
+    {
+      "alias": "DJI Phantom Serisi",
+      "platform_id": "PLT_DJI_PHANTOM_SERIES"
+    },
+    {
+      "alias": "DJI Phantom",
+      "platform_id": "PLT_DJI_PHANTOM_SERIES"
+    },
+    {
+      "alias": "DJI Phantom Series",
+      "platform_id": "PLT_DJI_PHANTOM_SERIES"
+    },
+    {
+      "alias": "Phantom Serisi",
+      "platform_id": "PLT_DJI_PHANTOM_SERIES"
+    },
+    {
+      "alias": "DJI Phantom Serisi-like",
+      "platform_id": "PLT_DJI_PHANTOM_SERIES"
+    },
+    {
+      "alias": "IAI Harop",
+      "platform_id": "PLT_HAROP"
+    },
+    {
+      "alias": "Harop",
+      "platform_id": "PLT_HAROP"
+    },
+    {
+      "alias": "IAI Harop UAV",
+      "platform_id": "PLT_HAROP"
+    },
+    {
+      "alias": "Harop Loitering Munition",
+      "platform_id": "PLT_HAROP"
+    },
+    {
+      "alias": "IAI Harop-like",
+      "platform_id": "PLT_HAROP"
+    },
+    {
+      "alias": "Shahed-136 / Geran-2",
+      "platform_id": "PLT_SHAHED136_GERAN2"
+    },
+    {
+      "alias": "Shahed-136",
+      "platform_id": "PLT_SHAHED136_GERAN2"
+    },
+    {
+      "alias": "Shahed 136",
+      "platform_id": "PLT_SHAHED136_GERAN2"
+    },
+    {
+      "alias": "Geran-2",
+      "platform_id": "PLT_SHAHED136_GERAN2"
+    },
+    {
+      "alias": "Geran 2",
+      "platform_id": "PLT_SHAHED136_GERAN2"
+    },
+    {
+      "alias": "Shahed-136 Geran-2",
+      "platform_id": "PLT_SHAHED136_GERAN2"
+    },
+    {
+      "alias": "Shahed-136 / Geran-2-like",
+      "platform_id": "PLT_SHAHED136_GERAN2"
+    },
+    {
+      "alias": "CASC CH-4",
+      "platform_id": "PLT_CH4"
+    },
+    {
+      "alias": "CH-4",
+      "platform_id": "PLT_CH4"
+    },
+    {
+      "alias": "CH4",
+      "platform_id": "PLT_CH4"
+    },
+    {
+      "alias": "CASC CH4",
+      "platform_id": "PLT_CH4"
+    },
+    {
+      "alias": "CASC CH-4-like",
+      "platform_id": "PLT_CH4"
+    },
+    {
+      "alias": "Forpost-R",
+      "platform_id": "PLT_FORPOST_R"
+    },
+    {
+      "alias": "Forpost R",
+      "platform_id": "PLT_FORPOST_R"
+    },
+    {
+      "alias": "ForpostR",
+      "platform_id": "PLT_FORPOST_R"
+    },
+    {
+      "alias": "Forpost-R UAS",
+      "platform_id": "PLT_FORPOST_R"
+    },
+    {
+      "alias": "Forpost-R-like",
+      "platform_id": "PLT_FORPOST_R"
+    },
+    {
+      "alias": "Elbit Hermes 450",
+      "platform_id": "PLT_HERMES_450"
+    },
+    {
+      "alias": "Hermes 450",
+      "platform_id": "PLT_HERMES_450"
+    },
+    {
+      "alias": "Hermes-450",
+      "platform_id": "PLT_HERMES_450"
+    },
+    {
+      "alias": "Elbit Hermes-450",
+      "platform_id": "PLT_HERMES_450"
+    },
+    {
+      "alias": "Elbit Hermes 450-like",
+      "platform_id": "PLT_HERMES_450"
+    },
+    {
+      "alias": "Elbit Hermes 900",
+      "platform_id": "PLT_HERMES_900"
+    },
+    {
+      "alias": "Hermes 900",
+      "platform_id": "PLT_HERMES_900"
+    },
+    {
+      "alias": "Hermes-900",
+      "platform_id": "PLT_HERMES_900"
+    },
+    {
+      "alias": "Elbit Hermes-900",
+      "platform_id": "PLT_HERMES_900"
+    },
+    {
+      "alias": "Elbit Hermes 900-like",
+      "platform_id": "PLT_HERMES_900"
+    },
+    {
+      "alias": "IAI Heron TP",
+      "platform_id": "PLT_HERON_TP"
+    },
+    {
+      "alias": "Heron TP",
+      "platform_id": "PLT_HERON_TP"
+    },
+    {
+      "alias": "Heron-TP",
+      "platform_id": "PLT_HERON_TP"
+    },
+    {
+      "alias": "IAI Heron-TP",
+      "platform_id": "PLT_HERON_TP"
+    },
+    {
+      "alias": "IAI Heron TP-like",
+      "platform_id": "PLT_HERON_TP"
+    },
+    {
+      "alias": "MQ-1 Predator",
+      "platform_id": "PLT_MQ1_PREDATOR"
+    },
+    {
+      "alias": "MQ-1",
+      "platform_id": "PLT_MQ1_PREDATOR"
+    },
+    {
+      "alias": "MQ1",
+      "platform_id": "PLT_MQ1_PREDATOR"
+    },
+    {
+      "alias": "Predator",
+      "platform_id": "PLT_MQ1_PREDATOR"
+    },
+    {
+      "alias": "General Atomics MQ-1 Predator",
+      "platform_id": "PLT_MQ1_PREDATOR"
+    },
+    {
+      "alias": "MQ-1 Predator-like",
+      "platform_id": "PLT_MQ1_PREDATOR"
+    },
+    {
+      "alias": "MQ-9B SkyGuardian",
+      "platform_id": "PLT_MQ9B_SKYGUARDIAN"
+    },
+    {
+      "alias": "MQ-9B",
+      "platform_id": "PLT_MQ9B_SKYGUARDIAN"
+    },
+    {
+      "alias": "MQ9B",
+      "platform_id": "PLT_MQ9B_SKYGUARDIAN"
+    },
+    {
+      "alias": "SkyGuardian",
+      "platform_id": "PLT_MQ9B_SKYGUARDIAN"
+    },
+    {
+      "alias": "General Atomics MQ-9B SkyGuardian",
+      "platform_id": "PLT_MQ9B_SKYGUARDIAN"
+    },
+    {
+      "alias": "MQ-9B SkyGuardian-like",
+      "platform_id": "PLT_MQ9B_SKYGUARDIAN"
+    },
+    {
+      "alias": "Kronstadt Orion İHA",
+      "platform_id": "PLT_ORION_UAV"
+    },
+    {
+      "alias": "Orion UAV",
+      "platform_id": "PLT_ORION_UAV"
+    },
+    {
+      "alias": "Orion İHA",
+      "platform_id": "PLT_ORION_UAV"
+    },
+    {
+      "alias": "Kronstadt Orion",
+      "platform_id": "PLT_ORION_UAV"
+    },
+    {
+      "alias": "Orion-RU",
+      "platform_id": "PLT_ORION_UAV"
+    },
+    {
+      "alias": "Kronstadt Orion İHA-like",
+      "platform_id": "PLT_ORION_UAV"
+    },
+    {
+      "alias": "RQ-170 Sentinel",
+      "platform_id": "PLT_RQ170_SENTINEL"
+    },
+    {
+      "alias": "RQ-170",
+      "platform_id": "PLT_RQ170_SENTINEL"
+    },
+    {
+      "alias": "RQ170",
+      "platform_id": "PLT_RQ170_SENTINEL"
+    },
+    {
+      "alias": "Sentinel UAV",
+      "platform_id": "PLT_RQ170_SENTINEL"
+    },
+    {
+      "alias": "Lockheed Martin RQ-170 Sentinel",
+      "platform_id": "PLT_RQ170_SENTINEL"
+    },
+    {
+      "alias": "RQ-170 Sentinel-like",
+      "platform_id": "PLT_RQ170_SENTINEL"
+    },
+    {
+      "alias": "RQ-4 Global Hawk",
+      "platform_id": "PLT_RQ4_GLOBAL_HAWK"
+    },
+    {
+      "alias": "RQ-4",
+      "platform_id": "PLT_RQ4_GLOBAL_HAWK"
+    },
+    {
+      "alias": "RQ4",
+      "platform_id": "PLT_RQ4_GLOBAL_HAWK"
+    },
+    {
+      "alias": "Global Hawk",
+      "platform_id": "PLT_RQ4_GLOBAL_HAWK"
+    },
+    {
+      "alias": "Northrop Grumman RQ-4 Global Hawk",
+      "platform_id": "PLT_RQ4_GLOBAL_HAWK"
+    },
+    {
+      "alias": "RQ-4 Global Hawk-like",
+      "platform_id": "PLT_RQ4_GLOBAL_HAWK"
+    },
+    {
+      "alias": "Wing Loong I",
+      "platform_id": "PLT_WING_LOONG_I"
+    },
+    {
+      "alias": "Wing Loong 1",
+      "platform_id": "PLT_WING_LOONG_I"
+    },
+    {
+      "alias": "Wing Loong-I",
+      "platform_id": "PLT_WING_LOONG_I"
+    },
+    {
+      "alias": "Chengdu Wing Loong I",
+      "platform_id": "PLT_WING_LOONG_I"
+    },
+    {
+      "alias": "Wing Loong I-like",
+      "platform_id": "PLT_WING_LOONG_I"
+    },
+    {
+      "alias": "Wing Loong II",
+      "platform_id": "PLT_WING_LOONG_II"
+    },
+    {
+      "alias": "Wing Loong 2",
+      "platform_id": "PLT_WING_LOONG_II"
+    },
+    {
+      "alias": "Wing Loong-II",
+      "platform_id": "PLT_WING_LOONG_II"
+    },
+    {
+      "alias": "Chengdu Wing Loong II",
+      "platform_id": "PLT_WING_LOONG_II"
+    },
+    {
+      "alias": "Wing Loong II-like",
+      "platform_id": "PLT_WING_LOONG_II"
+    },
+    {
+      "alias": "WZ-7 Soaring Dragon",
+      "platform_id": "PLT_WZ7_SOARING_DRAGON"
+    },
+    {
+      "alias": "WZ-7",
+      "platform_id": "PLT_WZ7_SOARING_DRAGON"
+    },
+    {
+      "alias": "WZ7",
+      "platform_id": "PLT_WZ7_SOARING_DRAGON"
+    },
+    {
+      "alias": "Soaring Dragon",
+      "platform_id": "PLT_WZ7_SOARING_DRAGON"
+    },
+    {
+      "alias": "Guizhou WZ-7 Soaring Dragon",
+      "platform_id": "PLT_WZ7_SOARING_DRAGON"
+    },
+    {
+      "alias": "WZ-7 Soaring Dragon-like",
+      "platform_id": "PLT_WZ7_SOARING_DRAGON"
+    },
+    {
+      "alias": "Northrop Grumman B-2 Spirit",
+      "platform_id": "PLT_B2_SPIRIT"
+    },
+    {
+      "alias": "B-2 Spirit",
+      "platform_id": "PLT_B2_SPIRIT"
+    },
+    {
+      "alias": "B-2",
+      "platform_id": "PLT_B2_SPIRIT"
+    },
+    {
+      "alias": "B2 Spirit",
+      "platform_id": "PLT_B2_SPIRIT"
+    },
+    {
+      "alias": "B2",
+      "platform_id": "PLT_B2_SPIRIT"
+    },
+    {
+      "alias": "Northrop B-2 Spirit",
+      "platform_id": "PLT_B2_SPIRIT"
+    },
+    {
+      "alias": "Northrop Grumman B-2 Spirit-like",
+      "platform_id": "PLT_B2_SPIRIT"
+    },
+    {
+      "alias": "Boeing B-52 Stratofortress",
+      "platform_id": "PLT_B52_STRATOFORTRESS"
+    },
+    {
+      "alias": "B-52 Stratofortress",
+      "platform_id": "PLT_B52_STRATOFORTRESS"
+    },
+    {
+      "alias": "B-52",
+      "platform_id": "PLT_B52_STRATOFORTRESS"
+    },
+    {
+      "alias": "B52",
+      "platform_id": "PLT_B52_STRATOFORTRESS"
+    },
+    {
+      "alias": "Stratofortress",
+      "platform_id": "PLT_B52_STRATOFORTRESS"
+    },
+    {
+      "alias": "Boeing B52 Stratofortress",
+      "platform_id": "PLT_B52_STRATOFORTRESS"
+    },
+    {
+      "alias": "Boeing B-52 Stratofortress-like",
+      "platform_id": "PLT_B52_STRATOFORTRESS"
+    },
+    {
+      "alias": "Kamov Ka-52 Alligator",
+      "platform_id": "PLT_KA52_ALLIGATOR"
+    },
+    {
+      "alias": "Ka-52 Alligator",
+      "platform_id": "PLT_KA52_ALLIGATOR"
+    },
+    {
+      "alias": "Ka-52",
+      "platform_id": "PLT_KA52_ALLIGATOR"
+    },
+    {
+      "alias": "Ka52",
+      "platform_id": "PLT_KA52_ALLIGATOR"
+    },
+    {
+      "alias": "Alligator Helicopter",
+      "platform_id": "PLT_KA52_ALLIGATOR"
+    },
+    {
+      "alias": "Kamov Ka52 Alligator",
+      "platform_id": "PLT_KA52_ALLIGATOR"
+    },
+    {
+      "alias": "Kamov Ka-52 Alligator-like",
+      "platform_id": "PLT_KA52_ALLIGATOR"
+    },
+    {
+      "alias": "ANKA",
+      "platform_id": "PLT_TUSAS_ANKA"
+    },
+    {
+      "alias": "T129 ATAK",
+      "platform_id": "PLT_T129_ATAK"
+    },
+    {
+      "alias": "TUSAŞ AKSUNGUR",
+      "platform_id": "PLT_TUSAS_AKSUNGUR"
+    },
+    {
+      "alias": "STM KARGU",
+      "platform_id": "PLT_STM_KARGU"
+    },
+    {
+      "alias": "KARGU",
+      "platform_id": "PLT_STM_KARGU"
+    },
+    {
+      "alias": "STM TOGAN",
+      "platform_id": "PLT_STM_TOGAN"
+    },
+    {
+      "alias": "TOGAN",
+      "platform_id": "PLT_STM_TOGAN"
+    },
+    {
+      "alias": "STM ALPAGU",
+      "platform_id": "PLT_STM_ALPAGU"
+    },
+    {
+      "alias": "ALPAGU",
+      "platform_id": "PLT_STM_ALPAGU"
+    },
+    {
+      "alias": "Vestel KARAYEL",
+      "platform_id": "PLT_VESTEL_KARAYEL"
+    },
+    {
+      "alias": "KARAYEL",
+      "platform_id": "PLT_VESTEL_KARAYEL"
+    },
+    {
+      "alias": "Su-35",
+      "platform_id": "PLT_SU35"
+    },
+    {
+      "alias": "Su-57",
+      "platform_id": "PLT_SU57"
+    },
+    {
+      "alias": "P-8A Poseidon",
+      "platform_id": "PLT_P8A_POSEIDON"
+    },
+    {
+      "alias": "AH-1 Super Cobra",
+      "platform_id": "PLT_AH1_SUPER_COBRA"
+    },
+    {
+      "alias": "MiG-29 Fulcrum",
+      "platform_id": "PLT_MIG29"
+    },
+    {
+      "alias": "Tusaş Şimşek",
+      "platform_id": "PLT_TUSAS_SIMSEK"
+    },
+    {
+      "alias": "Boeing E-7T Barış Kartalı",
+      "platform_id": "PLT_BOEING_E7"
+    },
+    {
+      "alias": "F-4E Phantom II Terminator",
+      "platform_id": "PLT_F4E_2020"
+    },
+    {
+      "alias": "Antonov An-225 Mriya",
+      "platform_id": "PLT_ANTONOV_AN225"
+    },
+    {
+      "alias": "An-225",
+      "platform_id": "PLT_ANTONOV_AN225"
+    },
+    {
+      "alias": "An225",
+      "platform_id": "PLT_ANTONOV_AN225"
+    },
+    {
+      "alias": "Mriya",
+      "platform_id": "PLT_ANTONOV_AN225"
+    },
+    {
+      "alias": "Antonov An-225",
+      "platform_id": "PLT_ANTONOV_AN225"
+    },
+    {
+      "alias": "Antonov An-225 Mriya-like",
+      "platform_id": "PLT_ANTONOV_AN225"
+    },
+    {
+      "alias": "F-4E Phantom II",
+      "platform_id": "PLT_F4E_PHANTOM_II"
+    },
+    {
+      "alias": "Phantom II",
+      "platform_id": "PLT_F4E_PHANTOM_II"
+    },
+    {
+      "alias": "F-4E Phantom II-like",
+      "platform_id": "PLT_F4E_PHANTOM_II"
+    },
+    {
+      "alias": "F-5E Tiger II",
+      "platform_id": "PLT_F5E_TIGER_II"
+    },
+    {
+      "alias": "F-5E Tiger 2",
+      "platform_id": "PLT_F5E_TIGER_II"
+    },
+    {
+      "alias": "F-5E Tiger 2 Swiss Air Force",
+      "platform_id": "PLT_F5E_TIGER_II"
+    },
+    {
+      "alias": "Tiger II",
+      "platform_id": "PLT_F5E_TIGER_II"
+    },
+    {
+      "alias": "F-5E",
+      "platform_id": "PLT_F5E_TIGER_II"
+    },
+    {
+      "alias": "F-5E Tiger II-like",
+      "platform_id": "PLT_F5E_TIGER_II"
+    },
+    {
+      "alias": "İş Jeti (Gulfstream)",
+      "platform_id": "PLT_GULFSTREAM_BUSINESS_JET"
+    },
+    {
+      "alias": "Gulfstream",
+      "platform_id": "PLT_GULFSTREAM_BUSINESS_JET"
+    },
+    {
+      "alias": "İş Jeti",
+      "platform_id": "PLT_GULFSTREAM_BUSINESS_JET"
+    },
+    {
+      "alias": "Business Jet",
+      "platform_id": "PLT_GULFSTREAM_BUSINESS_JET"
+    },
+    {
+      "alias": "Gulfstream Jet",
+      "platform_id": "PLT_GULFSTREAM_BUSINESS_JET"
+    },
+    {
+      "alias": "İş Jeti (Gulfstream)-like",
+      "platform_id": "PLT_GULFSTREAM_BUSINESS_JET"
+    },
+    {
+      "alias": "Kaan",
+      "platform_id": "PLT_KAAN"
+    },
+    {
+      "alias": "TF-X",
+      "platform_id": "PLT_KAAN"
+    },
+    {
+      "alias": "KAAN TF-X",
+      "platform_id": "PLT_KAAN"
+    },
+    {
+      "alias": "TAI Kaan",
+      "platform_id": "PLT_KAAN"
+    },
+    {
+      "alias": "Kaan-like",
+      "platform_id": "PLT_KAAN"
+    },
+    {
+      "alias": "Bayraktar Kızılelma",
+      "platform_id": "PLT_BAYRAKTAR_KIZILELMA"
+    },
+    {
+      "alias": "Kızılelma",
+      "platform_id": "PLT_BAYRAKTAR_KIZILELMA"
+    },
+    {
+      "alias": "Bayraktar KIZILELMA",
+      "platform_id": "PLT_BAYRAKTAR_KIZILELMA"
+    },
+    {
+      "alias": "MIUS",
+      "platform_id": "PLT_BAYRAKTAR_KIZILELMA"
+    },
+    {
+      "alias": "Bayraktar Kızılelma-like",
+      "platform_id": "PLT_BAYRAKTAR_KIZILELMA"
+    },
+    {
+      "alias": "TUSAŞ HÜRJET",
+      "platform_id": "PLT_TUSAS_HURJET"
+    },
+    {
+      "alias": "Hürjet",
+      "platform_id": "PLT_TUSAS_HURJET"
+    },
+    {
+      "alias": "TUSAŞ HÜRJET-like",
+      "platform_id": "PLT_TUSAS_HURJET"
+    },
+    {
+      "alias": "TUSAŞ ANKA-III",
+      "platform_id": "PLT_TUSAS_ANKA3"
+    },
+    {
+      "alias": "ANKA-3",
+      "platform_id": "PLT_TUSAS_ANKA3"
+    },
+    {
+      "alias": "ANKA 3",
+      "platform_id": "PLT_TUSAS_ANKA3"
+    },
+    {
+      "alias": "Tusaş ANKA 3",
+      "platform_id": "PLT_TUSAS_ANKA3"
+    },
+    {
+      "alias": "TUSAŞ ANKA-III-like",
+      "platform_id": "PLT_TUSAS_ANKA3"
+    },
+    {
+      "alias": "Bayraktar DİHA",
+      "platform_id": "PLT_BAYRAKTAR_DIHA"
+    },
+    {
+      "alias": "DİHA",
+      "platform_id": "PLT_BAYRAKTAR_DIHA"
+    },
+    {
+      "alias": "Bayraktar Kalkan DİHA",
+      "platform_id": "PLT_BAYRAKTAR_DIHA"
+    },
+    {
+      "alias": "Bayraktar DİHA-like",
+      "platform_id": "PLT_BAYRAKTAR_DIHA"
+    },
+    {
+      "alias": "Dassault nEUROn",
+      "platform_id": "PLT_NEURON_UCAV"
+    },
+    {
+      "alias": "nEUROn",
+      "platform_id": "PLT_NEURON_UCAV"
+    },
+    {
+      "alias": "nEUROn UCAV",
+      "platform_id": "PLT_NEURON_UCAV"
+    },
+    {
+      "alias": "Dassault nEUROn-like",
+      "platform_id": "PLT_NEURON_UCAV"
+    },
+    {
+      "alias": "BAE Systems Taranis",
+      "platform_id": "PLT_TARANIS_UCAV"
+    },
+    {
+      "alias": "Taranis",
+      "platform_id": "PLT_TARANIS_UCAV"
+    },
+    {
+      "alias": "Taranis UCAV",
+      "platform_id": "PLT_TARANIS_UCAV"
+    },
+    {
+      "alias": "BAE Systems Taranis-like",
+      "platform_id": "PLT_TARANIS_UCAV"
+    },
+    {
+      "alias": "WZ-8",
+      "platform_id": "PLT_WZ8"
+    },
+    {
+      "alias": "WZ8",
+      "platform_id": "PLT_WZ8"
+    },
+    {
+      "alias": "Wuzhen-8",
+      "platform_id": "PLT_WZ8"
+    },
+    {
+      "alias": "WZ-8-like",
+      "platform_id": "PLT_WZ8"
+    },
+    {
+      "alias": "Northrop Grumman X-47B",
+      "platform_id": "PLT_X47B"
+    },
+    {
+      "alias": "X-47B",
+      "platform_id": "PLT_X47B"
+    },
+    {
+      "alias": "X47B",
+      "platform_id": "PLT_X47B"
+    },
+    {
+      "alias": "Northrop Grumman X-47B-like",
+      "platform_id": "PLT_X47B"
+    },
+    {
+      "alias": "B-21 Raider",
+      "platform_id": "PLT_B21_RAIDER"
+    },
+    {
+      "alias": "B-21",
+      "platform_id": "PLT_B21_RAIDER"
+    },
+    {
+      "alias": "B21",
+      "platform_id": "PLT_B21_RAIDER"
+    },
+    {
+      "alias": "Northrop Grumman B-21 Raider",
+      "platform_id": "PLT_B21_RAIDER"
+    },
+    {
+      "alias": "B-21 Raider-like",
+      "platform_id": "PLT_B21_RAIDER"
+    }
+  ]
+}

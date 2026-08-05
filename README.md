@@ -1,110 +1,169 @@
-# VRAG — Hava Aracı Tanıma (Visual RAG)
+# Hava Sahası Gözetleme ve İHA Tehdit Tespit Sistemi
 
-Teknofest için **görsel retrieval** sistemi. Havadan çekilmiş, kırpılmış bir uçak
-görüntüsünün **hangi model** olduğunu (F-16, Kaan, B-2, ANKA...) bulur. Modeli
-yeniden eğitmeden, referans veritabanından **en benzer** kaydı bulur → yeni uçak
-eklemek = birkaç fotoğraf + yeniden indeksleme.
+Video/kamera görüntüsünden hava araçlarını (uçak, İHA/SİHA, helikopter) tespit eden, tam olarak hangi model olduğunu tanıyan, bağımsız bir görsel dil modeliyle doğrulayan ve son olarak bir LLM karar destek katmanıyla risk değerlendirmesi + Türkçe rapor üreten, **tamamen yerel (offline)** çalışan bir sistem.
 
-Bu, projenin **sade/optimal** sürümüdür: tek encoder (**SigLIP2-so400m**),
-retrieval-only, perspektif augmentation + güven kapısı açık.
+TEKNOFEST Türkçe Yapay Zeka Dil Ajanları Yarışması (3. Senaryo) kapsamında geliştirilmiştir.
 
-## Mimari — 2 katmanlı boru hattı
+## Sistem Mimarisi
 
 ```
-   ┌──────────────┐     ┌────────────────────────────────┐
-   │  1. TESPİT   │     │   2. RETRIEVAL                 │
-   │    (YOLO)    │crop▶│   SigLIP2 → Qdrant             │
-   │ uçağı kırpar │     │  en benzer top-k model         │
-   └──────────────┘     └────────────────────────────────┘
-     (repo dışı)             ◀──────── BU REPO ────────▶
+Video Girdisi
+     ↓
+Görüntü İyileştirme + SAHI ile Kare Dilimleme     (src/detection, src/utils/enhancer.py)
+     ↓
+YOLO ile Nesne Tespiti                             (src/detection/slicer.py, models/best.pt)
+     ↓
+ByteTrack ile Takip                                (src/tracking/tracker.py)
+     ↓
+Hedefin Kırpılması (Crop)
+     ↓
+Model Tanıma (VRAG) + Görsel Doğrulama (VLM)       (src/vrag/, src/vlm/ — SigLIP2+Qdrant / Ollama)
+     ↓
+Karar Destek (LLM — risk + Türkçe rapor)           (LLM/ — ayrı FastAPI servisi)
+     ↓
+Kokpit (Windows masaüstü) veya Web Viewer           (entegrasyon/)
+     ↓
+Operatör
 ```
 
-Görüntü **SigLIP2-so400m** ile vektöre çevrilir, **Qdrant**'ta en benzer
-referanslar bulunur, model bazında tekilleştirilir. **Nihai tahmin = top-1**
-(en yüksek benzerlik); geri kalan adaylar sıralı gösterilir.
+**Neden VLM değil VRAG kimlik için birincil kaynak:** VLM'i model tanıma zincirine sokmak (retrieval + VLM birlikte) doğruluğu düşürdü (top-1 %88.9 → %64.4, benchmark verisiyle). Bu yüzden model kimliği VRAG'ın retrieval sonucuna dayanır; VLM bağımsız bir ikinci göz olarak tehdit değerlendirmesi ve doğrulama yapar, kimlik kararını değiştirmez.
 
-**Neden VLM yok?** Önceki sürümde adayları bir görsel-dil modeline (Qwen2.5-VL)
-seçtiren 3. katman denendi; ölçümde güçlü retrieval'ı **bozdu** (top-1 %88.9→%64.4)
-ve ~100× yavaştı. Retrieval-only hem daha isabetli hem çok daha hızlı.
+## Klasör Yapısı
 
-## Doğruluk
+| Klasör | İçerik |
+|---|---|
+| `src/` | Ana algı hattı: SAHI+YOLO tespiti, ByteTrack takibi, VRAG (model tanıma), VLM entegrasyonu |
+| `veriler/` | VRAG referans veri seti — `<kategori>/<model>/*.jpg` + `metadata.json` (ülke/üretici/rol) |
+| `models/best.pt` | YOLO ağırlıkları |
+| `output/qdrant_db/` | VRAG'ın indekslenmiş vektör veritabanı (Qdrant, embedded/local mod) |
+| `LLM/` | Karar destek sistemi — ayrı bir FastAPI servisi (Platform Registry, Türkiye Envanteri, izin/uçuş planı/NOTAM kontrolleri, LLM ile Türkçe rapor) |
+| `entegrasyon/` | Algı hattını (src/) ve karar destek sistemini (LLM/) kullanıcı arayüzüne bağlayan katman |
+| `entegrasyon/backend/` | FastAPI backend — `src/core/pipeline.py`'yi çalıştırır, video akışı + hedef verisi sunar |
+| `entegrasyon/kokpit/` | Windows masaüstü arayüzü (WPF/.NET 10) |
+| `entegrasyon/web/` | Tarayıcı tabanlı arayüz (Kokpit çalışmayan platformlarda — macOS/Linux — kullanılır) |
 
-Leave-one-out (**95 model, 2809 sorgu**): **top-1 %90.5 · top-3 %98.0** (perspektif
-augmentation açık). SigLIP2-so400m, ölçtüğümüz 11 encoder içinde en iyisi —
-kontrastif modeller self-supervised DINOv2'yi açık ara geçti.
+## Ön Koşullar (her iki platform için)
 
-**Güven kapısı:** ilk iki aday çok yakınsa (margin < `MARGIN_ESIGI`=0.015) tahmin
-"düşük güven" işaretlenir; ölçümde yanlış tahminlerin ~%86'sını yakalar.
+- **[Ollama](https://ollama.com)** kurulu ve çalışıyor olmalı, şu modeller çekili olmalı:
+  ```
+  ollama pull qwen2.5vl:7b   # VLM — görsel istihbarat/doğrulama
+  ollama pull llama3.2:1b    # LLM karar destek — Türkçe rapor üretimi
+  ```
+- Python'un kendisini elle kurmanıza gerek yok — aşağıdaki `uv sync` adımı, projenin istediği **Python 3.11**'i sizin için otomatik indirip kuruyor.
+- İlk çalıştırmada **internet gerekir** — VRAG'ın görsel gömme modeli (`google/siglip2-so400m-patch14-384`) Hugging Face'ten otomatik indirilir (~3-4 GB, bir kerelik). Sonrasında sistem tamamen yerel/offline çalışır.
 
-## Kurulum
+---
 
-Python 3.12+ ve CUDA'lı bir GPU (8 GB rahat yeter) gerekir.
+## Kurulum ve Çalıştırma — Windows
 
-```bash
-python -m venv .venv && .venv\Scripts\activate     # Windows
-pip install -r requirements.txt
-```
-CUDA'lı torch: `pip install torch --index-url https://download.pytorch.org/whl/cu130`.
-Encoder ilk kullanımda HuggingFace'ten iner (~1.6 GB).
+1. **Git LFS'i kurun** (büyük dosyalar — görseller, VRAG indeksi, model ağırlıkları — bununla gelir):
+   ```powershell
+   winget install GitHub.GitLFS
+   git lfs install
+   ```
+2. **uv'yi kurun** (Python paket yöneticisi):
+   ```powershell
+   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+3. **Depoyu klonlayın:**
+   ```powershell
+   git clone https://github.com/uludagai-club/YZT-MEVZUU-26.git
+   cd YZT-MEVZUU-26
+   git lfs pull
+   ```
+4. **Ortak sanal ortamı kurun** (hem algı hattı hem LLM karar destek sistemi için TEK venv — backend ikisini de bu venv'in Python'uyla çalıştırıyor):
+   ```powershell
+   cd LLM
+   uv sync
+   uv pip install --python .venv\Scripts\python.exe ultralytics opencv-python qdrant-client requests python-multipart boxmot
+   cd ..
+   ```
+5. **Backend'i başlatın:**
+   ```powershell
+   cd entegrasyon\backend
+   ..\..\LLM\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
+   ```
+   `Hazır. N model indeksli.` yazısını görünce hazırdır.
+6. **İzleyin:** `entegrasyon\kokpit\Kokpit` klasöründeki Kokpit (WPF) uygulamasını Visual Studio'dan açıp çalıştırın — backend'e otomatik bağlanır. (.NET 10 SDK gerekir.)
+7. **Video başlatın:** Kokpit arayüzünden video dosyası seçip başlatın; ya da tarayıcıda `http://127.0.0.1:8000/docs` → `POST /oturum/baslat` → `video_yolu` alanına tam dosya yolunu yazıp Execute'a basın.
 
-## Kullanım
+---
 
-```bash
-python -m vrag ingest                 # veriler/ → Qdrant indeksi (ilk kez şart)
-python app.py                         # web arayüzü → http://127.0.0.1:5000
-python -m vrag search crop.jpg        # komut satırı (top-k + güven)
-```
-Web arayüzü: fotoğraf yükle → **Tanı**. *Benchmark Çalıştır* doğruluğu ölçer;
-*Yeniden İndeksle* veriyi değiştirince indeksi kurar.
+## Kurulum ve Çalıştırma — macOS
 
-## Veri
+1. **Git LFS'i kurun:**
+   ```bash
+   brew install git-lfs
+   git lfs install
+   ```
+2. **uv'yi kurun:**
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+3. **Depoyu klonlayın:**
+   ```bash
+   git clone https://github.com/uludagai-club/YZT-MEVZUU-26.git
+   cd YZT-MEVZUU-26
+   git lfs pull
+   ```
+4. **Ortak sanal ortamı kurun** (hem algı hattı hem LLM karar destek sistemi için TEK venv):
+   ```bash
+   cd LLM
+   uv sync
+   uv pip install --python .venv/bin/python ultralytics opencv-python qdrant-client requests python-multipart boxmot
+   cd ..
+   ```
+5. **Backend'i başlatın:**
+   ```bash
+   cd entegrasyon/backend
+   ../../LLM/.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
+   ```
+   `Hazır. N model indeksli.` yazısını görünce hazırdır.
+6. **İzleyin:** Kokpit Windows'a özel (WPF) olduğu için macOS'ta çalışmaz — bunun yerine tarayıcıda **http://127.0.0.1:8000/goruntule/** açın. Aynı backend'den servis edilen, canlı video akışını ve VRAG/VLM/LLM sonuçlarını sırayla gösteren web arayüzü.
+7. **Video başlatın:** Web arayüzündeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da:
+   ```bash
+   curl -X POST http://127.0.0.1:8000/oturum/baslat \
+     -H "Content-Type: application/json" \
+     -d '{"video_yolu": "/tam/yol/video.mp4"}'
+   ```
 
-`veriler/<kategori>/<model>/` altına fotoğraflar + her model klasörüne bir
-`metadata.json`:
+---
 
-```json
-{
-  "model": "F-16 Fighting Falcon",
-  "kategori": "Savaş Uçağı",
-  "ayirt_edici_ozellikler": "Tek motor, tek dikey kuyruk, karın hava alığı",
-  "ulke": "ABD",
-  "uretici": "Lockheed Martin",
-  "rol": "Çok Rollü Avcı",
-  "alternatif_adlar": ["Viper"],
-  "motor_sayisi": 1,
-  "silahli": true
-}
-```
+Her iki platformda da: farklı bir video denemek için backend'i yeniden başlatmanıza gerek yok — `/oturum/baslat`'ı tekrar çağırmanız (ya da arayüzden tekrar Başlat'a basmanız) yeterli, sistem farklı çözünürlükteki videolar arasında otomatik olarak temiz bir başlangıç yapar.
 
-Şu an **95 model, 2809 görsel** → augmentation ile **16854 vektör**. `ulke`/`rol`
-sonuç kartında gösterilir ve **arayüzden filtrelenebilir**; `alternatif_adlar`
-kopya modelleri tespit etmeye yarar (ör. Kaan = TF-X = MMU).
+## VRAG Referans Verisini Genişletme
 
-> **Veri kaynakları:** yerli modeller ve askeri sınıflar tez-set (Kaggle) ve
-> FGVC-Aircraft'tan; sivil yolcu uçakları FGVC-Aircraft'tan; birkaç eksik model
-> Wikimedia Commons'tan (klasöründe `kaynak_atif.json` ile **atıf/lisans** kaydı)
-> derlendi. Bazı klasörler yalnızca `metadata.json` içeren **iskelet**tir (foto
-> eklenince otomatik indekslenir).
+Yeni model/görsel eklemek için:
 
-> **Üstten referans (asıl isabet kazancı):** sorgu havadan, referanslar çoğu
-> yandan. Bir modele **üstten fotoğraf** eklemek = klasörüne koy + `python -m vrag
-> ingest`. Havadan sorguda isabeti en çok bu artırır.
+1. `veriler/<kategori>/<model>/` altına görselleri koyun (var olan bir modelse mevcut klasöre, **dosya adları çakışmasın**; yeni bir modelse yeni klasör + diğerleri gibi bir `metadata.json` — `model`, `kategori`, `ulke`, `uretici`, `rol` alanlarıyla).
+2. İndeksleyin — proje kök dizininden (`YZT-MEVZUU-26/`):
 
-## Proje yapısı
+   Windows:
+   ```powershell
+   LLM\.venv\Scripts\python.exe -m src.vrag.ingest --img_dir veriler
+   ```
 
-| Dosya | İş |
-|-------|-----|
-| `vrag/config.py` | Tüm ayarlar (encoder, Qdrant, augmentation, güven kapısı) |
-| `vrag/gomleme.py` | SigLIP2 encoder (görüntü → vektör) |
-| `vrag/artirma.py` | Augmentation (döndürme / ölçek / blur / perspektif) |
-| `vrag/vektor_deposu.py` | Qdrant sarmalayıcı |
-| `vrag/indeksleme.py` | Ingest: tara → augment → embed → Qdrant |
-| `vrag/arama.py` | Retrieval + tekilleştirme + güven kapısı |
-| `vrag/degerlendirme.py` | Leave-one-out benchmark |
-| `vrag/__main__.py` | `ingest` / `search` CLI |
-| `app.py` + `templates/` + `static/` | Flask web arayüzü |
+   macOS:
+   ```bash
+   LLM/.venv/bin/python -m src.vrag.ingest --img_dir veriler
+   ```
 
-## Sonraki adımlar
-- **YOLO bağlanması** — canlı crop'ların doğrudan hatta beslenmesi.
-- **Üstten referans görselleri** — havadan sorgu/yandan referans uçurumunu kapatır.
-- **Gerçek OOD** — DB'de hiç olmayan uçağı reddetme (güven kapısının ötesinde).
+Script **güvenli şekilde senkronize eder**: `veriler/`'in tamamını her seferinde verebilirsiniz — zaten indekslenmiş görselleri atlar (tekrar eklemez), sadece gerçekten yeni olanları işler, ve `veriler/`'den kaldırılmış görselleri de indeksten otomatik siler. Yani indeks her zaman diskteki `veriler/` klasörüyle bire bir eşleşir.
+
+⚠️ İndeksleme sırasında backend'in **kapalı olması gerekir** (ikisi aynı Qdrant veritabanı dosyasını kilitler — aynı anda açık olamazlar).
+
+## Sık Karşılaşılan Sorunlar
+
+**"Storage folder ... already accessed by another instance" hatası:** Backend hâlâ açık, önce onu durdurun (`Ctrl+C` veya süreci `kill` edin), sonra ingest'i çalıştırın.
+
+**VLM/LLM'den hiç cevap gelmiyor, `ProxyError` / `Unable to connect to proxy`:** Sistem genelinde bir proxy (GoodbyeDPI vb. DPI-bypass araçları dahil) `localhost`'u istisna listesine almadan aktifse, yerel Ollama çağrıları da o proxy'ye yönlendirilip başarısız olur. Proxy'yi kapatın (Ayarlar → Ağ → Proxy) ve backend'i **yeniden başlatın** (süreç açıkken proxy ayarı değişse bile eski durumu tutabiliyor).
+
+**Farklı çözünürlüklü bir videoya geçince çöküyor:** Bu sorun çözüldü — her yeni oturumda tracker + kamera hareketi kompanzasyonu otomatik sıfırlanıyor. Hâlâ oluyorsa güncel kodda olduğunuzdan emin olun.
+
+**Hepsi birlikte (YOLO+VRAG+VLM+LLM) çalışınca VLM/Ollama yanıt vermiyor / donanım yetmiyor gibi görünüyor:** VRAM tıkanıklığı — VRAG bilinçli olarak CPU'da çalışacak şekilde ayarlı (`src/config.py: VRAG_DEVICE = "cpu"`), bunu değiştirmeyin. Ayrıca VRAG ve VLM çağrıları aynı anda GPU/Ollama'ya düşmesin diye sıraya alınıyor (`pipeline.py: self._ai_gate`).
+
+**Ollama modelleri VRAM'e sığmıyor:** `src/config.py`'de `VLM_MODEL_NAME`'i daha küçük bir modelle değiştirebilirsiniz (örn. `minicpm-v4.6:1b`), doğruluktan biraz ödün verip VRAM kazanırsınız.
+
+## Lisans
+
+Bu proje açık kaynak kodlu olarak geliştirilmiştir.

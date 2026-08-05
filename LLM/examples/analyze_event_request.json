@@ -1,0 +1,45 @@
+{
+  "video_id": "VIDEO_001",
+  "explanation_requested": false,
+  "gpu_handoff": {
+    "visual_pipeline_status": "COMPLETED",
+    "gpu_release_status": "RELEASED"
+  },
+  "visual_evidence": {
+    "schema_version": "visual-evidence/1.1",
+    "evidence_source_mode": "VLM_ONLY",
+    "track_id": "TRK_001",
+    "visual_class": "FIGHTER_JET",
+    "final_visual_hypothesis": "F-16-like",
+    "candidate_matches": [],
+    "visual_evidence_status": "PARTIALLY_SUPPORTED",
+    "visual_confidence": 0.85,
+    "confidence_origin": "VLM_SELF_REPORTED",
+    "uncertainty_level": "MEDIUM",
+    "uncertainty_flags": ["VLM_ONLY_NO_RETRIEVAL_CONFIRMATION"],
+    "human_visual_review_required": true,
+    "track_metrics": null,
+    "crop_evidence_summary": null,
+    "timing": {
+      "first_seen_offset_seconds": 8.2,
+      "last_seen_offset_seconds": 15.6
+    },
+    "upstream_vlm_output": {
+      "schema_version": "upstream-vlm/1.0",
+      "arac_sinifi": "SAVAS_UCAGI",
+      "tehdit_seviyesi": "YUKSEK",
+      "tahmini_hedef_tipi": "MUHARIP_JET",
+      "ulke_orjini": "TR",
+      "hedef_modeli": "F-16",
+      "gidis_yeri": null,
+      "gorsel_analiz": "Görüntüde F-16 benzeri bir muharip jet görülmektedir.",
+      "guven_skoru": 85
+    },
+    "producer_metadata": {
+      "visual_pipeline_version": "temporary-contract/1.1",
+      "vlm_model": "UPSTREAM_PROVIDED",
+      "retrieval_model": null,
+      "created_at_utc": "2026-08-10T11:20:08Z"
+    }
+  }
+}

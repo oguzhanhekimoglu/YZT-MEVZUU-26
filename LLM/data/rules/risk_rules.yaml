@@ -1,0 +1,178 @@
+rules:
+  - id: RULE_INVENTORY_UNAVAILABLE
+    priority: 1190
+    when:
+      inventory_status: UNKNOWN
+    minimum_risk: UNKNOWN
+    human_review: true
+
+  - id: RULE_INVENTORY_EXECUTION_FAILURE
+    priority: 1180
+    when:
+      inventory_execution_status:
+        in: [ERROR, TIMEOUT, INVALID_INPUT]
+    minimum_risk: UNKNOWN
+    human_review: true
+
+  - id: RULE_REQUIRED_OPERATIONAL_CHECK_UNAVAILABLE
+    priority: 1170
+    when:
+      operational_consistency_flags: REQUIRED_OPERATIONAL_CHECK_UNAVAILABLE
+    minimum_risk: UNKNOWN
+    human_review: true
+  - id: RULE_CONTEXT_UNAVAILABLE
+    priority: 1000
+    when:
+      context_status:
+        in: [MISSING, INVALID, INACTIVE]
+    minimum_risk: UNKNOWN
+    human_review: true
+
+  - id: RULE_CRITICAL_TOOL_FAILURE
+    priority: 1000
+    when:
+      tool_health_status: FAILED
+    minimum_risk: UNKNOWN
+    human_review: true
+
+  - id: RULE_PLATFORM_UNRESOLVED
+    priority: 990
+    when:
+      platform_status:
+        in: [UNKNOWN, AMBIGUOUS]
+    minimum_risk: UNKNOWN
+    human_review: true
+
+  - id: RULE_UNREGISTERED_MILITARY_PLATFORM
+    priority: 975
+    when:
+      platform_usage_domain: MILITARY
+      inventory_execution_status: SUCCESS
+      inventory_status: NOT_LISTED
+      platform_status:
+        in: [EXPECTED, NOT_EXPECTED]
+      context_status: COMPLETE
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_MILITARY_LISTED_FOREIGN_ORIGIN
+    priority: 940
+    when:
+      platform_usage_domain: MILITARY
+      inventory_execution_status: SUCCESS
+      inventory_status: CONFIRMED
+      vlm_origin_category: FOREIGN
+      platform_status:
+        in: [EXPECTED, NOT_EXPECTED]
+      context_status: COMPLETE
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_MILITARY_LISTED_UNKNOWN_ORIGIN
+    priority: 520
+    when:
+      platform_usage_domain: MILITARY
+      inventory_execution_status: SUCCESS
+      inventory_status: CONFIRMED
+      vlm_origin_category: UNKNOWN
+      platform_status:
+        in: [EXPECTED, NOT_EXPECTED]
+      context_status: COMPLETE
+    minimum_risk: MEDIUM
+    human_review: true
+
+  - id: RULE_NOTAM_PROHIBITS_OPERATION
+    priority: 950
+    when:
+      notam_operation_effect: PROHIBITS_OPERATION
+    minimum_risk: CRITICAL
+    human_review: true
+
+  - id: RULE_NOTAM_RESTRICTS_OPERATION
+    priority: 925
+    when:
+      notam_operation_effect: RESTRICTS_OPERATION
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_NOTAM_PERMISSION_CONFLICT
+    priority: 900
+    when:
+      notam_operation_effect: CONFLICTS_WITH_PERMISSION
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_CONFLICTING_RECORDS
+    priority: 900
+    when:
+      record_consistency: CONFLICTING
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_PERMISSION_REVOKED
+    priority: 900
+    when:
+      permission_status: REVOKED
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_FLIGHT_PLAN_CANCELLED
+    priority: 875
+    when:
+      flight_plan_status: CANCELLED
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_PERMISSION_EXPIRED
+    priority: 850
+    when:
+      permission_status: EXPIRED
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_NOT_EXPECTED_NO_PERMISSION
+    priority: 800
+    when:
+      platform_status: NOT_EXPECTED
+      permission_status: NOT_FOUND
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_EXPECTED_NO_PERMISSION
+    priority: 600
+    when:
+      platform_status: EXPECTED
+      permission_status: NOT_FOUND
+    minimum_risk: MEDIUM
+    human_review: true
+
+  - id: RULE_NOT_EXPECTED_VALID_PERMISSION
+    priority: 550
+    when:
+      platform_status: NOT_EXPECTED
+      permission_status: VALID
+    minimum_risk: MEDIUM
+    human_review: true
+
+  - id: RULE_HIGH_VISUAL_UNCERTAINTY
+    priority: 500
+    when:
+      uncertainty_level: HIGH
+    minimum_risk: MEDIUM
+    human_review: true
+
+  - id: RULE_VERIFIED_OPERATION
+    priority: 100
+    when:
+      verification_status: VERIFIED
+      uncertainty_level:
+        in: [LOW, MEDIUM]
+    minimum_risk: LOW
+    human_review: false
+
+  - id: RULE_NON_AIRCRAFT
+    priority: 100
+    when:
+      verification_status: NOT_APPLICABLE
+    minimum_risk: LOW
+    human_review: false

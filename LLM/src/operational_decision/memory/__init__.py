@@ -1,0 +1,1 @@
+"""Event-memory persistence package."""

@@ -1,0 +1,21 @@
+queries:
+  - query_id: PERMISSION_NOT_FOUND
+    query: Türk hava sahasında uçuş planı mevcut olsa bile geçerli uçuş izni kaydı bulunmayan operasyonların izin bağlamı nedir?
+    document_ids: [LT_GEN_1_2, LT_ENR_1_10]
+    expected_document_ids: [LT_GEN_1_2, LT_ENR_1_10]
+  - query_id: PERMISSION_EXPIRED
+    query: Gözlem zamanında geçerlilik süresi sona ermiş uçuş izninin operasyonel değerlendirmesi nedir?
+    document_ids: [LT_GEN_1_2]
+    expected_document_ids: [LT_GEN_1_2]
+  - query_id: CIVIL_UAV
+    query: Sivil İHA operasyonlarında uçuş izni, hava sahası kullanımı ve risk değerlendirmesi hangi kurallara tabidir?
+    document_ids: [SHT_IHA_REV_05]
+    expected_document_ids: [SHT_IHA_REV_05]
+  - query_id: ACTIVE_NOTAM
+    query: Aktif ve operasyonla ilgili NOTAM bildiriminin uçuş operasyonu ve havacılık bilgi hizmetleri açısından anlamı nedir?
+    document_ids: [LT_GEN_3_1]
+    expected_document_ids: [LT_GEN_3_1]
+  - query_id: FLIGHT_PLAN_WITHOUT_PERMISSION
+    query: Uçuş planının bulunması, uçuş izninin bulunduğu anlamına gelir mi?
+    document_ids: [LT_GEN_1_2, LT_ENR_1_10]
+    expected_document_ids: [LT_GEN_1_2, LT_ENR_1_10]

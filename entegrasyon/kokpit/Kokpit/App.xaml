@@ -1,0 +1,77 @@
+<Application x:Class="Kokpit.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Kokpit"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Sade & modern koyu palet -->
+            <SolidColorBrush x:Key="Zemin"     Color="#0E1217"/>
+            <SolidColorBrush x:Key="Panel"     Color="#171C24"/>
+            <SolidColorBrush x:Key="PanelAcik" Color="#1E2530"/>
+            <SolidColorBrush x:Key="Cizgi"     Color="#28303B"/>
+            <SolidColorBrush x:Key="Metin"     Color="#E8EDF2"/>
+            <SolidColorBrush x:Key="Solgun"    Color="#8A97A6"/>
+            <SolidColorBrush x:Key="Vurgu"     Color="#4C8BF5"/>
+            <SolidColorBrush x:Key="Basari"    Color="#34D399"/>
+            <SolidColorBrush x:Key="Uyari"     Color="#FBBF24"/>
+            <SolidColorBrush x:Key="Tehdit"    Color="#F87171"/>
+
+            <local:TersBool x:Key="TersBool"/>
+            <local:NullGizle x:Key="NullGizle"/>
+            <local:DusukGuvenGorunur x:Key="DusukGuvenGorunur"/>
+            <local:OranGenislik x:Key="OranGenislik"/>
+
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource PanelAcik}"/>
+                <Setter Property="Foreground" Value="{StaticResource Metin}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Cizgi}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="14,7"/>
+                <Setter Property="Margin" Value="0,0,8,0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="b" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="b" Property="Background" Value="#26303D"/>
+                                    <Setter TargetName="b" Property="BorderBrush" Value="{StaticResource Vurgu}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="b" Property="Opacity" Value="0.35"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="Vurgulu" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Background" Value="{StaticResource Vurgu}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Vurgu}"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+            </Style>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource Metin}"/>
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+            </Style>
+
+            <Style x:Key="Baslik" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource Solgun}"/>
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Margin" Value="2,0,0,8"/>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

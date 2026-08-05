@@ -1,0 +1,2197 @@
+{
+  "$defs": {
+    "BaseCategory": {
+      "description": "Stable physical platform categories used only as registry metadata.",
+      "enum": [
+        "FIXED_WING_AIRCRAFT",
+        "ROTARY_WING_AIRCRAFT",
+        "MULTIROTOR_AIRCRAFT",
+        "TILTROTOR_AIRCRAFT",
+        "LOITERING_MUNITION"
+      ],
+      "title": "BaseCategory",
+      "type": "string"
+    },
+    "ContextStatus": {
+      "description": "Operational context resolution states.",
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "MISSING",
+        "INVALID",
+        "INACTIVE"
+      ],
+      "title": "ContextStatus",
+      "type": "string"
+    },
+    "DecisionCode": {
+      "description": "Controlled final decision codes.",
+      "enum": [
+        "AUTHORIZED_OPERATIONAL_MATCH",
+        "PARTIALLY_VERIFIED_OPERATION",
+        "UNVERIFIED_AIRCRAFT",
+        "OPERATIONAL_AUTHORIZATION_UNVERIFIED",
+        "UNREGISTERED_MILITARY_AIRCRAFT",
+        "UNEXPECTED_PLATFORM",
+        "EXPIRED_OR_INVALID_PERMISSION",
+        "ACTIVE_NOTAM_PROHIBITION",
+        "CONFLICTING_OPERATIONAL_RECORDS",
+        "PLATFORM_UNRESOLVED",
+        "NON_AIRCRAFT",
+        "INDETERMINATE",
+        "REJECTED_OUT_OF_SCOPE"
+      ],
+      "title": "DecisionCode",
+      "type": "string"
+    },
+    "EventExtractionStatus": {
+      "description": "Availability state of the external video event extractor.",
+      "enum": [
+        "PENDING_VIDEO_EVENT_INTEGRATION",
+        "AVAILABLE"
+      ],
+      "title": "EventExtractionStatus",
+      "type": "string"
+    },
+    "EventStatus": {
+      "description": "Persisted event lifecycle states.",
+      "enum": [
+        "CREATED",
+        "INPUT_VALIDATED",
+        "CONTEXT_RESOLVED",
+        "WAITING_FOR_GPU_HANDOFF",
+        "TOOLS_RUNNING",
+        "TOOLS_COMPLETED",
+        "VERIFICATION_COMPLETED",
+        "RISK_ASSESSED",
+        "RAG_COMPLETED",
+        "LLM_COMPLETED",
+        "FINALIZED",
+        "FAILED",
+        "REJECTED_INVALID_INPUT"
+      ],
+      "title": "EventStatus",
+      "type": "string"
+    },
+    "FlightPlanEvidence": {
+      "additionalProperties": false,
+      "description": "Selected flight-plan record facts kept independent from permission and NOTAM.",
+      "properties": {
+        "flight_plan_id": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Flight Plan Id",
+          "type": "string"
+        },
+        "planned_departure_utc": {
+          "format": "date-time",
+          "title": "Planned Departure Utc",
+          "type": "string"
+        },
+        "planned_arrival_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Planned Arrival Utc"
+        },
+        "flight_plan_status": {
+          "$ref": "#/$defs/FlightPlanStatus"
+        },
+        "callsign": {
+          "anyOf": [
+            {
+              "maxLength": 50,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Callsign"
+        },
+        "departure_aerodrome": {
+          "anyOf": [
+            {
+              "maxLength": 20,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Departure Aerodrome"
+        },
+        "arrival_aerodrome": {
+          "anyOf": [
+            {
+              "maxLength": 20,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Arrival Aerodrome"
+        },
+        "route_or_area": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Route Or Area"
+        },
+        "source_type": {
+          "maxLength": 50,
+          "minLength": 1,
+          "title": "Source Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "flight_plan_id",
+        "planned_departure_utc",
+        "flight_plan_status",
+        "source_type"
+      ],
+      "title": "FlightPlanEvidence",
+      "type": "object"
+    },
+    "FlightPlanStatus": {
+      "description": "Flight-plan domain states.",
+      "enum": [
+        "FILED",
+        "NOT_FOUND",
+        "EXPIRED",
+        "NOT_YET_ACTIVE",
+        "CANCELLED",
+        "AMBIGUOUS",
+        "CONFLICTING",
+        "NOT_APPLICABLE"
+      ],
+      "title": "FlightPlanStatus",
+      "type": "string"
+    },
+    "GuardCorrection": {
+      "additionalProperties": false,
+      "description": "Auditable deterministic correction applied to an LLM field.",
+      "properties": {
+        "field": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Field",
+          "type": "string"
+        },
+        "llm_value": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Llm Value"
+        },
+        "final_value": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Final Value"
+        },
+        "reason": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "reason"
+      ],
+      "title": "GuardCorrection",
+      "type": "object"
+    },
+    "IdentityScope": {
+      "description": "Identity granularity represented by one registry record.",
+      "enum": [
+        "MODEL",
+        "MODEL_FAMILY",
+        "VARIANT",
+        "GENERIC_CLASS"
+      ],
+      "title": "IdentityScope",
+      "type": "string"
+    },
+    "InventoryStatus": {
+      "description": "Turkiye inventory scope resolution states.",
+      "enum": [
+        "CONFIRMED",
+        "NOT_LISTED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "InventoryStatus",
+      "type": "string"
+    },
+    "ModelVersions": {
+      "additionalProperties": false,
+      "description": "Runtime model identifiers recorded with a final output.",
+      "properties": {
+        "decision_llm": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Llm"
+        },
+        "text_embedding": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text Embedding"
+        },
+        "visual_pipeline": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visual Pipeline"
+        }
+      },
+      "title": "ModelVersions",
+      "type": "object"
+    },
+    "NotamEvidence": {
+      "additionalProperties": false,
+      "description": "Compact active NOTAM evidence exposed for user and audit presentation.",
+      "properties": {
+        "notam_id": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Notam Id",
+          "type": "string"
+        },
+        "operational_area_id": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Operational Area Id",
+          "type": "string"
+        },
+        "valid_from_utc": {
+          "format": "date-time",
+          "title": "Valid From Utc",
+          "type": "string"
+        },
+        "valid_to_utc": {
+          "format": "date-time",
+          "title": "Valid To Utc",
+          "type": "string"
+        },
+        "notam_status": {
+          "$ref": "#/$defs/NotamStatus"
+        },
+        "operation_effect": {
+          "$ref": "#/$defs/NotamOperationEffect"
+        },
+        "display_number": {
+          "anyOf": [
+            {
+              "maxLength": 30,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Number"
+        },
+        "series": {
+          "anyOf": [
+            {
+              "maxLength": 10,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series"
+        },
+        "number": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Number"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "maximum": 2100,
+              "minimum": 2000,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "q_code": {
+          "anyOf": [
+            {
+              "maxLength": 20,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Q Code"
+        },
+        "item_e": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item E"
+        },
+        "estimated_end": {
+          "default": false,
+          "title": "Estimated End",
+          "type": "boolean"
+        },
+        "permanent": {
+          "default": false,
+          "title": "Permanent",
+          "type": "boolean"
+        },
+        "lower_limit": {
+          "anyOf": [
+            {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lower Limit"
+        },
+        "upper_limit": {
+          "anyOf": [
+            {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Upper Limit"
+        },
+        "fir_code": {
+          "anyOf": [
+            {
+              "maxLength": 12,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fir Code"
+        },
+        "aerodrome_code": {
+          "anyOf": [
+            {
+              "maxLength": 12,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Aerodrome Code"
+        },
+        "operational_reason_tr": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operational Reason Tr"
+        },
+        "conflict_with_permission": {
+          "default": false,
+          "title": "Conflict With Permission",
+          "type": "boolean"
+        },
+        "conflict_with_flight_plan": {
+          "default": false,
+          "title": "Conflict With Flight Plan",
+          "type": "boolean"
+        },
+        "summary_tr": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Summary Tr",
+          "type": "string"
+        },
+        "source_type": {
+          "maxLength": 50,
+          "minLength": 1,
+          "title": "Source Type",
+          "type": "string"
+        },
+        "source_reference": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Reference"
+        }
+      },
+      "required": [
+        "notam_id",
+        "operational_area_id",
+        "valid_from_utc",
+        "valid_to_utc",
+        "notam_status",
+        "operation_effect",
+        "summary_tr",
+        "source_type"
+      ],
+      "title": "NotamEvidence",
+      "type": "object"
+    },
+    "NotamOperationEffect": {
+      "description": "Controlled operational effects declared by NOTAM records.",
+      "enum": [
+        "NO_EFFECT",
+        "INFORMATIONAL",
+        "REQUIRES_ADDITIONAL_CHECK",
+        "RESTRICTS_OPERATION",
+        "PROHIBITS_OPERATION",
+        "CONFLICTS_WITH_PERMISSION",
+        "UNKNOWN"
+      ],
+      "title": "NotamOperationEffect",
+      "type": "string"
+    },
+    "NotamStatus": {
+      "description": "NOTAM domain states.",
+      "enum": [
+        "ACTIVE_RELEVANT",
+        "ACTIVE_NOT_RELEVANT",
+        "NONE_ACTIVE",
+        "EXPIRED_ONLY",
+        "NOT_YET_ACTIVE",
+        "AMBIGUOUS",
+        "CONFLICTING"
+      ],
+      "title": "NotamStatus",
+      "type": "string"
+    },
+    "OperationalConsistencyFlag": {
+      "description": "Controlled flags emitted by operational consistency checks.",
+      "enum": [
+        "INVENTORY_SCOPE_CONFIRMED",
+        "INVENTORY_NOT_LISTED",
+        "INVENTORY_CHECK_UNAVAILABLE",
+        "DOWNSTREAM_CHECKS_SKIPPED_INVENTORY_NOT_CONFIRMED",
+        "VISUAL_AFFILIATION_INVENTORY_MISMATCH",
+        "PLATFORM_NOT_EXPECTED_IN_CONTEXT",
+        "PLATFORM_CONTEXT_MISMATCH",
+        "FLIGHT_PLAN_WITHOUT_VALID_PERMISSION",
+        "INVALID_PERMISSION_WITH_FILED_PLAN",
+        "VALID_PERMISSION_WITH_INVALID_FLIGHT_PLAN",
+        "NOTAM_CONFLICTS_WITH_PERMISSION",
+        "NOTAM_RESTRICTS_OPERATION",
+        "NOTAM_PROHIBITS_OPERATION",
+        "REQUIRED_OPERATIONAL_CHECK_UNAVAILABLE",
+        "CONTEXT_UNAVAILABLE"
+      ],
+      "title": "OperationalConsistencyFlag",
+      "type": "string"
+    },
+    "OperationalConsistencyStatus": {
+      "description": "Deterministic operational consistency states.",
+      "enum": [
+        "CONSISTENT",
+        "FLAGGED",
+        "INDETERMINATE",
+        "NOT_APPLICABLE"
+      ],
+      "title": "OperationalConsistencyStatus",
+      "type": "string"
+    },
+    "PermissionEvidence": {
+      "additionalProperties": false,
+      "description": "Selected permission record facts exposed without changing its status.",
+      "properties": {
+        "permission_id": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Permission Id",
+          "type": "string"
+        },
+        "valid_from_utc": {
+          "format": "date-time",
+          "title": "Valid From Utc",
+          "type": "string"
+        },
+        "valid_to_utc": {
+          "format": "date-time",
+          "title": "Valid To Utc",
+          "type": "string"
+        },
+        "permission_status": {
+          "$ref": "#/$defs/PermissionStatus"
+        },
+        "operator_name": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operator Name"
+        },
+        "flight_purpose": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Flight Purpose"
+        },
+        "altitude_ft_msl": {
+          "anyOf": [
+            {
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Altitude Ft Msl"
+        },
+        "departure_aerodrome": {
+          "anyOf": [
+            {
+              "maxLength": 20,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Departure Aerodrome"
+        },
+        "arrival_aerodrome": {
+          "anyOf": [
+            {
+              "maxLength": 20,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Arrival Aerodrome"
+        },
+        "source_type": {
+          "maxLength": 50,
+          "minLength": 1,
+          "title": "Source Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "permission_id",
+        "valid_from_utc",
+        "valid_to_utc",
+        "permission_status",
+        "source_type"
+      ],
+      "title": "PermissionEvidence",
+      "type": "object"
+    },
+    "PermissionStatus": {
+      "description": "Flight permission domain states.",
+      "enum": [
+        "VALID",
+        "NOT_FOUND",
+        "EXPIRED",
+        "NOT_YET_VALID",
+        "REVOKED",
+        "AMBIGUOUS",
+        "CONFLICTING",
+        "NOT_APPLICABLE"
+      ],
+      "title": "PermissionStatus",
+      "type": "string"
+    },
+    "PlatformStatus": {
+      "description": "Platform registry resolution states.",
+      "enum": [
+        "EXPECTED",
+        "NOT_EXPECTED",
+        "UNKNOWN",
+        "AMBIGUOUS",
+        "NON_AIRCRAFT"
+      ],
+      "title": "PlatformStatus",
+      "type": "string"
+    },
+    "PlatformTaxonomy": {
+      "additionalProperties": false,
+      "description": "Optional descriptive taxonomy that does not affect runtime policy.",
+      "properties": {
+        "base_category": {
+          "$ref": "#/$defs/BaseCategory"
+        },
+        "usage_domain": {
+          "$ref": "#/$defs/UsageDomain"
+        },
+        "primary_role": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primary Role"
+        },
+        "operational_class": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operational Class"
+        },
+        "traits": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Traits",
+          "type": "array"
+        },
+        "identity_scope": {
+          "$ref": "#/$defs/IdentityScope"
+        },
+        "variant_policy": {
+          "$ref": "#/$defs/VariantPolicy"
+        }
+      },
+      "required": [
+        "base_category",
+        "usage_domain",
+        "identity_scope",
+        "variant_policy"
+      ],
+      "title": "PlatformTaxonomy",
+      "type": "object"
+    },
+    "RecommendedAction": {
+      "additionalProperties": false,
+      "description": "One catalog-constrained action proposed by the decision model.",
+      "properties": {
+        "action_code": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Action Code",
+          "type": "string"
+        },
+        "priority": {
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "reason_tr": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Reason Tr",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action_code",
+        "priority",
+        "reason_tr"
+      ],
+      "title": "RecommendedAction",
+      "type": "object"
+    },
+    "RecordConsistency": {
+      "description": "Consistency between permission and flight-plan records.",
+      "enum": [
+        "CONSISTENT",
+        "PARTIAL",
+        "CONFLICTING",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "RecordConsistency",
+      "type": "string"
+    },
+    "RiskLevel": {
+      "description": "Deterministic operational risk levels.",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL",
+        "UNKNOWN"
+      ],
+      "title": "RiskLevel",
+      "type": "string"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "description": "Compact authoritative provenance exposed in final output.",
+      "properties": {
+        "source_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "document_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Document Id",
+          "type": "string"
+        },
+        "filename": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Filename",
+          "type": "string"
+        },
+        "page_start": {
+          "minimum": 1,
+          "title": "Page Start",
+          "type": "integer"
+        },
+        "page_end": {
+          "minimum": 1,
+          "title": "Page End",
+          "type": "integer"
+        },
+        "section_title": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section Title"
+        },
+        "revision_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision Date"
+        },
+        "effective_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective Date"
+        }
+      },
+      "required": [
+        "source_id",
+        "document_id",
+        "filename",
+        "page_start",
+        "page_end"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    },
+    "TimestampedVideoEvent": {
+      "additionalProperties": false,
+      "description": "Validated event whose producer timestamps are retained verbatim.",
+      "properties": {
+        "event_id": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "maxLength": 150,
+          "minLength": 1,
+          "title": "Event Type",
+          "type": "string"
+        },
+        "first_seen": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "First Seen"
+        },
+        "last_seen": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Seen"
+        },
+        "critical_moment": {
+          "default": false,
+          "title": "Critical Moment",
+          "type": "boolean"
+        },
+        "description_tr": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Description Tr",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "track_id": {
+          "anyOf": [
+            {
+              "maxLength": 150,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Track Id"
+        },
+        "source": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "event_type",
+        "first_seen",
+        "description_tr",
+        "confidence",
+        "source"
+      ],
+      "title": "TimestampedVideoEvent",
+      "type": "object"
+    },
+    "ToolExecutionStatus": {
+      "description": "Infrastructure execution states for controlled tools.",
+      "enum": [
+        "SUCCESS",
+        "INVALID_INPUT",
+        "TIMEOUT",
+        "ERROR",
+        "SKIPPED"
+      ],
+      "title": "ToolExecutionStatus",
+      "type": "string"
+    },
+    "ToolExecutionSummaryItem": {
+      "additionalProperties": false,
+      "description": "Compact final-output summary of one tool execution.",
+      "properties": {
+        "execution_status": {
+          "$ref": "#/$defs/ToolExecutionStatus"
+        },
+        "latency_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latency Ms"
+        },
+        "domain_status": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Domain Status"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Code"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "execution_status"
+      ],
+      "title": "ToolExecutionSummaryItem",
+      "type": "object"
+    },
+    "ToolHealthStatus": {
+      "description": "Aggregated health states of required tools.",
+      "enum": [
+        "HEALTHY",
+        "DEGRADED",
+        "FAILED"
+      ],
+      "title": "ToolHealthStatus",
+      "type": "string"
+    },
+    "UncertaintyLevel": {
+      "description": "Canonical visual uncertainty levels.",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "title": "UncertaintyLevel",
+      "type": "string"
+    },
+    "UntimestampedVisualAssessment": {
+      "additionalProperties": false,
+      "description": "Raw visual assessment kept separate from timestamped events.",
+      "properties": {
+        "type": {
+          "const": "VISUAL_PLATFORM_ASSESSMENT",
+          "default": "VISUAL_PLATFORM_ASSESSMENT",
+          "title": "Type",
+          "type": "string"
+        },
+        "timestamp": {
+          "default": null,
+          "title": "Timestamp",
+          "type": "null"
+        },
+        "source": {
+          "const": "RAW_VLM",
+          "default": "RAW_VLM",
+          "title": "Source",
+          "type": "string"
+        },
+        "critical": {
+          "const": false,
+          "default": false,
+          "title": "Critical",
+          "type": "boolean"
+        },
+        "description_tr": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Description Tr",
+          "type": "string"
+        }
+      },
+      "required": [
+        "description_tr"
+      ],
+      "title": "UntimestampedVisualAssessment",
+      "type": "object"
+    },
+    "UsageDomain": {
+      "description": "Controlled platform usage domains used only as registry metadata.",
+      "enum": [
+        "MILITARY",
+        "CIVIL",
+        "DUAL_USE",
+        "DEMO",
+        "UNKNOWN"
+      ],
+      "title": "UsageDomain",
+      "type": "string"
+    },
+    "VariantPolicy": {
+      "description": "Metadata describing how platform variants should be represented.",
+      "enum": [
+        "METADATA_ONLY",
+        "EXPLICIT_CHILD_RECORDS",
+        "EXACT_IDENTITY",
+        "GENERIC_ONLY"
+      ],
+      "title": "VariantPolicy",
+      "type": "string"
+    },
+    "VerificationStatus": {
+      "description": "Deterministic operational verification states.",
+      "enum": [
+        "VERIFIED",
+        "PARTIALLY_VERIFIED",
+        "UNVERIFIED",
+        "INDETERMINATE",
+        "NOT_APPLICABLE"
+      ],
+      "title": "VerificationStatus",
+      "type": "string"
+    },
+    "VisualClass": {
+      "description": "Canonical visual target classes.",
+      "enum": [
+        "FIGHTER_JET",
+        "UAV",
+        "UCAV",
+        "HELICOPTER",
+        "TRANSPORT_AIRCRAFT",
+        "CIVILIAN_AIRCRAFT",
+        "MICRO_DRONE",
+        "UNKNOWN_AIRCRAFT",
+        "NON_AIRCRAFT"
+      ],
+      "title": "VisualClass",
+      "type": "string"
+    },
+    "VisualEvidenceStatus": {
+      "description": "Support level of canonical visual evidence.",
+      "enum": [
+        "SUPPORTED",
+        "PARTIALLY_SUPPORTED",
+        "WEAK",
+        "CONFLICTING",
+        "INSUFFICIENT"
+      ],
+      "title": "VisualEvidenceStatus",
+      "type": "string"
+    },
+    "VlmOriginCategory": {
+      "description": "Normalized VLM-reported country-of-origin/affiliation hypothesis.",
+      "enum": [
+        "TURKEY",
+        "UNKNOWN",
+        "FOREIGN"
+      ],
+      "title": "VlmOriginCategory",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Versioned final output used for finalized and rejected events.",
+  "properties": {
+    "schema_version": {
+      "default": "final-output/2.1",
+      "enum": [
+        "final-output/2.0",
+        "final-output/2.1"
+      ],
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "event_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Event Id",
+      "type": "string"
+    },
+    "request_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Request Id",
+      "type": "string"
+    },
+    "event_status": {
+      "$ref": "#/$defs/EventStatus"
+    },
+    "video_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Video Id"
+    },
+    "camera_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Camera Id"
+    },
+    "context_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Context Id"
+    },
+    "operational_area_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Operational Area Id"
+    },
+    "scenario_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scenario Id"
+    },
+    "track_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Track Id"
+    },
+    "observation_time_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Observation Time Utc"
+    },
+    "observation_end_time_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Observation End Time Utc"
+    },
+    "visual_class": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VisualClass"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "visual_hypothesis": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visual Hypothesis"
+    },
+    "visual_analysis_tr": {
+      "anyOf": [
+        {
+          "maxLength": 4000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visual Analysis Tr"
+    },
+    "timestamped_events": {
+      "items": {
+        "$ref": "#/$defs/TimestampedVideoEvent"
+      },
+      "title": "Timestamped Events",
+      "type": "array"
+    },
+    "timestamps_available": {
+      "default": false,
+      "title": "Timestamps Available",
+      "type": "boolean"
+    },
+    "event_extraction_status": {
+      "$ref": "#/$defs/EventExtractionStatus",
+      "default": "PENDING_VIDEO_EVENT_INTEGRATION"
+    },
+    "untimestamped_visual_assessment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UntimestampedVisualAssessment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "visual_evidence_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VisualEvidenceStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "visual_confidence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visual Confidence"
+    },
+    "uncertainty_level": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UncertaintyLevel"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "uncertainty_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Uncertainty Flags",
+      "type": "array"
+    },
+    "platform_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlatformStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "platform_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Platform Id"
+    },
+    "matched_platform": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Matched Platform"
+    },
+    "canonical_name": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Canonical Name"
+    },
+    "platform_category": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VisualClass"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "platform_taxonomy": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlatformTaxonomy"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "platform_usage_domain": {
+      "$ref": "#/$defs/UsageDomain",
+      "default": "UNKNOWN"
+    },
+    "platform_origin": {
+      "anyOf": [
+        {
+          "maxLength": 50,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Platform Origin"
+    },
+    "manufacturer_country_code": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Z]{2}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Manufacturer Country Code"
+    },
+    "platform_identity_scope": {
+      "anyOf": [
+        {
+          "maxLength": 50,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Platform Identity Scope"
+    },
+    "platform_variant_policy": {
+      "anyOf": [
+        {
+          "maxLength": 50,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Platform Variant Policy"
+    },
+    "vlm_origin_hypothesis": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Vlm Origin Hypothesis"
+    },
+    "vlm_origin_category": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VlmOriginCategory"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "inventory_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/InventoryStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "inventory_registry_version": {
+      "anyOf": [
+        {
+          "maxLength": 50,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inventory Registry Version"
+    },
+    "inventory_record_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inventory Record Id"
+    },
+    "inventory_country_code": {
+      "anyOf": [
+        {
+          "maxLength": 3,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inventory Country Code"
+    },
+    "inventory_operator_name": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inventory Operator Name"
+    },
+    "inventory_service_status": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inventory Service Status"
+    },
+    "inventory_dataset_id": {
+      "anyOf": [
+        {
+          "maxLength": 150,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inventory Dataset Id"
+    },
+    "inventory_dataset_version": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inventory Dataset Version"
+    },
+    "inventory_source_type": {
+      "anyOf": [
+        {
+          "maxLength": 50,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inventory Source Type"
+    },
+    "inventory_reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Inventory Reason Codes",
+      "type": "array"
+    },
+    "operational_consistency_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OperationalConsistencyStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "operational_consistency_flags": {
+      "items": {
+        "$ref": "#/$defs/OperationalConsistencyFlag"
+      },
+      "title": "Operational Consistency Flags",
+      "type": "array"
+    },
+    "permission_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PermissionStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "permission_details": {
+      "items": {
+        "$ref": "#/$defs/PermissionEvidence"
+      },
+      "maxItems": 10,
+      "title": "Permission Details",
+      "type": "array"
+    },
+    "flight_plan_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FlightPlanStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "flight_plan_details": {
+      "items": {
+        "$ref": "#/$defs/FlightPlanEvidence"
+      },
+      "maxItems": 10,
+      "title": "Flight Plan Details",
+      "type": "array"
+    },
+    "record_consistency": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RecordConsistency"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "notam_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NotamStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "notam_operation_effect": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NotamOperationEffect"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "notam_details": {
+      "items": {
+        "$ref": "#/$defs/NotamEvidence"
+      },
+      "maxItems": 10,
+      "title": "Notam Details",
+      "type": "array"
+    },
+    "matched_notam_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Matched Notam Ids",
+      "type": "array"
+    },
+    "primary_notam_number": {
+      "anyOf": [
+        {
+          "maxLength": 30,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Primary Notam Number"
+    },
+    "notam_reason_tr": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notam Reason Tr"
+    },
+    "notam_matched_by": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Notam Matched By",
+      "type": "array"
+    },
+    "notam_conflict_with_permission": {
+      "default": false,
+      "title": "Notam Conflict With Permission",
+      "type": "boolean"
+    },
+    "notam_conflict_with_flight_plan": {
+      "default": false,
+      "title": "Notam Conflict With Flight Plan",
+      "type": "boolean"
+    },
+    "context_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ContextStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "verification_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VerificationStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "verification_reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Verification Reason Codes",
+      "type": "array"
+    },
+    "tool_health_status": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ToolHealthStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "decision": {
+      "$ref": "#/$defs/DecisionCode"
+    },
+    "decision_confidence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Decision Confidence"
+    },
+    "risk_level": {
+      "$ref": "#/$defs/RiskLevel"
+    },
+    "minimum_risk_level": {
+      "$ref": "#/$defs/RiskLevel"
+    },
+    "risk_assessment_confidence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Risk Assessment Confidence"
+    },
+    "evidence_quality_score": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Evidence Quality Score"
+    },
+    "matched_rule_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Matched Rule Ids",
+      "type": "array"
+    },
+    "risk_explanation": {
+      "anyOf": [
+        {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Risk Explanation"
+    },
+    "risk_increasing_factors": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Risk Increasing Factors",
+      "type": "array"
+    },
+    "risk_reducing_factors": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Risk Reducing Factors",
+      "type": "array"
+    },
+    "rag_summary": {
+      "anyOf": [
+        {
+          "maxLength": 4000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rag Summary"
+    },
+    "rag_sources": {
+      "items": {
+        "$ref": "#/$defs/SourceReference"
+      },
+      "maxItems": 4,
+      "title": "Rag Sources",
+      "type": "array"
+    },
+    "rag_decision_effect": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rag Decision Effect"
+    },
+    "human_review_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Human Review Reasons",
+      "type": "array"
+    },
+    "human_review_priority": {
+      "default": "NORMAL",
+      "enum": [
+        "NORMAL",
+        "URGENT"
+      ],
+      "title": "Human Review Priority",
+      "type": "string"
+    },
+    "hostile_target_confirmed": {
+      "default": false,
+      "title": "Hostile Target Confirmed",
+      "type": "boolean"
+    },
+    "legal_violation_confirmed": {
+      "default": false,
+      "title": "Legal Violation Confirmed",
+      "type": "boolean"
+    },
+    "summary_tr": {
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Summary Tr",
+      "type": "string"
+    },
+    "operational_report_tr": {
+      "anyOf": [
+        {
+          "maxLength": 12000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Operational Report Tr"
+    },
+    "turkish_report": {
+      "anyOf": [
+        {
+          "maxLength": 12000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Turkish Report"
+    },
+    "evidence_summary": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Summary",
+      "type": "array"
+    },
+    "recommended_actions": {
+      "items": {
+        "$ref": "#/$defs/RecommendedAction"
+      },
+      "title": "Recommended Actions",
+      "type": "array"
+    },
+    "human_approval_required": {
+      "title": "Human Approval Required",
+      "type": "boolean"
+    },
+    "uncertainty_notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Uncertainty Notes",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/SourceReference"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "tool_execution_summary": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ToolExecutionSummaryItem"
+      },
+      "title": "Tool Execution Summary",
+      "type": "object"
+    },
+    "guard_corrections": {
+      "items": {
+        "$ref": "#/$defs/GuardCorrection"
+      },
+      "title": "Guard Corrections",
+      "type": "array"
+    },
+    "processing_latency_ms": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Processing Latency Ms"
+    },
+    "model_versions": {
+      "$ref": "#/$defs/ModelVersions"
+    }
+  },
+  "required": [
+    "event_id",
+    "request_id",
+    "event_status",
+    "decision",
+    "risk_level",
+    "minimum_risk_level",
+    "summary_tr",
+    "human_approval_required"
+  ],
+  "title": "FinalDecisionOutput",
+  "type": "object"
+}

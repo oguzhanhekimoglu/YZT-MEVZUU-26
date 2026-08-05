@@ -1,0 +1,261 @@
+{
+  "schema_version": "turkey-inventory/1.0",
+  "dataset_id": "TR-INVENTORY-DEMO",
+  "dataset_version": "1.0.0",
+  "effective_at_utc": "2026-07-24T00:00:00Z",
+  "source_type": "DEMO_MOCK",
+  "records": [
+    {
+      "inventory_record_id": "TR-DEMO-F16-001",
+      "platform_id": "PLT_F16",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-TB2-001",
+      "platform_id": "PLT_BAYRAKTAR_TB2",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish SİHA Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-AKINCI-001",
+      "platform_id": "PLT_BAYRAKTAR_AKINCI",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Heavy-Class SİHA Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-ANKA-001",
+      "platform_id": "PLT_TUSAS_ANKA",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish MALE İHA Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-T129-001",
+      "platform_id": "PLT_T129_ATAK",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Rotary-Wing Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-T625-001",
+      "platform_id": "PLT_T625_GOKBEY",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Rotary-Wing Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-A400M-001",
+      "platform_id": "PLT_A400M",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Military Transport Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-C130-001",
+      "platform_id": "PLT_C130",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Military Transport Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-CN235-001",
+      "platform_id": "PLT_CN235",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Military Transport Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-E7-001",
+      "platform_id": "PLT_BOEING_E7",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Airborne Early Warning Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-AKSUNGUR-001",
+      "platform_id": "PLT_TUSAS_AKSUNGUR",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish MALE IHA Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-KARGU-001",
+      "platform_id": "PLT_STM_KARGU",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Mini IHA Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-TOGAN-001",
+      "platform_id": "PLT_STM_TOGAN",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Mini IHA Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-F4E2020-001",
+      "platform_id": "PLT_F4E_2020",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Fighter Aircraft Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-PKG8-001",
+      "platform_id": "PLT_F5_FREEDOM_FIGHTER",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Fighter Aircraft Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-PKG8-002",
+      "platform_id": "PLT_NF5_TURK_YILDIZLARI",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Aerobatic Aircraft Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-PKG8-003",
+      "platform_id": "PLT_T38_TALON",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Training Aircraft Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-PKG8-004",
+      "platform_id": "PLT_SIKORSKY_S70",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Utility Helicopter Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-PKG8-005",
+      "platform_id": "PLT_CH47F_CHINOOK",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Heavy Lift Helicopter Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-PKG8-006",
+      "platform_id": "PLT_AS532_COUGAR",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Utility Helicopter Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-PKG8-007",
+      "platform_id": "PLT_UH1_HUEY",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Utility Helicopter Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-PKG8-008",
+      "platform_id": "PLT_AH1_SUPER_COBRA",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Attack Helicopter Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-KAAN-001",
+      "platform_id": "PLT_KAAN",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Fifth-Gen Fighter Operator",
+      "service_status": "FLIGHT_TEST",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-KIZILELMA-001",
+      "platform_id": "PLT_BAYRAKTAR_KIZILELMA",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Combat UAS Operator",
+      "service_status": "FLIGHT_TEST",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-HURJET-001",
+      "platform_id": "PLT_TUSAS_HURJET",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Jet Trainer Operator",
+      "service_status": "FLIGHT_TEST",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-ANKA3-001",
+      "platform_id": "PLT_TUSAS_ANKA3",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Stealth UAS Operator",
+      "service_status": "DEVELOPMENT",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-DIHA-001",
+      "platform_id": "PLT_BAYRAKTAR_DIHA",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish VTOL UAS Operator",
+      "service_status": "FLIGHT_TEST",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-F4E-001",
+      "platform_id": "PLT_F4E_PHANTOM_II",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Legacy Fighter Operator",
+      "service_status": "LIMITED_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
+    }
+  ]
+}

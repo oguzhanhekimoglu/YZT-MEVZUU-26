@@ -1,0 +1,24 @@
+# VRAG-Kokpit backend — Python 3.11 venv
+# Arkadaşın YOLO yığını (boxmot/ByteTrack) + VRAG (SigLIP2/Qdrant) BİR ARADA.
+# Not: torch AYRI kurulur (CUDA index-url):
+#   pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
+
+# --- Ortak çekirdek (boxmot numpy==1.26.4'e pinli) ---
+numpy==1.26.4
+
+# --- Arkadaşın YOLO hattı ---
+boxmot==12.0.2          # ByteTrack (+ lapx, ftfy, yacs, gdown, filterpy, loguru, pandas, regex çeker)
+ultralytics             # YOLOv10 (best.pt)
+opencv-python
+
+# --- VRAG (retrieval) ---
+transformers==4.49.0    # SigLIP2 desteği + torch 2.2 uyumlu (5.x torch>=2.4 ister)
+qdrant-client
+pillow
+safetensors
+sentencepiece
+
+# --- Backend (FastAPI + MJPEG/WS) ---
+fastapi
+uvicorn[standard]
+python-multipart
