@@ -83,6 +83,8 @@ Operatör
    ..\..\LLM\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
    `Hazır. N model indeksli.` yazısını görünce hazırdır.
+
+   💡 Adım 5 yerine kök dizindeki `Sistemi_Baslat.bat`'a çift tıklayarak backend'i başlatıp tarayıcıyı otomatik açtırabilirsiniz.
 6. **Arayüzü açın:** Tarayıcıda **http://127.0.0.1:8000/goruntule/** açın.
 7. **Video başlatın:** Arayüzdeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da tarayıcıda `http://127.0.0.1:8000/docs` → `POST /oturum/baslat` → `video_yolu` alanına tam dosya yolunu yazıp Execute'a basın.
 
