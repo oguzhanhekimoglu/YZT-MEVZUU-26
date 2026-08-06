@@ -21,7 +21,7 @@ Model Tanıma (VRAG) + Görsel Doğrulama (VLM)       (src/vrag/, src/vlm/ — S
      ↓
 Karar Destek (LLM — risk + Türkçe rapor)           (LLM/ — ayrı FastAPI servisi)
      ↓
-Kokpit (Windows masaüstü) veya Web Viewer           (entegrasyon/)
+Web Arayüzü (Windows ve macOS'ta aynı şekilde)      (entegrasyon/)
      ↓
 Operatör
 ```
@@ -39,8 +39,7 @@ Operatör
 | `LLM/` | Karar destek sistemi — ayrı bir FastAPI servisi (Platform Registry, Türkiye Envanteri, izin/uçuş planı/NOTAM kontrolleri, LLM ile Türkçe rapor) |
 | `entegrasyon/` | Algı hattını (src/) ve karar destek sistemini (LLM/) kullanıcı arayüzüne bağlayan katman |
 | `entegrasyon/backend/` | FastAPI backend — `src/core/pipeline.py`'yi çalıştırır, video akışı + hedef verisi sunar |
-| `entegrasyon/kokpit/` | Windows masaüstü arayüzü (WPF/.NET 10) |
-| `entegrasyon/web/` | Tarayıcı tabanlı arayüz (Kokpit çalışmayan platformlarda — macOS/Linux — kullanılır) |
+| `entegrasyon/web/` | Tek, platform bağımsız arayüz — tarayıcıdan açılır, Windows ve macOS'ta aynı şekilde çalışır |
 
 ## Ön Koşullar (her iki platform için)
 
@@ -84,8 +83,8 @@ Operatör
    ..\..\LLM\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
    `Hazır. N model indeksli.` yazısını görünce hazırdır.
-6. **İzleyin:** `entegrasyon\kokpit\Kokpit` klasöründeki Kokpit (WPF) uygulamasını Visual Studio'dan açıp çalıştırın — backend'e otomatik bağlanır. (.NET 10 SDK gerekir.)
-7. **Video başlatın:** Kokpit arayüzünden video dosyası seçip başlatın; ya da tarayıcıda `http://127.0.0.1:8000/docs` → `POST /oturum/baslat` → `video_yolu` alanına tam dosya yolunu yazıp Execute'a basın.
+6. **Arayüzü açın:** Tarayıcıda **http://127.0.0.1:8000/goruntule/** açın.
+7. **Video başlatın:** Arayüzdeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da tarayıcıda `http://127.0.0.1:8000/docs` → `POST /oturum/baslat` → `video_yolu` alanına tam dosya yolunu yazıp Execute'a basın.
 
 ---
 
@@ -119,8 +118,8 @@ Operatör
    ../../LLM/.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
    `Hazır. N model indeksli.` yazısını görünce hazırdır.
-6. **İzleyin:** Kokpit Windows'a özel (WPF) olduğu için macOS'ta çalışmaz — bunun yerine tarayıcıda **http://127.0.0.1:8000/goruntule/** açın. Aynı backend'den servis edilen, canlı video akışını ve VRAG/VLM/LLM sonuçlarını sırayla gösteren web arayüzü.
-7. **Video başlatın:** Web arayüzündeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da:
+6. **Arayüzü açın:** Tarayıcıda **http://127.0.0.1:8000/goruntule/** açın — aynı backend'den servis edilen, canlı video akışını ve VRAG/VLM/LLM sonuçlarını sırayla gösteren web arayüzü.
+7. **Video başlatın:** Arayüzdeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da:
    ```bash
    curl -X POST http://127.0.0.1:8000/oturum/baslat \
      -H "Content-Type: application/json" \

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""VRAG-Kokpit backend (FastAPI) â€” YOLO tespit+takip + VRAG model tanÄ±ma.
+"""VRAG backend (FastAPI) â€” YOLO tespit+takip + VRAG model tanÄ±ma.
 
 UÃ§lar:
   POST /oturum/baslat {video_yolu}  â†’ video iÅŸlemeyi baÅŸlat (arka plan thread)
@@ -95,7 +95,7 @@ async def lifespan(app: FastAPI):
     if llm_process:
         llm_process.terminate()
 
-app = FastAPI(title="VRAG-Kokpit Backend", lifespan=lifespan)
+app = FastAPI(title="VRAG Backend", lifespan=lifespan)
 app.mount("/goruntule", StaticFiles(directory=str(Path(__file__).parent.parent / "web"), html=True), name="goruntule")
 
 def _kare_okuyucu(cap, q):

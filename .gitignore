@@ -16,7 +16,7 @@ venv/
 env/
 
 # ============================================================
-# .NET / Visual Studio (Kokpit masaüstü uygulaması) build çıktıları
+# .NET / Visual Studio build çıktıları (varsa)
 # ============================================================
 **/bin/
 **/obj/
