@@ -110,7 +110,8 @@ class PipelineAdapter:
                     "gercek_tahmin": gercek,
                     "arac_sinifi": sinif_map.get(arac, arac),
                     "ulke_orjini": ulke,
-                    "gidis_yonu": v.get("gidis_yonu", "")
+                    "gidis_yonu": v.get("gidis_yonu", ""),
+                    "hedef_modeli_tutarlilik": v.get("_hedef_modeli_tutarlilik", "")
                 }
                 d["vlm"] = vlm_payload
                 self.last_vlm_payload = vlm_payload  # Durumu kaydet

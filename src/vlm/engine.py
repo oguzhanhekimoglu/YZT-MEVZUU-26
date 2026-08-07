@@ -463,6 +463,23 @@ class VLMEngine:
             self._in_flight_tracks.discard(track_id)
         self.aggregator.reset(track_id)
 
+    def reset_all(self) -> None:
+        """
+        BUG-FIX (eski videodan kalan sonuç): forget_track() tek bir track_id
+        için temizlik yapıyordu, ama yeni bir video oturumu başlarken
+        tracker.reset() ByteTrack'in ID sayacını da sıfırlıyor — yani yeni
+        videodaki ilk hedef, eski videodaki aynı (küçük) track_id'yi
+        (örn. 0) alabiliyordu. VLM önbelleği (_last_result, oylama geçmişi)
+        temizlenmediği için o track_id'ye ait ESKİ cevap (örn. "Kaan", 2/2
+        tutarlılık) hiç yeni analiz yapılmadan geri dönüyordu. Yeni oturum
+        başlarken tracker.reset() ile BİRLİKTE bu da çağrılmalı.
+        """
+        with self._lock:
+            self._last_call_time.clear()
+            self._last_result.clear()
+            self._in_flight_tracks.clear()
+        self.aggregator._history.clear()
+
 
 class TrackVoteAggregator:
     """
@@ -478,8 +495,16 @@ class TrackVoteAggregator:
     dışarıdan bağımsız kullanılabilsin diye ayrı bırakıldı.
     """
 
+    # BUG-FIX (gecikmeli/eski model ismi): "hedef_modeli" eskiden burada
+    # oylanıyordu — VRAG artık doğru/net bir modele geçse bile, penceredeki
+    # eski (yanlış) oylar çoğunlukta kaldığı sürece ekran YANLIŞ model ismini
+    # göstermeye devam ediyordu (örn. VRAG "Kaan" dese bile birkaç kare daha
+    # "F-16" görünüyordu). "hedef_modeli" artık oylanmıyor — her zaman EN SON
+    # analizin ham sonucu gösteriliyor (gecikme yok). Bunun yerine, ne kadar
+    # "kararlı" olduğunu göstermek için ayrı bir tutarlılık bilgisi ekleniyor
+    # (_hedef_modeli_tutarlilik = "X/Y") — gösterimi geciktirmeden.
     VOTED_FIELDS = ("arac_sinifi", "tehdit_seviyesi", "tahmini_hedef_tipi",
-                     "ulke_orjini", "hedef_modeli")
+                     "ulke_orjini")
 
     def __init__(self, window: int = 5):
         self.window = window
@@ -491,7 +516,7 @@ class TrackVoteAggregator:
         if len(hist) > self.window:
             hist.pop(0)
 
-        stable = dict(result)  # gorsel_analiz gibi alanlar en son sonuçtan kalır
+        stable = dict(result)  # gorsel_analiz, hedef_modeli gibi alanlar en son sonuçtan kalır
         for field in self.VOTED_FIELDS:
             votes = [h.get(field) for h in hist if h.get(field)]
             if not votes:
@@ -504,6 +529,13 @@ class TrackVoteAggregator:
             for v in pool:
                 counts[v] = counts.get(v, 0) + 1
             stable[field] = max(counts, key=counts.get)
+
+        # Gecikmesiz tutarlılık göstergesi: son N analizin kaçı, ŞU AN
+        # gösterilen (en güncel) hedef_modeli ile aynı fikirde.
+        guncel_model = result.get("hedef_modeli")
+        if guncel_model:
+            ayni_fikirde = sum(1 for h in hist if h.get("hedef_modeli") == guncel_model)
+            stable["_hedef_modeli_tutarlilik"] = f"{ayni_fikirde}/{len(hist)}"
 
         stable["_vote_count"] = len(hist)  # kaç analizden oylandığını göstermek için
         return stable

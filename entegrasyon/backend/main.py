@@ -37,6 +37,16 @@ class Durum:
         self.frame_no = 0
         self.kaynak = ""
         self.kilit = threading.Lock()
+        # BUG-FIX (çifte pipeline / VRAG kilit çakışması): "Başlat"a art arda
+        # basılırsa (ör. çift tıklama, hızlı yeniden deneme) iki ayrı
+        # _video_dongu thread'i aynı anda "durum.fuzyon is None mı?" kontrolünü
+        # geçip İKİ AYRI PipelineAdapter (ve dolayısıyla iki VRAGEngine/Qdrant
+        # bağlantısı) oluşturmaya çalışabiliyordu. İkincisi, Qdrant'ın yerel
+        # veritabanı dosyasını kilitli bulup VRAG'ı hiç başlatamıyordu — sonuç:
+        # VRAG'dan hiç cevap gelmiyor, VLM de desteksiz kalıp "Bilinmiyor"
+        # döndürüyordu. Bu kilit, pipeline oluşturma/sıfırlama bloğunun aynı
+        # anda yalnızca bir thread tarafından çalıştırılmasını garanti eder.
+        self.pipeline_kilit = threading.Lock()
         self.thread: threading.Thread | None = None
         self.meta_cache: dict = {}
 
@@ -111,22 +121,42 @@ def _kare_okuyucu(cap, q):
 
 def _video_dongu(video_yolu: str):
     durum.calisiyor = True
-    
-    # CUDA Thread kilitlemesini önlemek için modeli bu thread içinde yükle
-    if durum.fuzyon is None:
-        print("[BACKEND] Modeller belleğe alınıyor, lütfen bekleyin...", flush=True)
-        from pipeline_adapter import PipelineAdapter
-        durum.fuzyon = PipelineAdapter(source_fps=25.0)
-    else:
-        # Otomatik tam sıfırlama: farklı çözünürlükte bir video ile yeniden
-        # başlatılsa bile (tracker, kamera hareketi kompanzasyonu, sahne-diff
-        # önbelleği) her oturum temiz baştan başlasın — model ağırlıklarını
-        # yeniden yüklemeden (~10-15sn kazanç), yalnızca çözünürlüğe bağlı
-        # önbellekleri sıfırlar. Böylece video değiştirmek için backend'i
-        # kapatıp açmaya gerek kalmaz.
-        print("[BACKEND] Yeni oturum: tracker + kamera hareketi önbelleği sıfırlanıyor...", flush=True)
-        durum.fuzyon.pipeline.tracker.reset()
-        durum.fuzyon.pipeline._prev_gray = None
+
+    # BUG-FIX: bu blok (pipeline oluşturma/sıfırlama) art arda gelen iki
+    # /oturum/baslat isteğinde aynı anda çalışırsa, "durum.fuzyon is None mı?"
+    # kontrolünü ikisi de geçip iki ayrı PipelineAdapter (iki ayrı VRAG/Qdrant
+    # bağlantısı) oluşturmaya çalışabiliyordu — bkz. Durum.pipeline_kilit
+    # tanımındaki not. Kilitle bu bloğu tek seferde tek thread'e indiriyoruz.
+    with durum.pipeline_kilit:
+        # CUDA Thread kilitlemesini önlemek için modeli bu thread içinde yükle
+        if durum.fuzyon is None:
+            print("[BACKEND] Modeller belleğe alınıyor, lütfen bekleyin...", flush=True)
+            from pipeline_adapter import PipelineAdapter
+            durum.fuzyon = PipelineAdapter(source_fps=25.0)
+        else:
+            # Otomatik tam sıfırlama: farklı çözünürlükte bir video ile yeniden
+            # başlatılsa bile (tracker, kamera hareketi kompanzasyonu, sahne-diff
+            # önbelleği) her oturum temiz baştan başlasın — model ağırlıklarını
+            # yeniden yüklemeden (~10-15sn kazanç), yalnızca çözünürlüğe bağlı
+            # önbellekleri sıfırlar. Böylece video değiştirmek için backend'i
+            # kapatıp açmaya gerek kalmaz.
+            print("[BACKEND] Yeni oturum: tracker + kamera hareketi + VLM önbelleği sıfırlanıyor...", flush=True)
+            durum.fuzyon.pipeline.tracker.reset()
+            durum.fuzyon.pipeline._prev_gray = None
+            # BUG-FIX: tracker.reset() ByteTrack'in ID sayacını da sıfırlıyor, yani
+            # yeni videodaki ilk hedef eski videodaki aynı track_id'yi alabiliyordu.
+            # VLM'in kendi önbelleği (self.vlm) ayrı bir nesne olduğu için tracker
+            # sıfırlanınca otomatik temizlenmiyordu — eski videodan kalan cevap
+            # (ör. "Kaan", tutarlılık 2/2) hiç yeni analiz yapılmadan gösteriliyordu.
+            durum.fuzyon.pipeline.vlm.reset_all()
+            # BUG-FIX: pipeline_adapter.py, henüz kendi tazesi olmayan hedefler için
+            # (ör. yeni track ilk birkaç karede) en son bilinen VLM/LLM sonucunu
+            # (last_vlm_payload/last_llm_payload) "hayalet" olarak gösteriyordu —
+            # bunlar PipelineAdapter nesnesinde saklandığı için (oturumlar arası
+            # yaşıyor) yeni video başlasa bile eski sonuç ekranda kalmaya devam
+            # ediyordu. Yeni oturumda bunlar da temizlenmeli.
+            durum.fuzyon.last_vlm_payload = None
+            durum.fuzyon.last_llm_payload = None
 
     cap = cv2.VideoCapture(video_yolu)
     if not cap.isOpened():

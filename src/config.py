@@ -286,9 +286,6 @@ VLM_MIN_HITS_FOR_COLLAGE   = 8
 # artÄ±k ulaÅŸÄ±labilir.
 VLM_MIN_CROP_POOL_SIZE     = 10   # _crop_buffer'da birikmesi gereken min. kaliteli kare
 
-# KÃ¼Ã§Ã¼k modeller kolajlarda kafasÄ± karÄ±ÅŸtÄ±ÄŸÄ± iÃ§in sadece en iyi TEK kareyi gÃ¶nder
-VLM_CROP_SEND_COUNT        = 1    # Sadece en iyi 1 fotoğrafı gönder (Kolaj yapma)
-
 VLM_VOTE_WINDOW            = 5
 VLM_COOLDOWN_S             = 0.5   # VLM Ã§aÄŸrÄ±larÄ± arasÄ± minimum sÃ¼re
 VLM_MIN_BBOX_PX            = 15    # Hedefin VLM'e gitmesi iÃ§in en az 15px olmasÄ±nÄ± bekle.
@@ -318,9 +315,12 @@ VLM_MIN_HITS_FOR_COLLAGE   = 8
 # artÄ±k ulaÅŸÄ±labilir.
 VLM_MIN_CROP_POOL_SIZE     = 10   # _crop_buffer'da birikmesi gereken min. kaliteli kare
 
-# KullanÄ±cÄ± isteÄŸi: kolaj yerine tek, en yÃ¼ksek kaliteli kareyi VLM'e gÃ¶nder.
-# 2 veya 4 yapmak isterseniz build_visual_grid otomatik kolaja dÃ¶ner.
-VLM_CROP_SEND_COUNT        = 4    # Kolaj: 4 farklÄ± aÃ§Ä±dan en iyi fotoÄŸraflarÄ± 2x2 grid olarak VLM'e gÃ¶nder
+# BUG-FIX (Ã§ift tanÄ±m): Bu deÄŸiÅŸken eskiden iki kere tanÄ±mlanÄ±yordu (Ã¶nce 1,
+# sonra buradaki 4 onu eziyordu) â€” Ã§eliÅŸen iki yorum, hangisinin aktif
+# olduÄŸunu belirsizleÅŸtiriyordu. Tek tanÄ±ma indirildi, deÄŸer (4) korunuyor.
+# 4 farklÄ± aÃ§Ä±dan en iyi fotoÄŸraflarÄ± 2x2 grid (kolaj) olarak VLM'e gÃ¶nderir;
+# 1 yapÄ±lÄ±rsa build_visual_grid otomatik olarak tek kare gÃ¶nderime dÃ¶ner.
+VLM_CROP_SEND_COUNT        = 4
 
 # ======================== TEHDÄ°T SKORU =======================
 THREAT_WEIGHT_CLASS  = 2.0
