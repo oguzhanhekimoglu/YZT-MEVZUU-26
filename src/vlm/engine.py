@@ -24,7 +24,8 @@ DEBUG_VLM_DIR.mkdir(parents=True, exist_ok=True)
 try:
     from src.config import (
         VLM_MODEL_NAME, VLM_API_URL, VLM_ENGINE_MIN_CALL_INTERVAL_S,
-        VLM_VOTE_WINDOW, VLM_NUM_PREDICT, VLM_TIMEOUT_S, VRAG_ENABLED
+        VLM_VOTE_WINDOW, VLM_NUM_PREDICT, VLM_TIMEOUT_S, VRAG_ENABLED,
+        VLM_DEBUG_SAVE_IMAGES
     )
 except ImportError:
     VLM_MODEL_NAME = "gemma4:12b"
@@ -33,6 +34,7 @@ except ImportError:
     VLM_VOTE_WINDOW = 5
     VLM_NUM_PREDICT = 2048
     VLM_TIMEOUT_S = 120.0
+    VLM_DEBUG_SAVE_IMAGES = False
 
 # Kolaj parametreleri
 try:
@@ -227,9 +229,16 @@ class VLMEngine:
 
         grid_img = self.build_visual_grid(crops)
 
-        # --- Kolaj'ı diske kaydet (her zaman, sessizce değil) ---
+        # --- Kolaj'ı diske kaydet (yalnızca VLM_DEBUG_SAVE_IMAGES=True iken) ---
         # Kaydedilen dosyayı vlm_manual_test.py ile açıp test edebilirsin:
         #   python vlm_manual_test.py pipeline_output/debug_vlm/track_X_....jpg
+        #
+        # BUG-FIX (FPS düşüşü): Bu blok eskiden HER VLM çağrısında koşulsuz
+        # çalışıyordu — cv2.imwrite + etiket çizimi senkron CPU/disk işi, arka
+        # plan thread'inde olsa bile Python'ın GIL'i yüzünden ana video işleme
+        # döngüsüyle çekişip VLM tetiklendiği an FPS'in ani düşmesine yol
+        # açıyordu. Artık yalnızca manuel debug için açıkça istendiğinde
+        # (config.py: VLM_DEBUG_SAVE_IMAGES=True) çalışıyor.
         #
         # BUG-FIX (etiketsiz fotoğraf): Bu görsel doğrudan ham crop'tan
         # oluşuyordu — canlı videodaki HUD (ID/sınıf/güven kutusu) sadece
@@ -237,23 +246,24 @@ class VLMEngine:
         # ulaşmıyordu. Sonuç: diske kaydedilen HER track_X.jpg etiketsizdi.
         # VLM'e giden temiz görüntüyü (grid_img) BOZMADAN, sadece diske
         # yazılan kopyanın üstüne bilgi şeridi basıyoruz.
-        try:
-            DEBUG_VLM_DIR.mkdir(parents=True, exist_ok=True)
-            fname = f"track_{track_id}_{int(time.time())}.jpg"
-            save_path = DEBUG_VLM_DIR / fname
+        if VLM_DEBUG_SAVE_IMAGES:
+            try:
+                DEBUG_VLM_DIR.mkdir(parents=True, exist_ok=True)
+                fname = f"track_{track_id}_{int(time.time())}.jpg"
+                save_path = DEBUG_VLM_DIR / fname
 
-            labeled_img = self._label_debug_image(
-                grid_img, track_id=track_id, yolo_class=yolo_class, yolo_conf=yolo_conf,
-                speed=speed, threat=threat,
-            )
+                labeled_img = self._label_debug_image(
+                    grid_img, track_id=track_id, yolo_class=yolo_class, yolo_conf=yolo_conf,
+                    speed=speed, threat=threat,
+                )
 
-            ok = cv2.imwrite(str(save_path), labeled_img)
-            if ok:
-                log.info(f"[VLM-KOLAJ] Diske kaydedildi → {save_path}")
-            else:
-                log.warning(f"[VLM-KOLAJ] imwrite başarısız → {save_path} (cv2 hata kodu)")
-        except Exception as e:
-            log.warning(f"[VLM-KOLAJ] Kayıt hatası: {e}")
+                ok = cv2.imwrite(str(save_path), labeled_img)
+                if ok:
+                    log.info(f"[VLM-KOLAJ] Diske kaydedildi → {save_path}")
+                else:
+                    log.warning(f"[VLM-KOLAJ] imwrite başarısız → {save_path} (cv2 hata kodu)")
+            except Exception as e:
+                log.warning(f"[VLM-KOLAJ] Kayıt hatası: {e}")
 
 
         _, buffer = cv2.imencode('.jpg', grid_img, [int(cv2.IMWRITE_JPEG_QUALITY), 80])

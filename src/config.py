@@ -337,6 +337,11 @@ ARENA_POLYGON          = []   # [] = tÃ¼m frame arena
 OUTPUT_DIR    = Path(__file__).parent.parent / "output"
 DEBUG_VLM_DIR = OUTPUT_DIR / "debug_vlm"
 DEBUG_RAG_DIR = OUTPUT_DIR / "debug_rag"
+# VLM her cagrida kolaji diske kaydediyordu (cv2.imwrite + etiket cizimi) - bu
+# senkron CPU/disk isi, arka plan thread'inde olsa bile GIL yuzunden ana video
+# donguesunun FPS'ini dusuruyordu (VLM baslarken ani FPS dususu). Uretimde
+# kapali, manuel VLM debug/test yaparken True yapip acilabilir.
+VLM_DEBUG_SAVE_IMAGES = False
 SHOW_WINDOW   = True
 SAVE_VIDEO    = False
 

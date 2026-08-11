@@ -94,13 +94,17 @@ class TeknoFestPipeline:
         # Prensip 1: Asenkron ve Bloke Etmeyen Mimari için paralel işleme worker havuzu (VLMPool)
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=4, thread_name_prefix="VLMPool")
 
-        # VRAM tıkanıklığı düzeltmesi: VRAG (embedding) ve VLM (Ollama) çağrıları
-        # ThreadPoolExecutor sayesinde aynı anda birden fazla track için paralel
-        # tetiklenebiliyordu — birden fazla ağır AI çağrısının aynı anda GPU/Ollama'ya
-        # düşmesi darboğaza yol açıyordu. Bu kilit, ağır AI işlerini (VRAG + VLM)
-        # router gibi sıraya sokup her seferinde yalnızca birinin gerçekten
-        # çalışmasını garanti eder; kuyruğa girme paralel kalır, sadece asıl iş sıralanır.
-        self._ai_gate = threading.Lock()
+        # BUG-FIX (VRAG'ın süresiz donması): Tek bir kilit (_ai_gate) eskiden VRAG
+        # (SigLIP2 embedding) ile VLM (Ollama) çağrılarının İKİSİNİ BİRDEN
+        # sıralıyordu. Ama VRAG artık CPU'da çalışıyor (VRAG_DEVICE=cpu) ve Ollama
+        # ayrı bir process/GPU kullanıyor — aralarında gerçek kaynak çakışması yok.
+        # Ortak kilidin bedeli ağırdı: VLM'in zaman aşımı 120 saniye, ve bu süre
+        # boyunca TÜM VRAG aramaları (ve diğer track'lerin VLM çağrıları) donuyordu
+        # (canlı testte doğrulandı — bir VRAG görevi kilidi hiç alamadan
+        # dakikalarca askıda kaldı, kuyruktaki sonraki hedefler hiç başlayamadı).
+        # Artık VRAG ve VLM ayrı kilitlere sahip.
+        self._vrag_gate = threading.Lock()
+        self._vlm_gate = threading.Lock()
         
         # --- CUDA WARMUP ---
         # PyTorch modelleri (YOLO ve SigLIP) ilk çalıştıklarında CUDA bellek tahsisi ve derleme
@@ -510,9 +514,9 @@ class TeknoFestPipeline:
     def _async_vrag_task(self, track, live_crop):
         try:
             import time
-            # Router kilidi: VRAG (embedding) ve VLM (Ollama) aynı anda çalışmasın —
-            # birden fazla track paralel tetiklense bile ağır AI işi sıraya girer.
-            with self._ai_gate:
+            # VRAG kendi kilidini kullanır — VLM'in (Ollama, 120sn'ye kadar sürebilir)
+            # kilidini beklemek zorunda değil.
+            with self._vrag_gate:
                 matches = self.vlm.vrag_engine.search_similar_vehicle(live_crop)
             if matches:
                 # Zamansal oylama: VRAG track başına ~saniyede bir çalışıyor, tek
@@ -554,9 +558,9 @@ class TeknoFestPipeline:
             if not enhanced_crops:
                 enhanced_crops = crops
 
-            # Router kilidi: aynı anda yalnızca bir ağır AI çağrısı (VRAG ya da VLM/Ollama)
-            # gerçekten çalışsın — GPU/Ollama'ya paralel çoklu istek düşmesini engeller.
-            with self._ai_gate:
+            # VLM kendi kilidini kullanır — aynı anda yalnızca bir Ollama çağrısı çalışsın,
+            # ama artık VRAG'ı bloklamaz.
+            with self._vlm_gate:
                 json_result = self.vlm.analyze_target(
                     track_id  = track.track_id,
                     crops     = enhanced_crops,
