@@ -28,6 +28,7 @@ from src.config import (
     SCENE_CHANGE_THRESHOLD, FAR_TARGET_AREA_RATIO, MIN_OBJECT_PX,
     DISPLAY_MIN_CONF, DISPLAY_MIN_CLASS_VOTE, DISPLAY_ALLOWED_CLASSES, DISPLAY_MIN_HITS, EDGE_MARGIN_PX,
     EDGE_MAX_FRAMES, SUSPENDED_DRAW_GRACE_FRAMES, MAX_OBJECT_AREA_RATIO,
+    VRAG_VOTE_WINDOW,
 )
 
 _LOG_FILE = Path(__file__).parent / "pipeline.log"
@@ -309,7 +310,7 @@ class TeknoFestPipeline:
                     cx1, cy1 = max(0, x1 - pad_x), max(0, y1 - pad_y)
                     cx2, cy2 = min(frame_bgr.shape[1], x2 + pad_x), min(frame_bgr.shape[0], y2 + pad_y)
                     live_crop = frame_bgr[cy1:cy2, cx1:cx2]
-                    
+
                     if live_crop.size > 0 and self.vlm.vrag_engine:
                         track.vrag_is_running = True
                         self.executor.submit(self._async_vrag_task, track, live_crop)
@@ -514,7 +515,26 @@ class TeknoFestPipeline:
             with self._ai_gate:
                 matches = self.vlm.vrag_engine.search_similar_vehicle(live_crop)
             if matches:
-                track.vrag_matches = matches
+                # Zamansal oylama: VRAG track başına ~saniyede bir çalışıyor, tek
+                # karenin sonucu titreyebiliyor (aynı hedef için art arda farklı
+                # modeller — örn. F-16→WZ-7→F-4E→WZ-7). Ham en-son sonucu doğrudan
+                # göstermek yerine, son VRAG_VOTE_WINDOW aramanın en sık tekrar eden
+                # top-1 modelini gösteriyoruz (VLM tarafındaki TrackVoteAggregator
+                # ile aynı mantık) — titreme azalır, gerçekten baskın olan cevaba
+                # yakınsama ihtimali artar.
+                if not hasattr(track, "vrag_history"):
+                    track.vrag_history = deque(maxlen=VRAG_VOTE_WINDOW)
+                track.vrag_history.append(matches)
+
+                from collections import Counter
+                top1_adlari = [m[0]["model"] for m in track.vrag_history if m]
+                secilen_model, _ = Counter(top1_adlari).most_common(1)[0]
+                # Oylanan modele ait EN SON (en güncel) eşleşme bilgisini kullan
+                secilen_match = next(
+                    (m[0] for m in reversed(track.vrag_history) if m and m[0]["model"] == secilen_model),
+                    matches[0],
+                )
+                track.vrag_matches = [secilen_match] + matches[1:]
         except Exception as e:
             log.warning(f"VRAG error: {e}")
         finally:

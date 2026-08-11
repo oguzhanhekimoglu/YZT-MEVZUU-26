@@ -346,6 +346,11 @@ VRAG_DB_PATH         = OUTPUT_DIR / "qdrant_db"
 VRAG_COLLECTION_NAME = "uav_knowledge"
 SIGLIP_MODEL_NAME    = "google/siglip2-so400m-patch14-384"
 VRAG_MIN_SCORE       = 0.65  # EÅŸleÅŸme iÃ§in minimum Cosine Similarity
+# Zamansal oylama: VRAG'in bagimsiz canli aramasi track basina saniyede bir
+# calisir, tek karenin sonucu titreyebilir (ayni hedef icin art arda farkli
+# modeller). Son VRAG_VOTE_WINDOW aramanin en sik tekrar eden top-1 modeli
+# gosterilir - VLM tarafindaki TrackVoteAggregator ile ayni mantik.
+VRAG_VOTE_WINDOW     = 5
 # ======================== VRAG VERİ ARTIRMA (AUGMENTATION) ===
 DONME_ACILARI        = (-12, 12)
 OLCEK_FAKTORLERI     = (0.8, 0.5, 0.25)
