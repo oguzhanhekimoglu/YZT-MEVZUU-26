@@ -153,6 +153,14 @@ Script **güvenli şekilde senkronize eder**: `veriler/`'in tamamını her sefer
 
 ⚠️ İndeksleme sırasında backend'in **kapalı olması gerekir** (ikisi aynı Qdrant veritabanı dosyasını kilitler — aynı anda açık olamazlar).
 
+⚠️ `--img_dir` **mutlaka belirtin** (varsayılan `data/knowledge_base`'dir, `veriler/` değil) — yanlışlıkla varsayılanla çalıştırmak, script'in "diskte artık yok" sanıp `veriler/`'deki tüm mevcut kayıtları indeksten **silmesine** yol açar.
+
+### Güven Göstergeleri
+
+- **Düşük güven ⚠️ işareti:** VRAG'ın en iyi eşleşmesi ya `VRAG_MIN_SCORE` (0.65) altındaysa ya da onu ondan **farklı bir modelden** ayıran fark belirsizse (`VRAG_MARGIN_ESIGI`, 0.015), sonuç yine gösterilir ama bu etiketle işaretlenir — sistem "eminim" demek yerine belirsizliğini dürüstçe bildirir.
+- **Zamansal oylama:** VRAG'ın bağımsız canlı araması track başına ~saniyede bir çalışır; tek bir karenin sonucu titreyebileceği için (aynı hedef için art arda farklı model önerileri), son `VRAG_VOTE_WINDOW` (5) aramanın en sık tekrar eden modeli gösterilir.
+- **VLM debug kolaj kaydı** (`src/config.py: VLM_DEBUG_SAVE_IMAGES`) varsayılan olarak **kapalı** — üretimde gereksiz CPU/disk işini önler. VLM'e giden görselleri manuel incelemek isterseniz `True` yapıp `output/debug_vlm/`'e bakabilirsiniz.
+
 ## Sık Karşılaşılan Sorunlar
 
 **"Storage folder ... already accessed by another instance" hatası:** Backend hâlâ açık, önce onu durdurun (`Ctrl+C` veya süreci `kill` edin), sonra ingest'i çalıştırın.
@@ -161,7 +169,7 @@ Script **güvenli şekilde senkronize eder**: `veriler/`'in tamamını her sefer
 
 **Farklı çözünürlüklü bir videoya geçince çöküyor:** Bu sorun çözüldü — her yeni oturumda tracker + kamera hareketi kompanzasyonu otomatik sıfırlanıyor. Hâlâ oluyorsa güncel kodda olduğunuzdan emin olun.
 
-**Hepsi birlikte (YOLO+VRAG+VLM+LLM) çalışınca VLM/Ollama yanıt vermiyor / donanım yetmiyor gibi görünüyor:** VRAM tıkanıklığı — VRAG bilinçli olarak CPU'da çalışacak şekilde ayarlı (`src/config.py: VRAG_DEVICE = "cpu"`), bunu değiştirmeyin. Ayrıca VRAG ve VLM çağrıları aynı anda GPU/Ollama'ya düşmesin diye sıraya alınıyor (`pipeline.py: self._ai_gate`).
+**Hepsi birlikte (YOLO+VRAG+VLM+LLM) çalışınca VLM/Ollama yanıt vermiyor / donanım yetmiyor gibi görünüyor:** VRAM tıkanıklığı — VRAG bilinçli olarak CPU'da çalışacak şekilde ayarlı (`src/config.py: VRAG_DEVICE = "cpu"`), bunu değiştirmeyin. VRAG ve VLM artık **ayrı kilitlere** sahip (`pipeline.py: self._vrag_gate`, `self._vlm_gate`) — VLM'in Ollama çağrısı (120 saniyeye kadar sürebilir) sırasında VRAG'ın kendi bağımsız aramaları artık bloklanmıyor; eskiden tek bir ortak kilit (`_ai_gate`) ikisini birden sıraya alıyordu ve VLM meşgulken VRAG tamamen donabiliyordu.
 
 **Ollama modelleri VRAM'e sığmıyor:** `src/config.py`'de `VLM_MODEL_NAME`'i daha küçük bir modelle değiştirebilirsiniz (örn. `minicpm-v4.6:1b`), doğruluktan biraz ödün verip VRAM kazanırsınız.
 
