@@ -44,11 +44,15 @@ def generate_vlm_prompt(speed: float, zigzag: float, threat: float, yolo_class: 
 
     vrag_section = ""
     if vrag_context:
+        # BUG-FIX (körü körüne güven): Burada eskiden "%80 üzeriyse mutlaka VRAG'ın
+        # verdiği Model ismini doğru kabul edip kullan!" talimatı vardı — bu,
+        # engine.py'deki _build_vrag_context()'in kendi (destek/ipucu odaklı)
+        # rehberiyle çelişiyor ve onu geçersiz kılıyordu. Kesin güven kararı artık
+        # kod seviyesinde (VRAG_GUVEN_ESIGI) veriliyor; tüm değerlendirme talimatı
+        # tek yerde (vrag_context içinde) veriliyor.
         vrag_section = f"""
 [GÖRSEL HAFIZA (VRAG) EŞLEŞMELERİ]
-{vrag_context}
-ÖNEMLİ: Eğer VRAG eşleşmelerinden herhangi birinin benzerliği %80 veya üzerindeyse, bu çok güçlü bir kanıttır. Silüet tamamen farklı bir şeye benzemiyorsa mutlaka VRAG'ın verdiği 'Model' ismini doğru kabul edip kullan!
-"""
+{vrag_context}"""
 
     prompt = f"""Sen uzman bir askeri istihbarat ve hava aracı analistisin. Sana uçan bir hedefin hava gözetleme görüntüleri gösterilecek. Görevin görseli inceleyip verilen VRAG veritabanı eşleşmelerini yorumlamak ve kesin bir istihbarat raporu sunmaktır. ÇIKTIN SADECE VE SADECE JSON FORMATINDA OLMALIDIR.
 

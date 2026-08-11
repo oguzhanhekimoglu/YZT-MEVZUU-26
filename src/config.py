@@ -356,6 +356,26 @@ VRAG_MIN_SCORE       = 0.65  # EÅŸleÅŸme iÃ§in minimum Cosine Similarity
 # modeller). Son VRAG_VOTE_WINDOW aramanin en sik tekrar eden top-1 modeli
 # gosterilir - VLM tarafindaki TrackVoteAggregator ile ayni mantik.
 VRAG_VOTE_WINDOW     = 5
+
+# --- DENEYSEL: Sirali dongu modu (VRAG -> VLM -> LLM -> dur -> yeni crop -> VRAG...) ---
+# Kullanicinin acikca istedigi bir A/B testi: track basina VRAG/VLM/LLM'in her
+# biri sirayla, birbirini bekleyerek calisir (su anki bagimsiz/paralel tetikleme
+# yerine). Amac: kaynak cekismesini azaltmak ve VRAG'in gosterdigi sonuc ile
+# VLM'in yorumladigi kare arasindaki zaman farkini kapatmak. Bilinen riski: VRAG
+# artik VLM/LLM turu (~20-40sn) boyunca donuk kalir, zamansal oylama penceresi
+# cok yavas dolar, kisa gorunen hedefler tam turu hic tamamlayamayabilir. Kolayca
+# geri alinabilmesi icin tek bir bayrak - False yapmak eski (bagimsiz) davranisa
+# aninda doner.
+SIRALI_DONGU_MODU    = True
+
+# --- DENEYSEL: VRAG skoru esik-ustuyse VLM'e direkt guven ---
+# UYARI: Bu oturumda VRAG'in >= %90 skorla dahi confidently YANLIS oldugu
+# kanitlanmisti (f15.mp4 -> "F-16" %91.7, gercek F-15). Yani bu esik dogrulugu
+# garanti ETMEZ - kullanici bunu bilerek, VRAG/VLM karsilastirmasini gormek
+# icin test etmek istedi. arayuzde "_guvenilen_kaynak" alaniyla hangi yoldan
+# gelindigi gorunur, boylece etkisi izlenebilir.
+VRAG_GUVEN_ESIGI     = 0.90
+
 # ======================== VRAG VERİ ARTIRMA (AUGMENTATION) ===
 DONME_ACILARI        = (-12, 12)
 OLCEK_FAKTORLERI     = (0.8, 0.5, 0.25)

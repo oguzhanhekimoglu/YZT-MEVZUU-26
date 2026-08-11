@@ -252,6 +252,7 @@ function vlmBlok(h) {
       </span>
     </div>
     <div class="satir"><span class="k">Tahmin</span><span class="v">${esc(v.gercek_tahmin || "-")}${v.hedef_modeli_tutarlilik ? ` <span class="sure-etiketi">(tutarlılık: ${esc(v.hedef_modeli_tutarlilik)})</span>` : ""}</span></div>
+    ${v.guvenilen_kaynak ? `<div class="satir"><span class="k">Güvenilen Kaynak</span><span class="v"><span class="sure-etiketi">${esc(v.guvenilen_kaynak)}</span></span></div>` : ""}
     <div class="satir"><span class="k">Araç Sınıfı</span><span class="v">${esc(v.arac_sinifi || "-")}</span></div>
     <div class="satir"><span class="k">Ülke Orijini</span><span class="v">${esc(v.ulke_orjini || "Bilinmiyor")}</span></div>
     <div class="satir"><span class="k">Doğrulama</span><span class="v">${esc(v.dogrulama || "-")}</span></div>

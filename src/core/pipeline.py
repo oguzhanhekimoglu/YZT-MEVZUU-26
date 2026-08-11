@@ -28,7 +28,7 @@ from src.config import (
     SCENE_CHANGE_THRESHOLD, FAR_TARGET_AREA_RATIO, MIN_OBJECT_PX,
     DISPLAY_MIN_CONF, DISPLAY_MIN_CLASS_VOTE, DISPLAY_ALLOWED_CLASSES, DISPLAY_MIN_HITS, EDGE_MARGIN_PX,
     EDGE_MAX_FRAMES, SUSPENDED_DRAW_GRACE_FRAMES, MAX_OBJECT_AREA_RATIO,
-    VRAG_VOTE_WINDOW,
+    VRAG_VOTE_WINDOW, SIRALI_DONGU_MODU, VRAG_GUVEN_ESIGI,
 )
 
 _LOG_FILE = Path(__file__).parent / "pipeline.log"
@@ -301,12 +301,21 @@ class TeknoFestPipeline:
             
             # --- [YENİ] Bağımsız VRAG Araması ---
             # VLM'i beklemeden doğrudan VRAG'ı çalıştırıp HUD'a yansıtabilmek için.
-            if size_ok and len(track._crop_buffer) > 0:
+            #
+            # DENEYSEL (SIRALI_DONGU_MODU): Açıksa VRAG artık "bağımsız" değil —
+            # yalnızca track'in dongu_asamasi "vrag" iken tetiklenir (VLM/LLM
+            # turunu bekler). Bkz. config.py'deki SIRALI_DONGU_MODU notu.
+            dongu_vrag_sirasi = (
+                not SIRALI_DONGU_MODU
+                or self.vlm.vrag_engine is None
+                or getattr(track, "dongu_asamasi", "vrag") == "vrag"
+            )
+            if size_ok and len(track._crop_buffer) > 0 and dongu_vrag_sirasi:
                 if not hasattr(track, "vrag_last_time"):
                     track.vrag_last_time = 0.0
                 if not hasattr(track, "vrag_is_running"):
                     track.vrag_is_running = False
-                
+
                 if not track.vrag_is_running and (now - track.vrag_last_time > 1.0):
                     # Eski karelerde takılı kalmamak için doğrudan o anki CANLI kareyi kesip kullanıyoruz
                     x1, y1, x2, y2 = map(int, track.bbox)
@@ -368,7 +377,24 @@ class TeknoFestPipeline:
                     f"edge_ok:{edge_ok} (edge_frames={track.edge_touch_frames})"
                 )
 
-            if vlm_ready and (not track.is_vlm_querying or is_superior_recall) and (not track.vlm_done or is_superior_recall):
+            # DENEYSEL (SIRALI_DONGU_MODU): Aktifse VLM, "hiç analiz edilmemiş
+            # ya da çok daha net kare geldi" mantığı yerine SADECE track'in
+            # dongu_asamasi "vlm" olduğunda (yani VRAG az önce bitirip sırayı
+            # devrettiğinde) tetiklenir — her turda vlm_done'a bakmaksızın
+            # yeniden analiz eder.
+            sirali_mod_aktif = SIRALI_DONGU_MODU and self.vlm.vrag_engine is not None
+            if sirali_mod_aktif:
+                vlm_calissin_mi = (
+                    getattr(track, "dongu_asamasi", "vrag") == "vlm"
+                    and not track.is_vlm_querying
+                )
+            else:
+                vlm_calissin_mi = (
+                    (not track.is_vlm_querying or is_superior_recall)
+                    and (not track.vlm_done or is_superior_recall)
+                )
+
+            if vlm_ready and vlm_calissin_mi:
                 if is_superior_recall:
                     log.info(
                         f"[VLM-RECALL / SÜPER KARE] Track {track.track_id} → "
@@ -544,6 +570,9 @@ class TeknoFestPipeline:
         finally:
             track.vrag_is_running = False
             track.vrag_last_time = time.perf_counter()
+            # DENEYSEL (SIRALI_DONGU_MODU): VRAG turunu bitirdi, sırayı VLM'e devret.
+            if SIRALI_DONGU_MODU:
+                track.dongu_asamasi = "vlm"
 
     def _async_vlm_task(self, track, crops, speed, zigzag, threat_score, yolo_class="bilinmeyen", yolo_conf=0.5):
         vrag_matches = getattr(track, "vrag_matches", [])
@@ -578,10 +607,33 @@ class TeknoFestPipeline:
 
             if json_result is not None:
                 track.vlm_done = True   # BUG-2: Başarılı sonuçtan sonra işaretle
+                # DENEYSEL (SIRALI_DONGU_MODU): VLM turu bitti, sırayı LLM'e devret.
+                # "vlm" olarak kalsaydı, LLM daha işini bitirmeden VLM tetikleme
+                # koşulu (dongu_asamasi=="vlm" and not is_vlm_querying) yeniden
+                # doğru olur ve VLM gereksiz yere tekrar tetiklenirdi.
+                if SIRALI_DONGU_MODU:
+                    track.dongu_asamasi = "llm"
+
+                # DENEYSEL (VRAG_GUVEN_ESIGI): VRAG'ın en iyi eşleşmesi eşik ve
+                # üzerindeyse, VLM'in kendi bağımsız yorumu yerine VRAG'ın model/
+                # ülke bilgisi nihai sonuç olarak kullanılır — kullanıcının
+                # istediği VLM-vs-VRAG karşılaştırmasını görünür kılmak için
+                # "_guvenilen_kaynak" alanı da ekleniyor.
+                # UYARI (kodda not edildi, config.py'de detaylı): Bu oturumda
+                # VRAG'ın >= %90 skorla dahi yanlış olabildiği kanıtlanmıştı —
+                # bu eşik doğruluğu garanti etmez, sadece kıyaslama sağlar.
+                if vrag_matches and vrag_matches[0].get("score", 0.0) >= VRAG_GUVEN_ESIGI:
+                    en_iyi_vrag = vrag_matches[0]
+                    json_result["hedef_modeli"] = en_iyi_vrag.get("model", json_result.get("hedef_modeli"))
+                    if en_iyi_vrag.get("ulke", "Bilinmiyor") != "Bilinmiyor":
+                        json_result["ulke_orjini"] = en_iyi_vrag["ulke"]
+                    json_result["_guvenilen_kaynak"] = "VRAG"
+                else:
+                    json_result["_guvenilen_kaynak"] = "VLM"
 
                 # [YENİ] VLM kararı kaydedilir (kuş filtresi için)
                 track.vlm_class = json_result.get("arac_sinifi")
-                
+
                 # [YENİ] UI'a tam json göndermek için vlm_result kaydet
                 track.vlm_result = json_result
 
@@ -637,9 +689,16 @@ class TeknoFestPipeline:
                 )
             else:
                 log.warning(f"[VLM] Track {track.track_id}: Geçerli analiz döndürülemedi.")
+                # DENEYSEL (SIRALI_DONGU_MODU): Geçerli sonuç yok, LLM'e devredecek
+                # bir şey olmadığı için turu burada VRAG'a geri sarıyoruz —
+                # yoksa dongu_asamasi "vlm"de takılı kalıp cycle durur.
+                if SIRALI_DONGU_MODU:
+                    track.dongu_asamasi = "vrag"
 
         except Exception as e:
             log.error(f"[VLM] Asenkron Hata (Track {track.track_id}): {e}")
+            if SIRALI_DONGU_MODU:
+                track.dongu_asamasi = "vrag"
         finally:
             if should_reset_querying:
                 track.is_vlm_querying = False
@@ -698,4 +757,7 @@ class TeknoFestPipeline:
         except Exception as e:
             log.error(f"[LLM] Asenkron Hata: {e}")
         finally:
-            track.is_llm_querying = False
+            track.is_llm_querying = False
+            # DENEYSEL (SIRALI_DONGU_MODU): Tur tamamlandı, VRAG'a yeni crop ile geri dön.
+            if SIRALI_DONGU_MODU:
+                track.dongu_asamasi = "vrag"

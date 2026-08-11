@@ -111,7 +111,10 @@ class PipelineAdapter:
                     "arac_sinifi": sinif_map.get(arac, arac),
                     "ulke_orjini": ulke,
                     "gidis_yonu": v.get("gidis_yonu", ""),
-                    "hedef_modeli_tutarlilik": v.get("_hedef_modeli_tutarlilik", "")
+                    "hedef_modeli_tutarlilik": v.get("_hedef_modeli_tutarlilik", ""),
+                    # DENEYSEL (VRAG_GUVEN_ESIGI): nihai model/ülke bilgisi VRAG'tan mı
+                    # yoksa VLM'in kendi bağımsız yorumundan mı geldi.
+                    "guvenilen_kaynak": v.get("_guvenilen_kaynak", "")
                 }
                 d["vlm"] = vlm_payload
                 self.last_vlm_payload = vlm_payload  # Durumu kaydet

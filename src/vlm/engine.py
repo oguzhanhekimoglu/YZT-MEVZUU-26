@@ -46,6 +46,47 @@ except ImportError:
 
 from .prompts import CROSS_CHECK_KEYWORDS, generate_vlm_prompt
 
+
+def _build_vrag_context(matches: list) -> str:
+    """VRAG eşleşmelerinden VLM'e verilecek bağlam metnini oluşturur.
+
+    BUG-FIX (körü körüne güven): Eskiden burada "%80 üzeriyse BU KESİN BİR
+    EŞLEŞMEDİR, DOĞRUDAN kullan" talimatı vardı — VLM'in VRAG yanlış olsa bile
+    onu papağan gibi tekrarlamasına yol açıyordu (F-16-hep-çıkma hatası).
+    Artık kesin/körü körüne güven kararı KOD seviyesinde, deterministik olarak
+    veriliyor (pipeline.py: VRAG_GUVEN_ESIGI, >=%90 iken VRAG'ın cevabı zaten
+    doğrudan nihai sonuca yazılıyor — prompt'un bunu ayrıca zorlamasına gerek
+    yok). Bu metnin görevi SADECE %90 altındaki durumda VLM'e VRAG'ı bir DESTEK/
+    ipucu olarak sunmak — VLM kendi gözlemine dayanarak nihai kararı kendisi
+    verir, VRAG'ı görmezden gelmez ama ona da dikte edilmiş gibi davranmaz.
+    """
+    if not matches:
+        return ""
+    lines = [
+        "GÖRSEL HAFIZA (VRAG) EŞLEŞMELERİ:",
+        "Veritabanımızdaki bilinen hedeflerle yapılan vektörel karşılaştırma sonuçları "
+        "(bir ipucu/destektir, kesin doğru olmak zorunda değil):",
+    ]
+    for i, m in enumerate(matches, 1):
+        belirsiz_etiketi = " [belirsiz eşleşme]" if m.get("dusuk_guven") else ""
+        lines.append(
+            f"- {i}. Model: {m['model']} (Sınıf: {m['class']}, Ülke: {m.get('ulke', 'Bilinmiyor')}, "
+            f"Benzerlik: %{int(m['score']*100)}){belirsiz_etiketi}"
+        )
+    lines.append(
+        "DEĞERLENDİRME REHBERİ: Bu eşleşmeleri kendi görsel analizini destekleyecek bir "
+        "ipucu olarak kullan. Gördüğün silüet/şekil bunlarla uyuşuyorsa ve '[belirsiz "
+        "eşleşme]' işareti yoksa, VRAG'ın verdiği Model/Ülke bilgisini değerlendirmene "
+        "dahil edebilirsin. Ama gördüğün görsel VRAG'ın dediğinden belirgin şekilde "
+        "farklıysa ya da eşleşme '[belirsiz eşleşme]' işaretliyse, VRAG'a KÖRÜ KÖRÜNE "
+        "GÜVENME — kendi gözlemine dayanarak NİHAİ KARARI SEN VER; gerekirse "
+        "'hedef_modeli': 'Bilinmiyor' de. Yüksek benzerlikli, çok güvenilir eşleşmeler "
+        "zaten ayrıca değerlendirilip gerektiğinde nihai sonuca otomatik yansıtılıyor — "
+        "senin görevin burada kendi bağımsız gözlemini vermek."
+    )
+    return "\n".join(lines) + "\n"
+
+
 class VLMEngine:
     def __init__(self, model_name: str = VLM_MODEL_NAME, api_url: str = VLM_API_URL,
                  min_recall_interval_s: float = VLM_ENGINE_MIN_CALL_INTERVAL_S, vote_window: int = VLM_VOTE_WINDOW):
@@ -273,21 +314,15 @@ class VLMEngine:
         vrag_context = ""
         if vrag_matches:
             matches = vrag_matches
-            log.info(f"[VRAG] ⚡ Mevcut Eşleşmeler Kullanıldı: " + 
+            log.info(f"[VRAG] ⚡ Mevcut Eşleşmeler Kullanıldı: " +
                      ", ".join([f"{m['model']} (%{int(m['score']*100)})" for m in matches]))
-            vrag_context = "GÖRSEL HAFIZA (VRAG) EŞLEŞMELERİ:\nVeritabanımızdaki bilinen hedeflerle yapılan vektörel karşılaştırma sonuçları:\n"
-            for i, m in enumerate(matches, 1):
-                vrag_context += f"- {i}. Model: {m['model']} (Sınıf: {m['class']}, Benzerlik: %{int(m['score']*100)})\n"
-            vrag_context += "DİKKAT: Yukarıdaki VRAG eşleşmeleri %80 ve üzeri güvenilirlikteyse (örn: %91, %95), BU KESİN BİR EŞLEŞMEDİR. Gördüğün siluet tamamen alakasız değilse (örn. VRAG helikopter diyor ama sen pervaneli uçak görüyorsan), mutlaka VRAG'ın verdiği 'Model' bilgisini DOĞRUDAN kullan ve o yönde karar ver!\n"
+            vrag_context = _build_vrag_context(matches)
         elif self.vrag_engine and crops:
             matches = self.vrag_engine.search_similar_vehicle(crops[0])
             if matches:
-                log.info(f"[VRAG] ⚡ Yeni Eşleşme Bulundu: " + 
+                log.info(f"[VRAG] ⚡ Yeni Eşleşme Bulundu: " +
                          ", ".join([f"{m['model']} (%{int(m['score']*100)})" for m in matches]))
-                vrag_context = "GÖRSEL HAFIZA (VRAG) EŞLEŞMELERİ:\nVeritabanımızdaki bilinen hedeflerle yapılan vektörel karşılaştırma sonuçları:\n"
-                for i, m in enumerate(matches, 1):
-                    vrag_context += f"- {i}. Model: {m['model']} (Sınıf: {m['class']}, Benzerlik: %{int(m['score']*100)})\n"
-                vrag_context += "DİKKAT: Yukarıdaki VRAG eşleşmeleri %80 ve üzeri güvenilirlikteyse (örn: %91, %95), BU KESİN BİR EŞLEŞMEDİR. Gördüğün siluet tamamen alakasız değilse (örn. VRAG helikopter diyor ama sen pervaneli uçak görüyorsan), mutlaka VRAG'ın verdiği 'Model' bilgisini DOĞRUDAN kullan ve o yönde karar ver!\n"
+                vrag_context = _build_vrag_context(matches)
 
         prompt = generate_vlm_prompt(speed, zigzag, threat, yolo_class, yolo_conf, n_crops=len(crops), vrag_context=vrag_context)
 
