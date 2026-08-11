@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-"""VRAG backend (FastAPI) â€” YOLO tespit+takip + VRAG model tanÄ±ma.
+"""VRAG backend (FastAPI) — YOLO tespit+takip + VRAG model tanıma.
 
-UÃ§lar:
-  POST /oturum/baslat {video_yolu}  â†’ video iÅŸlemeyi baÅŸlat (arka plan thread)
-  POST /oturum/durdur               â†’ durdur
-  GET  /durum                       â†’ oturum durumu
-  GET  /video                       â†’ MJPEG (kutulu kare akÄ±ÅŸÄ±)
-  WS   /hedefler                    â†’ canlÄ± hedef JSON'u (C# panelleri)
-  POST /tani  (dosya)               â†’ tek gÃ¶rselde VRAG (model + adaylar)
-  GET  /meta                        â†’ model/Ã¼lke/rol listeleri
-  GET  /gecmis?adet=N               â†’ tespit geÃ§miÅŸi (log)
+Uçlar:
+  POST /oturum/baslat {video_yolu}  → video işlemeyi başlat (arka plan thread)
+  POST /oturum/durdur               → durdur
+  GET  /durum                       → oturum durumu
+  GET  /video                       → MJPEG (kutulu kare akışı)
+  WS   /hedefler                    → canlı hedef JSON'u (web arayüzü)
+  POST /tani  (dosya)               → tek görselde VRAG (model + adaylar)
+  GET  /meta                        → model/ülke/rol listeleri
+  GET  /gecmis?adet=N               → tespit geçmişi (log)
 """
 import asyncio
 import json
@@ -267,17 +267,8 @@ async def tani(dosya: UploadFile = File(...)):
     img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
     if img is None:
         return JSONResponse({"hata": "GÃ¶rsel Ã§Ã¶zÃ¼lemedi."}, status_code=400)
-    adaylar = [] # Not directly supported in simple adapter yet
-    if not adaylar:
-        return {"model": None, "adaylar": []}
-    from vrag_adapter import dusuk_guven, margin
-    return {
-        "model": adaylar[0].model, "skor": round(adaylar[0].skor, 3),
-        "dusuk_guven": dusuk_guven(adaylar), "margin": round(margin(adaylar), 3),
-        "ulke": adaylar[0].ulke, "uretici": adaylar[0].uretici, "rol": adaylar[0].rol,
-        "adaylar": [{"model": a.model, "skor": round(a.skor, 3),
-                     "ulke": a.ulke, "rol": a.rol} for a in adaylar],
-    }
+    # Not directly supported in simple adapter yet
+    return {"model": None, "adaylar": []}
 
 
 @app.get("/meta")
@@ -321,8 +312,7 @@ def referans(model: str):
 
 @app.get("/gecmis")
 def gecmis(adet: int = 100):
-    if False:
-        return {"kayitlar": durum.fuzyon.kayit.son_kayitlar(adet)}
+    # Not directly supported in simple adapter yet (kayit.py kaldırıldı — kullanılmıyordu).
     return {"kayitlar": []}
 
 
