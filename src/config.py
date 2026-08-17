@@ -10,10 +10,20 @@ import torch
 
 # ======================== DONANIM ============================
 DEVICE       = "cuda:0" if torch.cuda.is_available() else "cpu"
+# NOT: MPS (Apple GPU) iki kez denendi — Ollama (VLM/LLM) aynı Metal GPU'yu
+# kullandığı için VLM/LLM çağrısı sırasında YOLO'nun FPS'i 20'den 2'ye kadar
+# düşüyordu (iki süreç arasında GPU kuyruk çakışması, uygulama seviyesinde
+# çözülemedi). CPU'da kararlı ~7 FPS tercih edildi. Alternatif: vLLM/CUDA
+# (Windows) — bkz. VLM_API_URL, orada bu çakışma yaşanmıyor.
 # VRAM tıkanıklığı (YOLO + VRAG + VLM/Ollama + LLM aynı GPU'da yarışıyordu) için
 # VRAG (SigLIP2) kalıcı olarak CPU'ya alındı — GPU'da yalnızca YOLO ve Ollama kalsın.
 VRAG_DEVICE  = "cpu"
 MODEL_PATH   = str(Path(__file__).parent.parent / "models" / "best.pt")
+# YOLO fp16 çıkarım: yalnızca CUDA'da anlamlı hız kazandırır (tensor core'lar),
+# CPU'da fp16 desteklenmez/hızlandırmaz — bu yüzden cihaza göre otomatik seçilir,
+# başka bir makinede (RTX vb.) çalıştıranın kod değiştirmesine gerek kalmaz.
+# ultralytics >=8.4: eski half=True kaldırıldı, yerine quantize=16 (fp16) / None (fp32) geldi.
+YOLO_QUANTIZE = 16 if "cuda" in DEVICE else None
 
 # ======================== SAHI / SLICER ======================
 # --- Pass-1: HÄ±zlÄ± Ã¶n tarama ---
@@ -26,7 +36,10 @@ SLICE_H    = 640         # PatÃ§a yÃ¼ksekliÄŸi
 SLICE_W    = 640         # PatÃ§a geniÅŸliÄŸi
 OVERLAP    = 0.25        # %25 Ã¶rtÃ¼ÅŸme (kenar nesnelerini koru)
 NMS_IOU    = 0.20        # Ã‡akÄ±ÅŸan kutularÄ± agresif birleÅŸtirme eÅŸiÄŸi (0.30'dan 0.20'ye dÃ¼ÅŸÃ¼rÃ¼ldÃ¼)
-BATCH_SIZE = 8           # GPU batch boyutu
+# CUDA'lı makinelerde (Windows/Linux + RTX vb.) YOLO aynı GPU'yu VRAG/vLLM ile
+# paylaşabiliyor — batch küçük tutulup VRAM'den yer açılır. Mac'te (CPU) böyle
+# bir paylaşım/çakışma yok, hız payı bol olduğu için daha büyük batch kalabilir.
+BATCH_SIZE = 4 if "cuda" in DEVICE else 8   # GPU batch boyutu (donanıma göre otomatik)
 
 # --- YOLO GÃ¼ven EÅŸikleri ---
 CONFIDENCE          = 0.40   # YakÄ±n (bÃ¼yÃ¼k) hedefler iÃ§in minimum gÃ¼ven
@@ -286,35 +299,6 @@ VLM_MIN_HITS_FOR_COLLAGE   = 8
 # artÄ±k ulaÅŸÄ±labilir.
 VLM_MIN_CROP_POOL_SIZE     = 10   # _crop_buffer'da birikmesi gereken min. kaliteli kare
 
-VLM_VOTE_WINDOW            = 5
-VLM_COOLDOWN_S             = 0.5   # VLM Ã§aÄŸrÄ±larÄ± arasÄ± minimum sÃ¼re
-VLM_MIN_BBOX_PX            = 15    # Hedefin VLM'e gitmesi iÃ§in en az 15px olmasÄ±nÄ± bekle.
-# ======================== TEHDÄ°T SKORU =======================
-VLM_MIN_CONFIDENCE_FOR_TIP = 40    # GÃ¼ven eÅŸiÄŸi (0-100), altÄ± â†’ tanÄ±msÄ±z
-VLM_MIN_TRACK_CONF         = 0.35  # Track gÃ¼veni bunun altÄ±ndaysa VLM Ã§alÄ±ÅŸmaz
-VLM_CROP_CONTEXT_RATIO     = 0.25  # Prensip 3 (Smart Crop): UÃ§aÄŸÄ±n tamamÄ±nÄ± ve Ã§evresini almak iÃ§in %25 padding
-VLM_CROP_MIN_CONF          = 0.30  # Keyframe tamponuna kabul eÅŸiÄŸi
-# FarklÄ± aÃ§Ä±lardan (dÃ¶nÃ¼ÅŸ, dalÄ±ÅŸ, yan silÃ¼et) en zengin aday havuzunu toplamak iÃ§in geniÅŸ tampon
-VLM_CROP_BUFFER_SIZE       = 45
-# KaÃ§ frame gÃ¶rÃ¼ldÃ¼kten sonra kolaj VLM'e gÃ¶nderilsin (Ã§ok kÄ±sa track'leri filtreler)
-# NOT: Bu tek baÅŸÄ±na yeterli deÄŸil â€” bkz. VLM_MIN_CROP_POOL_SIZE. hits sadece
-# "track ne kadar sÃ¼redir yaÅŸÄ±yor"yu Ã¶lÃ§er, buffer'Ä±n gerÃ§ekten dolup dolmadÄ±ÄŸÄ±nÄ± deÄŸil.
-VLM_MIN_HITS_FOR_COLLAGE   = 8
-
-# BUG-FIX (en kÃ¶tÃ¼ kare sorunu): Eskiden VLM, hedef daha 8. frame'de (~0.27sn)
-# gÃ¶rÃ¼lÃ¼r gÃ¶rÃ¼lmez tetikleniyordu. O anda _crop_buffer'da genelde 3-6 kare vardÄ±
-# (hedef henÃ¼z uzak/bulanÄ±k/kÃ¶tÃ¼ aÃ§Ä±da). "En iyisini seÃ§" doÄŸru Ã§alÄ±ÅŸÄ±yordu ama
-# Ã§ok kÃ¼Ã§Ã¼k ve kÃ¶tÃ¼ bir havuzun en iyisini seÃ§iyordu. Åimdi VLM, track'in kendi
-# kalite-filtrelenmiÅŸ buffer'Ä± bu kadar kareyle dolana kadar BEKLÄ°YOR â€” bÃ¶ylece
-# hedef ekranda gezinirken (yaklaÅŸma, dÃ¶nÃ¼ÅŸ, yan silÃ¼et) toplanan gerÃ§ekten
-# zengin bir havuzdan seÃ§im yapÄ±lÄ±yor.
-# BUG-FIX (VLM hiÃ§ tetiklenmiyordu): 18, track'ler kÄ±sa Ã¶mÃ¼rlÃ¼/bÃ¶lÃ¼nmÃ¼ÅŸ
-# olduÄŸunda (bkz. slicer.py _dedupe_overlapping_targets dÃ¼zeltmesi) VEYA
-# gÃ¶rÃ¼ntÃ¼ kalitesi sÄ±nÄ±rdayken pratikte hiÃ§ dolmuyordu. 10'a Ã§ekildi â€”
-# hÃ¢lÃ¢ "birkaÃ§ karenin en iyisi" deÄŸil, gerÃ§ek bir zengin havuz, ama
-# artÄ±k ulaÅŸÄ±labilir.
-VLM_MIN_CROP_POOL_SIZE     = 10   # _crop_buffer'da birikmesi gereken min. kaliteli kare
-
 # BUG-FIX (Ã§ift tanÄ±m): Bu deÄŸiÅŸken eskiden iki kere tanÄ±mlanÄ±yordu (Ã¶nce 1,
 # sonra buradaki 4 onu eziyordu) â€” Ã§eliÅŸen iki yorum, hangisinin aktif
 # olduÄŸunu belirsizleÅŸtiriyordu. Tek tanÄ±ma indirildi, deÄŸer (4) korunuyor.
@@ -386,8 +370,14 @@ PERSPEKTIF_AKTIF     = True
 # Akıllı kare atlama: YOLO çıkarımı bütçeyi aşarsa sonraki kare(ler)de
 # sadece Kalman tahmin kullanılır, YOLO atlanır.
 ADAPTIVE_SKIP_ENABLED   = True
-ADAPTIVE_SKIP_BUDGET_MS = 45    # Frame başına YOLO bütçesi (ms). Aşılırsa sonraki frame atlanır
+ADAPTIVE_SKIP_BUDGET_MS = 33    # Frame başına YOLO bütçesi (ms, ~30 FPS hedefine uyumlu). Aşılırsa sonraki frame atlanır
 FRAME_READ_BUFFER_SIZE  = 4     # Ön-okuma thread tamponu (frame sayısı)
+# İşleme çözünürlüğü tavanı: SAHI'de patch sayısı alanla orantılı (4K → 1080p'de
+# patch sayısı ~4'te bire iner). Kare, pipeline'a girmeden en başta küçültülür —
+# detection/tracking/crop/çizim hepsi aynı (küçültülmüş) uzayda kalır, ayrıca bir
+# koordinat geri-eşlemesi gerekmez. VLM/VRAG kırpıntıları zaten 384px'e indiği için
+# kimlik kaybı olmaz; bedeli çok uzak/minik hedeflerde YOLO recall'ının azıcık düşmesi.
+PROC_MAX_WIDTH          = 1920  # Bu genişlikten büyük kareler bu değere küçültülür (None = kapalı)
 
 # ======================== VLM SAĞLAMLIK ===========================
 # llava-phi3 gibi küçük multimodal modeller format:"json" parametresiyle

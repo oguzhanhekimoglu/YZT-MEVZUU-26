@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from src.config import (
     SLICE_H, SLICE_W, OVERLAP, NMS_IOU, BATCH_SIZE,
     VARIANCE_THRESHOLD, PASS1_SIZE, PASS1_CONF, PASS1_EXPAND_PX,
-    ROI_EXPAND, CONFIDENCE, DEVICE,
+    ROI_EXPAND, CONFIDENCE, DEVICE, YOLO_QUANTIZE,
     FAR_TARGET_MIN_CONF, FAR_TARGET_AREA_RATIO,
     MIN_OBJECT_PX, MAX_OBJECT_AREA_RATIO, ASPECT_RATIO_MIN, ASPECT_RATIO_MAX,
     FULLSCAN_FALLBACK, FULLSCAN_STRIDE, FULLSCAN_ALWAYS, FULLSCAN_SKIP_FRAMES,
@@ -484,7 +484,8 @@ class SmartSlicer:
         small[pad_y:pad_y + new_h, pad_x:pad_x + new_w] = resized
 
         p1_results = self.model(
-            small, conf=PASS1_CONF, device=DEVICE, verbose=False, imgsz=PASS1_SIZE
+            small, conf=PASS1_CONF, device=DEVICE, verbose=False, imgsz=PASS1_SIZE,
+            quantize=YOLO_QUANTIZE,
         )[0]
 
         rois = []
@@ -609,7 +610,7 @@ class SmartSlicer:
     @staticmethod
     def _variance_ok(patch: np.ndarray) -> bool:
         gray = cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY)
-        lap  = cv2.Laplacian(gray, cv2.CV_64F)
+        lap  = cv2.Laplacian(gray, cv2.CV_32F)  # CV_64F yerine CV_32F: aynı sonuç, daha az bellek/işlem
         return float(lap.var()) >= VARIANCE_THRESHOLD
 
     # ──────────────────────────────────────────────────────────
@@ -627,7 +628,8 @@ class SmartSlicer:
             conf=FAR_TARGET_MIN_CONF,
             device=DEVICE,
             verbose=False,
-            imgsz=max(SLICE_H, SLICE_W)
+            imgsz=max(SLICE_H, SLICE_W),
+            quantize=YOLO_QUANTIZE,
         )
 
         dets: list[RawDetection] = []

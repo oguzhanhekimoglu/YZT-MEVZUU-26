@@ -28,7 +28,7 @@ from src.config import (
     SCENE_CHANGE_THRESHOLD, FAR_TARGET_AREA_RATIO, MIN_OBJECT_PX,
     DISPLAY_MIN_CONF, DISPLAY_MIN_CLASS_VOTE, DISPLAY_ALLOWED_CLASSES, DISPLAY_MIN_HITS, EDGE_MARGIN_PX,
     EDGE_MAX_FRAMES, SUSPENDED_DRAW_GRACE_FRAMES, MAX_OBJECT_AREA_RATIO,
-    VRAG_VOTE_WINDOW, SIRALI_DONGU_MODU, VRAG_GUVEN_ESIGI,
+    VRAG_VOTE_WINDOW, SIRALI_DONGU_MODU, VRAG_GUVEN_ESIGI, PROC_MAX_WIDTH,
 )
 
 _LOG_FILE = Path(__file__).parent / "pipeline.log"
@@ -227,6 +227,18 @@ class TeknoFestPipeline:
     def process_frame(self, frame_bgr: np.ndarray) -> list[TrackedTarget]:
         t_total = time.perf_counter()
         self._frame_count += 1
+
+        # İşleme çözünürlüğü tavanı: pipeline'a girmeden en başta küçült, böylece
+        # detection/tracking/crop/çizim hepsi aynı uzayda kalır (koordinat geri-
+        # eşlemesi gerekmez). Zaten daha küçük gönderilen kareler (ör. backend
+        # adaptöründeki 1280px sınırı) burada zaten eşiğin altında kalıp no-op olur.
+        if PROC_MAX_WIDTH and frame_bgr.shape[1] > PROC_MAX_WIDTH:
+            olcek = PROC_MAX_WIDTH / frame_bgr.shape[1]
+            frame_bgr = cv2.resize(
+                frame_bgr, (PROC_MAX_WIDTH, int(round(frame_bgr.shape[0] * olcek))),
+                interpolation=cv2.INTER_AREA,
+            )
+
         fh, fw = frame_bgr.shape[:2]
 
         # ======================================================
@@ -636,6 +648,27 @@ class TeknoFestPipeline:
 
                 # [YENİ] UI'a tam json göndermek için vlm_result kaydet
                 track.vlm_result = json_result
+
+                # BUG-FIX (KRİTİK — LLM hiç tetiklenmeyebiliyordu): LLM tetiklemesi
+                # eskiden SADECE process_frame'in "for track in valid_tracks" döngüsünde
+                # (yani track hâlâ takip listesindeyken) kontrol ediliyordu. VLM ~13-20sn
+                # sürebiliyor; bu süre boyunca hedef KALMAN_SUSPENDED_AGE'den (75 kare,
+                # ~3sn) uzun süre tespit edilemezse tracker track'i TAMAMEN SİLİYOR
+                # (bkz. tracker.py: dead_ids). Track silinince valid_tracks'te bir daha
+                # hiç görünmüyor, ana döngüdeki LLM kontrolü asla bu track'i göremiyor
+                # ve LLM sonsuza dek tetiklenmiyordu — sessizce. Artık VLM bittiği anda,
+                # aynı thread içinde, track'in ana döngüde hâlâ var olup olmadığına
+                # bakmaksızın LLM'i DOĞRUDAN tetikliyoruz. process_frame'deki eski
+                # kontrol de duruyor (hash+is_llm_querying ile çift tetiklemeyi zaten
+                # engelliyor) — track hâlâ aktifse o da çalışabilir, zararı yok.
+                current_vlm_hash = str(json_result)
+                if (
+                    not getattr(track, "is_llm_querying", False)
+                    and getattr(track, "last_llm_vlm_hash", None) != current_vlm_hash
+                ):
+                    track.is_llm_querying = True
+                    track.last_llm_vlm_hash = current_vlm_hash
+                    self.executor.submit(self._async_llm_task, track, json_result)
 
                 # Prompt'tan guven_skoru kaldırılıp tracker/YOLO sistemine devredildiği için
                 # JSON'da olmadığında 0% basmamak adına doğrudan sistem skoru kullanılır.

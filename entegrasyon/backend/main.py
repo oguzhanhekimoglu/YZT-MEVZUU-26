@@ -13,6 +13,7 @@ Uçlar:
 """
 import asyncio
 import json
+import logging
 import threading
 import time
 from contextlib import asynccontextmanager
@@ -23,6 +24,18 @@ import numpy as np
 from fastapi import FastAPI, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+
+# BUG-FIX (INFO logları görünmüyordu): main.py hiç logging.basicConfig
+# çağırmıyordu, kök logger uvicorn'un kendi ayarına rağmen varsayılan WARNING
+# seviyesinde kalıyordu — pipeline.py/vlm/engine.py'deki TÜM log.info()
+# çağrıları ([VLM BEKLEMEDE], [LLM] Karar alındı, [VRAG] Embedder hazır vb.)
+# sessizce kayboluyordu. force=True, uvicorn'un kendi handler'ı zaten
+# ayarlanmış olsa bile seviyeyi INFO'ya zorluyor.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    force=True,
+)
 
 import ayarlar
 from pipeline_adapter import PipelineAdapter
