@@ -46,13 +46,20 @@ data/databases/*.db
 yuklemeler/
 
 # ============================================================
-# Test videoları (referans veri değil — VRAG referans görselleri
-# 'veriler/' altında ayrı ve Git LFS ile takip ediliyor, bkz. .gitattributes)
+# Test videoları (referans veri değil)
 # ============================================================
 data/videos/*.mp4
 data/videos/*.avi
 data/videos/*.mkv
 VİDEOLAR/
+
+# ============================================================
+# VRAG referans fotoğrafları — ham kaynak veri, repo'yu şişiriyordu.
+# İndekslenmiş hali (output/qdrant_db/) çalışması için yeterli ve
+# hâlâ takip ediliyor; veriler/ sadece indeksi yeniden oluşturmak
+# istendiğinde gerekir, elle/ayrı paylaşılır.
+# ============================================================
+veriler/
 
 # ============================================================
 # Geçici / ajan klasörleri

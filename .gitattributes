@@ -4,13 +4,8 @@
 # olması gerekir (bkz. README kurulum adımları).
 # ============================================================
 
-# VRAG referans görselleri (veriler/<kategori>/<model>/*.jpg|png|jpeg)
-veriler/**/*.jpg filter=lfs diff=lfs merge=lfs -text
-veriler/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
-veriler/**/*.png filter=lfs diff=lfs merge=lfs -text
-veriler/**/*.JPG filter=lfs diff=lfs merge=lfs -text
-veriler/**/*.JPEG filter=lfs diff=lfs merge=lfs -text
-veriler/**/*.PNG filter=lfs diff=lfs merge=lfs -text
+# VRAG referans görselleri (veriler/) artık .gitignore'da — ham kaynak veri
+# repo'yu şişiriyordu, indekslenmiş hali (aşağıdaki qdrant_db) yeterli.
 
 # İndekslenmiş VRAG vektör veritabanı (Qdrant embedded/local)
 output/qdrant_db/** filter=lfs diff=lfs merge=lfs -text
