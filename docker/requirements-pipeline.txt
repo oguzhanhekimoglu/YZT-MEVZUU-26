@@ -1,0 +1,7 @@
+# LLM/pyproject.toml (uv.lock) zaten torch/transformers/fastapi/pydantic vb.
+# ortak bağımlılıkları kuruyor. Bunlar SADECE ana YOLO/VRAG pipeline'ının
+# ihtiyaç duyduğu, LLM tarafında olmayan ekstra paketler.
+ultralytics==8.4.115
+opencv-python-headless>=4.10
+qdrant-client==1.19.0
+pillow>=10.0

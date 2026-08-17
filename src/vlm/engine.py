@@ -23,13 +23,14 @@ DEBUG_VLM_DIR.mkdir(parents=True, exist_ok=True)
 # Model/adres/zamanlama config.py'den okunur; config.py yoksa önceki sabit varsayılanlara düşer.
 try:
     from src.config import (
-        VLM_MODEL_NAME, VLM_API_URL, VLM_ENGINE_MIN_CALL_INTERVAL_S,
+        VLM_MODEL_NAME, VLM_API_URL, VLM_BACKEND, VLM_ENGINE_MIN_CALL_INTERVAL_S,
         VLM_VOTE_WINDOW, VLM_NUM_PREDICT, VLM_TIMEOUT_S, VRAG_ENABLED,
         VLM_DEBUG_SAVE_IMAGES
     )
 except ImportError:
     VLM_MODEL_NAME = "gemma4:12b"
     VLM_API_URL = "http://localhost:11434/api/generate"
+    VLM_BACKEND = "ollama"
     VLM_ENGINE_MIN_CALL_INTERVAL_S = 3.0
     VLM_VOTE_WINDOW = 5
     VLM_NUM_PREDICT = 2048
@@ -89,9 +90,11 @@ def _build_vrag_context(matches: list) -> str:
 
 class VLMEngine:
     def __init__(self, model_name: str = VLM_MODEL_NAME, api_url: str = VLM_API_URL,
-                 min_recall_interval_s: float = VLM_ENGINE_MIN_CALL_INTERVAL_S, vote_window: int = VLM_VOTE_WINDOW):
+                 min_recall_interval_s: float = VLM_ENGINE_MIN_CALL_INTERVAL_S, vote_window: int = VLM_VOTE_WINDOW,
+                 backend: str = VLM_BACKEND):
         self.model_name = model_name
         self.api_url = api_url
+        self.backend = backend  # "ollama" | "vllm" — istek/URL şekli buna göre dallanır
 
         # --- Aynı track_id için gereksiz tekrar çağrı koruması ---
         # NEDEN: pipeline.py'de VLM'in track başına tek sefer çalışması
@@ -326,29 +329,50 @@ class VLMEngine:
 
         prompt = generate_vlm_prompt(speed, zigzag, threat, yolo_class, yolo_conf, n_crops=len(crops), vrag_context=vrag_context)
 
-        # Force chat API endpoint for better instruction following
-        chat_url = self.api_url.replace("/api/generate", "/api/chat")
-        
-        payload = {
-            "model":  self.model_name,
-            "format": "json",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt,
-                    "images": [img_b64]
-                }
-            ],
-            "stream": False,
-            "options": {
+        if self.backend == "vllm":
+            # vLLM'in OpenAI-uyumlu /v1/chat/completions'ı — görsel içerik ayrı bir
+            # "image_url" (data URI) parçası olarak content listesine eklenir, Ollama'daki
+            # gibi mesaja düz "images" alanı eklenmez.
+            call_url = self.api_url
+            payload = {
+                "model": self.model_name,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"}},
+                        ],
+                    }
+                ],
                 "temperature": 0.0,
-                "top_p":       0.9,
-                "num_predict": VLM_NUM_PREDICT,
+                "top_p": 0.9,
+                "max_tokens": VLM_NUM_PREDICT,
+                "response_format": {"type": "json_object"},
             }
-        }
+        else:
+            # Force chat API endpoint for better instruction following
+            call_url = self.api_url.replace("/api/generate", "/api/chat")
+            payload = {
+                "model":  self.model_name,
+                "format": "json",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt,
+                        "images": [img_b64]
+                    }
+                ],
+                "stream": False,
+                "options": {
+                    "temperature": 0.0,
+                    "top_p":       0.9,
+                    "num_predict": VLM_NUM_PREDICT,
+                }
+            }
 
         try:
-            response = requests.post(chat_url, json=payload, timeout=VLM_TIMEOUT_S)
+            response = requests.post(call_url, json=payload, timeout=VLM_TIMEOUT_S)
             response.raise_for_status()
             
             resp_json = response.json()
@@ -483,7 +507,7 @@ class VLMEngine:
             return stable
 
         except requests.exceptions.Timeout:
-            log.error(f"[VLM] Track {track_id}: Ollama yanıt vermedi ({VLM_TIMEOUT_S:.0f}s timeout)")
+            log.error(f"[VLM] Track {track_id}: {self.backend} yanıt vermedi ({VLM_TIMEOUT_S:.0f}s timeout)")
             return None
         except Exception as e:
             log.error(f"[VLM] Track {track_id}: API hatası → {e}")

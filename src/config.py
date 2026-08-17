@@ -5,6 +5,7 @@
 # Her parametre tek bir yerde tanÄ±mlanÄ±r.
 # Gruplar: DonanÄ±m â†’ AlgÄ±lama â†’ Takip â†’ Filtreleme â†’ VLM â†’ Ã‡Ä±ktÄ±
 # ============================================================
+import os
 from pathlib import Path
 import torch
 
@@ -256,8 +257,22 @@ COLLAGE_BG_COLOR   = (30, 30, 30)  # Siyah deÄŸil koyu gri zemin â€” VLM 
 
 # ======================== VLM ================================
 # dÃ¼ÅŸÃ¼nmeye token hÄ±rcar, JSON Ã§Ä±kmaz.
-VLM_MODEL_NAME             = "qwen2.5vl:7b"
-VLM_API_URL                = "http://localhost:11434/api/generate"
+# Backend seçimi donanıma göre otomatik: CUDA'lı makinede vLLM (Docker, bkz.
+# docker/docker-compose.yml), Mac/CPU'da Ollama — kimsenin elle kod
+# değiştirmesine gerek kalmaz (YOLO_QUANTIZE/BATCH_SIZE ile aynı desen).
+# Üçü de ortam değişkeniyle ezilebilir — docker-compose'daki "app" servisi
+# VLM_BACKEND/VLM_API_URL'i container-ağı servis adına (ör. "vllm-vlm")
+# göre set eder, kod hiç değişmez.
+VLM_BACKEND                = os.environ.get("VLM_BACKEND") or ("vllm" if "cuda" in DEVICE else "ollama")
+# Ollama yerel tag ("qwen2.5vl:7b") bekler; vLLM HuggingFace repo id + kendi
+# sunucusunun portu bekler. Model/port değişirse docker-compose.yml ile
+# birlikte güncellenmeli.
+VLM_MODEL_NAME             = os.environ.get("VLM_MODEL_NAME") or (
+                               "Qwen/Qwen2.5-VL-7B-Instruct-AWQ" if VLM_BACKEND == "vllm"
+                               else "qwen2.5vl:7b")
+VLM_API_URL                = os.environ.get("VLM_API_URL") or (
+                               "http://localhost:8002/v1/chat/completions" if VLM_BACKEND == "vllm"
+                               else "http://localhost:11434/api/generate")
 VLM_NUM_PREDICT            = 1024   # KÄ±sa ve Ã¶z JSON cevaplarÄ± iÃ§in yeterli
 VLM_TIMEOUT_S              = 300.0  # 5 dakika timeout (YavaÅŸ bilgisayarlar iÃ§in artÄ±rÄ±ldÄ±)
 VLM_MIN_RECALL_INTERVAL_S  = 0.7    # [GÃœNCELLENDÄ°] 3.0->0.7: UÃ§ak aniden yakÄ±nlaÅŸÄ±p inanÄ±lmaz net bir kare (Ã¶rnekteki F-4 kuyruÄŸu gibi) verirse 3 saniye bekleme, hemen 0.7 sn iÃ§inde VLM'i tetikle!

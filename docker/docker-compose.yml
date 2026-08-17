@@ -1,0 +1,119 @@
+# Tüm sistem (YOLO+SAHI pipeline + VRAG + backend + LLM karar servisi + VLM +
+# küçük karar modeli) container'larda — Ollama'ya hiç ihtiyaç yok. Sadece
+# Windows/Linux + NVIDIA GPU (CUDA) makinelerde çalışır.
+#
+# Ön koşul: NVIDIA sürücü + nvidia-container-toolkit kurulu olmalı.
+# Doğrulama: docker run --rm --gpus all nvidia/cuda:12.4.1-base nvidia-smi
+#
+# ÖNEMLİ: "docker compose" (v2, boşluklu, modern Docker Desktop'a gömülü)
+# kullan — eski/standalone "docker-compose" (v1, tireli) GPU rezervasyonunu
+# (deploy.resources.reservations.devices) swarm dışında görmezden gelebilir.
+#
+# Kullanım:
+#   cd docker
+#   HUGGING_FACE_HUB_TOKEN=hf_xxx docker compose up -d --build
+#   curl http://localhost:8000/durum                # ana backend ayakta mı
+#   curl http://localhost:8002/v1/models             # VLM sunucusu
+#   curl http://localhost:8003/v1/models             # küçük karar modeli
+#   → web arayüzü: http://localhost:8000/goruntule/
+#
+# GPU paylaşımı (tek karta göre kaba tahmin, kart küçükse ayarla):
+#   vllm-vlm (7B AWQ)  ~%55   vllm-llm (1B)  ~%15   app/YOLO  kalan ~%30
+services:
+  vllm-vlm:
+    image: vllm/vllm-openai:latest
+    container_name: uav-vrag-vllm-vlm
+    restart: unless-stopped
+    ports:
+      - "8002:8000"
+    volumes:
+      - huggingface_cache:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN:-}
+    command:
+      - --model=Qwen/Qwen2.5-VL-7B-Instruct-AWQ
+      - --quantization=awq
+      - --gpu-memory-utilization=0.55
+      - --max-model-len=4096
+      - --port=8000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s   # ilk model indirme/yükleme dakikalar sürebilir
+
+  vllm-llm:
+    image: vllm/vllm-openai:latest
+    container_name: uav-vrag-vllm-llm
+    restart: unless-stopped
+    ports:
+      - "8003:8000"
+    volumes:
+      - huggingface_cache:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN:-}
+    command:
+      - --model=meta-llama/Llama-3.2-1B-Instruct
+      - --gpu-memory-utilization=0.15
+      - --max-model-len=8192
+      - --port=8000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 180s
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: uav-vrag-app
+    restart: unless-stopped
+    depends_on:
+      vllm-vlm:
+        condition: service_healthy
+      vllm-llm:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - VLM_BACKEND=vllm
+      - VLM_API_URL=http://vllm-vlm:8000/v1/chat/completions
+      - VLM_MODEL_NAME=Qwen/Qwen2.5-VL-7B-Instruct-AWQ
+      - OPERATIONAL_DECISION_LLM_BACKEND=vllm
+      - OPERATIONAL_DECISION_VLLM_BASE_URL=http://vllm-llm:8000
+      - OPERATIONAL_DECISION_DECISION_MODEL=meta-llama/Llama-3.2-1B-Instruct
+    volumes:
+      # Kod dışındaki her şey bind-mount — repo'nun kendisi zaten bu verilerle
+      # birlikte klonlanmış olacak, imaja gömmeye gerek yok.
+      - ../veriler:/app/veriler
+      - ../output:/app/output
+      - ../models:/app/models
+      - ../data:/app/data
+      - ../LLM/data:/app/LLM/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  huggingface_cache:

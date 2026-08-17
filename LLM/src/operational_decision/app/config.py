@@ -32,6 +32,12 @@ class AppSettings(BaseSettings):
     seed_directory: Path = PROJECT_ROOT / "data/seeds"
     ollama_base_url: str = "http://127.0.0.1:11434"
     decision_model: str = "llama3.2:1b"
+    # 1B'lik karar modeli küçük olduğu için VRAM/hız avantajı sınırlı — varsayılan
+    # olarak Ollama'da kalması önerilir (Docker/vLLM sadece asıl büyük VLM için
+    # düşünüldü, bkz. docker/docker-compose.vllm.yml). Yine de istenirse
+    # OPERATIONAL_DECISION_LLM_BACKEND=vllm ile açılabilir.
+    llm_backend: Literal["ollama", "vllm"] = "ollama"
+    vllm_base_url: str = "http://127.0.0.1:8003"
 
     @model_validator(mode="after")
     def require_isolated_production_databases(self) -> "AppSettings":
