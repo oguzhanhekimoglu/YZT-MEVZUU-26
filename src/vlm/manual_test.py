@@ -1,5 +1,5 @@
 # ============================================================
-# vlm_manual_test.py — VLM'i pipeline'dan tamamen izole test aracı
+# src/vlm/manual_test.py — VLM'i pipeline'dan tamamen izole test aracı
 # ============================================================
 # AMAÇ: Sistemde bir sorun olduğunda (yanlış sınıflandırma, düşük güven,
 # tutarsız cevap vb.) sorunun YOLO/SAHI/tracker'dan mı yoksa VLM'in
@@ -8,21 +8,21 @@
 # VLMEngine.analyze_target()'a gönderir — YOLO/SAHI/ByteTrack'in hiçbiri
 # devrede değildir.
 #
-# KULLANIM:
+# KULLANIM (proje kök dizininden, modül olarak):
 #   Tek fotoğraf:
-#       python vlm_manual_test.py images/foto.jpg
+#       python -m src.vlm.manual_test images/foto.jpg
 #
 #   4 kolaj fotoğraf (tam pipeline simülasyonu):
-#       python vlm_manual_test.py f1.jpg f2.jpg f3.jpg f4.jpg
+#       python -m src.vlm.manual_test f1.jpg f2.jpg f3.jpg f4.jpg
 #
 #   Ham görüntüyle (enhancer uygulanmadan):
-#       python vlm_manual_test.py foto.jpg --raw
+#       python -m src.vlm.manual_test foto.jpg --raw
 #
 #   Kolajı diske kaydet (debug):
-#       python vlm_manual_test.py f1.jpg f2.jpg f3.jpg f4.jpg --save-collage
+#       python -m src.vlm.manual_test f1.jpg f2.jpg f3.jpg f4.jpg --save-collage
 #
 #   Farklı model test:
-#       python vlm_manual_test.py foto.jpg --model qwen2.5vl:7b
+#       python -m src.vlm.manual_test foto.jpg --model qwen2.5vl:7b
 # ============================================================
 
 import argparse

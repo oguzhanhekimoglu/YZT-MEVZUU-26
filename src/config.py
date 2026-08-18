@@ -408,8 +408,8 @@ LLM_TIMEOUT_S         = 30.0    # LLM API çağrısı timeout süresi (saniye)
 LLM_RETRY_COUNT       = 1       # Hata durumunda tekrar deneme sayısı
 # LLM servisini subprocess olarak otomatik başlat
 LLM_AUTO_START        = True
-LLM_PROJECT_DIR       = str(Path(__file__).parent.parent / "LLM")
-LLM_VENV_DIR          = str(Path(__file__).parent.parent / "LLM" / ".venv")
+LLM_PROJECT_DIR       = str(Path(__file__).parent.parent / "karar_servisi")
+LLM_VENV_DIR          = str(Path(__file__).parent.parent / "karar_servisi" / ".venv")
 LLM_HOST              = "127.0.0.1"
 LLM_PORT              = 8000
 

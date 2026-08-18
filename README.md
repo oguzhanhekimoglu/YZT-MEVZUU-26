@@ -19,9 +19,9 @@ Hedefin Kırpılması (Crop)
      ↓
 Model Tanıma (VRAG) + Görsel Doğrulama (VLM)       (src/vrag/, src/vlm/ — SigLIP2+Qdrant / Ollama)
      ↓
-Karar Destek (LLM — risk + Türkçe rapor)           (LLM/ — ayrı FastAPI servisi)
+Karar Destek (LLM — risk + Türkçe rapor)           (karar_servisi/ — ayrı FastAPI servisi)
      ↓
-Web Arayüzü (Windows ve macOS'ta aynı şekilde)      (entegrasyon/)
+Web Arayüzü (Windows ve macOS'ta aynı şekilde)      (backend/)
      ↓
 Operatör
 ```
@@ -33,13 +33,12 @@ Operatör
 | Klasör | İçerik |
 |---|---|
 | `src/` | Ana algı hattı: SAHI+YOLO tespiti, ByteTrack takibi, VRAG (model tanıma), VLM entegrasyonu |
-| `veriler/` | VRAG referans veri seti — `<kategori>/<model>/*.jpg` + `metadata.json` (ülke/üretici/rol) |
+| `data/referans/` | VRAG referans veri seti — `<kategori>/<model>/*.jpg` + `metadata.json` (ülke/üretici/rol) |
 | `models/best.pt` | YOLO ağırlıkları |
 | `output/qdrant_db/` | VRAG'ın indekslenmiş vektör veritabanı (Qdrant, embedded/local mod) |
-| `LLM/` | Karar destek sistemi — ayrı bir FastAPI servisi (Platform Registry, Türkiye Envanteri, izin/uçuş planı/NOTAM kontrolleri, LLM ile Türkçe rapor) |
-| `entegrasyon/` | Algı hattını (src/) ve karar destek sistemini (LLM/) kullanıcı arayüzüne bağlayan katman |
-| `entegrasyon/backend/` | FastAPI backend — `src/core/pipeline.py`'yi çalıştırır, video akışı + hedef verisi sunar |
-| `entegrasyon/web/` | Tek, platform bağımsız arayüz — tarayıcıdan açılır, Windows ve macOS'ta aynı şekilde çalışır |
+| `karar_servisi/` | Karar destek sistemi — ayrı bir FastAPI servisi (Platform Registry, Türkiye Envanteri, izin/uçuş planı/NOTAM kontrolleri, LLM ile Türkçe rapor) |
+| `backend/` | Algı hattını (src/) ve karar destek sistemini (karar_servisi/) kullanıcı arayüzüne bağlayan FastAPI backend — `src/core/pipeline.py`'yi çalıştırır, video akışı + hedef verisi sunar |
+| `backend/web/` | Tek, platform bağımsız arayüz — tarayıcıdan açılır, Windows ve macOS'ta aynı şekilde çalışır |
 
 ## Ön Koşullar (her iki platform için)
 
@@ -72,15 +71,15 @@ Operatör
    ```
 4. **Ortak sanal ortamı kurun** (hem algı hattı hem LLM karar destek sistemi için TEK venv — backend ikisini de bu venv'in Python'uyla çalıştırıyor):
    ```powershell
-   cd LLM
+   cd karar_servisi
    uv sync
    uv pip install --python .venv\Scripts\python.exe ultralytics opencv-python qdrant-client requests python-multipart boxmot
    cd ..
    ```
 5. **Backend'i başlatın:**
    ```powershell
-   cd entegrasyon\backend
-   ..\..\LLM\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
+   cd backend
+   ..\karar_servisi\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
    `Hazır. N model indeksli.` yazısını görünce hazırdır.
 
@@ -109,15 +108,15 @@ Operatör
    ```
 4. **Ortak sanal ortamı kurun** (hem algı hattı hem LLM karar destek sistemi için TEK venv):
    ```bash
-   cd LLM
+   cd karar_servisi
    uv sync
    uv pip install --python .venv/bin/python ultralytics opencv-python qdrant-client requests python-multipart boxmot
    cd ..
    ```
 5. **Backend'i başlatın:**
    ```bash
-   cd entegrasyon/backend
-   ../../LLM/.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
+   cd backend
+   ../karar_servisi/.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
    `Hazır. N model indeksli.` yazısını görünce hazırdır.
 6. **Arayüzü açın:** Tarayıcıda **http://127.0.0.1:8000/goruntule/** açın — aynı backend'den servis edilen, canlı video akışını ve VRAG/VLM/LLM sonuçlarını sırayla gösteren web arayüzü.
@@ -136,24 +135,24 @@ Her iki platformda da: farklı bir video denemek için backend'i yeniden başlat
 
 Yeni model/görsel eklemek için:
 
-1. `veriler/<kategori>/<model>/` altına görselleri koyun (var olan bir modelse mevcut klasöre, **dosya adları çakışmasın**; yeni bir modelse yeni klasör + diğerleri gibi bir `metadata.json` — `model`, `kategori`, `ulke`, `uretici`, `rol` alanlarıyla).
+1. `data/referans/<kategori>/<model>/` altına görselleri koyun (var olan bir modelse mevcut klasöre, **dosya adları çakışmasın**; yeni bir modelse yeni klasör + diğerleri gibi bir `metadata.json` — `model`, `kategori`, `ulke`, `uretici`, `rol` alanlarıyla).
 2. İndeksleyin — proje kök dizininden (`YZT-MEVZUU-26/`):
 
    Windows:
    ```powershell
-   LLM\.venv\Scripts\python.exe -m src.vrag.ingest --img_dir veriler
+   karar_servisi\.venv\Scripts\python.exe -m src.vrag.ingest --img_dir data\referans
    ```
 
    macOS:
    ```bash
-   LLM/.venv/bin/python -m src.vrag.ingest --img_dir veriler
+   karar_servisi/.venv/bin/python -m src.vrag.ingest --img_dir data/referans
    ```
 
-Script **güvenli şekilde senkronize eder**: `veriler/`'in tamamını her seferinde verebilirsiniz — zaten indekslenmiş görselleri atlar (tekrar eklemez), sadece gerçekten yeni olanları işler, ve `veriler/`'den kaldırılmış görselleri de indeksten otomatik siler. Yani indeks her zaman diskteki `veriler/` klasörüyle bire bir eşleşir.
+Script **güvenli şekilde senkronize eder**: `data/referans/`'ın tamamını her seferinde verebilirsiniz — zaten indekslenmiş görselleri atlar (tekrar eklemez), sadece gerçekten yeni olanları işler, ve `data/referans/`'dan kaldırılmış görselleri de indeksten otomatik siler. Yani indeks her zaman diskteki `data/referans/` klasörüyle bire bir eşleşir.
 
 ⚠️ İndeksleme sırasında backend'in **kapalı olması gerekir** (ikisi aynı Qdrant veritabanı dosyasını kilitler — aynı anda açık olamazlar).
 
-⚠️ `--img_dir` **mutlaka belirtin** (varsayılan `data/knowledge_base`'dir, `veriler/` değil) — yanlışlıkla varsayılanla çalıştırmak, script'in "diskte artık yok" sanıp `veriler/`'deki tüm mevcut kayıtları indeksten **silmesine** yol açar.
+⚠️ `--img_dir` **mutlaka belirtin** (varsayılan `data/knowledge_base`'dir, `data/referans/` değil) — yanlışlıkla varsayılanla çalıştırmak, script'in "diskte artık yok" sanıp `data/referans/`'daki tüm mevcut kayıtları indeksten **silmesine** yol açar.
 
 ### Güven Göstergeleri
 

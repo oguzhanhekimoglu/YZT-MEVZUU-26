@@ -1,13 +1,18 @@
-# VRAG bağımlılıkları (Python 3.12+)
+# Bu dosya referans amaçlıdır — asıl kurulum akışı README.md'deki gibi TEK bir
+# ortak venv üzerinden yürür:
+#   cd karar_servisi && uv sync && uv pip install --python .venv/bin/python \
+#     ultralytics opencv-python qdrant-client requests python-multipart boxmot
+# torch/transformers/fastapi/uvicorn/pydantic gibi ortak bağımlılıklar zaten
+# karar_servisi/pyproject.toml (uv.lock) tarafından kuruluyor; burada listelenenler
+# SADECE ana YOLO/VRAG algı hattının ihtiyaç duyduğu, pyproject.toml'da olmayan
+# ekstra paketlerdir (docker/requirements-pipeline.txt ile aynı mantık).
 #
 # GPU (CUDA) kullanımı için torch'u CUDA index'inden kurun, örn:
 #   pip install torch --index-url https://download.pytorch.org/whl/cu130
-# transformers, SigLIP2 görüntü encoder'ı için gerekir.
-torch>=2.2
-transformers>=4.49
+ultralytics>=8.4
+opencv-python>=4.10
 qdrant-client>=1.10
+requests>=2.31
+python-multipart>=0.0.9
+boxmot>=10
 pillow>=10.0
-numpy>=1.26
-
-# Web arayüzü (app.py)
-flask>=3.0

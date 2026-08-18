@@ -3,9 +3,9 @@
 from pathlib import Path
 
 # --- Proje yollarÄ± (klasÃ¶r-iÃ§i kopyalar; GÃ–RELÄ° â†’ klasÃ¶rÃ¼ taÅŸÄ±san da Ã§alÄ±ÅŸÄ±r) ---
-_KOK = Path(__file__).resolve().parent.parent           # VRAG-Kokpit-Tam
+_KOK = Path(__file__).resolve().parent           # VRAG-Kokpit-Tam (backend/ artik entegrasyon/backend/ degil, tek seviye)
 MEVZUU_YOLO_DIZINI = _KOK / "yolo"                      # YOLO hattÄ± (klasÃ¶r iÃ§i)
-VRAG_DIZINI = _KOK.parent                              # VRAG retrieval (klasÃ¶r iÃ§i)
+VRAG_DIZINI = _KOK.parent                              # VRAG retrieval (proje kÃ¶kÃ¼)
 
 # --- FÃ¼zyon (VRAG tetikleme) ---
 VRAG_PERIYOT_SN = 2.0        # aynÄ± track iÃ§in VRAG'Ä± en fazla bu sÄ±klÄ±kta koÅŸtur (periyodik yenile)

@@ -41,7 +41,7 @@ def main():
     # bir UUID kullanÄ±yor, yani ayn Ä± klasÃ¶rÃ¼ ikinci kez ingest etmek ayn Ä±
     # gÃ¶rselleri veritabanÄ±na tekrar tekrar ekliyordu. ArtÄ±k baÅŸlamadan Ã¶nce
     # zaten indekslenmiÅŸ (model, dosya adÄ±) Ã§iftlerini okuyup atlÄ±yoruz â€”
-    # bu sayede "veriler/" klasÃ¶rÃ¼nÃ¼n tamamÄ±nÄ± her geniÅŸletmede gÃ¼venle
+    # bu sayede "data/referans/" klasÃ¶rÃ¼nÃ¼n tamamÄ±nÄ± her geniÅŸletmede gÃ¼venle
     # yeniden Ã§alÄ±ÅŸtÄ±rabilirsiniz, sadece gerÃ§ekten yeni dosyalar iÅŸlenir.
     print("Zaten indekslenmiÅŸ dosyalar kontrol ediliyor...")
     indekslenmis = engine.db.indekslenmis_dosyalari_al()
@@ -56,11 +56,11 @@ def main():
 
     yeni_dosyalar = [fp for key, fp in diskteki.items() if key not in indekslenmis]
 
-    # BUG-FIX (silinen kategoriler indekste kalÄ±yordu): "veriler/" klasÃ¶rÃ¼nden
+    # BUG-FIX (silinen kategoriler indekste kalÄ±yordu): "data/referans/" klasÃ¶rÃ¼nden
     # bir model/kategori tamamen kaldÄ±rÄ±lsa bile eski vektÃ¶rler indekste
     # kalÄ±p VRAG'Ä±n hÃ¢lÃ¢ diskte olmayan bir modeli "tanÄ±masÄ±na" yol
     # aÃ§Ä±yordu. ArtÄ±k diskte artÄ±k karÅŸÄ±lÄ±ÄŸÄ± olmayan indeks kayÄ±tlarÄ±
-    # otomatik siliniyor â€” indeks her zaman "veriler/" ile birebir eÅŸleÅŸir.
+    # otomatik siliniyor â€” indeks her zaman "data/referans/" ile birebir eÅŸleÅŸir.
     silinecekler = indekslenmis - set(diskteki.keys())
     if silinecekler:
         print(f"{len(silinecekler)} gÃ¶rsel artÄ±k diskte yok, indeksten siliniyor...")

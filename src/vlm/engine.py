@@ -274,8 +274,8 @@ class VLMEngine:
         grid_img = self.build_visual_grid(crops)
 
         # --- Kolaj'ı diske kaydet (yalnızca VLM_DEBUG_SAVE_IMAGES=True iken) ---
-        # Kaydedilen dosyayı vlm_manual_test.py ile açıp test edebilirsin:
-        #   python vlm_manual_test.py pipeline_output/debug_vlm/track_X_....jpg
+        # Kaydedilen dosyayı src/vlm/manual_test.py ile açıp test edebilirsin:
+        #   python -m src.vlm.manual_test pipeline_output/debug_vlm/track_X_....jpg
         #
         # BUG-FIX (FPS düşüşü): Bu blok eskiden HER VLM çağrısında koşulsuz
         # çalışıyordu — cv2.imwrite + etiket çizimi senkron CPU/disk işi, arka

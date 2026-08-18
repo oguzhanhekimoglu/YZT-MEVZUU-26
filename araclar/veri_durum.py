@@ -9,7 +9,7 @@ Kullanım:  python araclar/veri_durum.py
 import json
 from pathlib import Path
 
-KOK = Path(__file__).resolve().parent.parent / "veriler"
+KOK = Path(__file__).resolve().parent.parent / "data" / "referans"
 EXT = (".jpg", ".jpeg", ".png")
 GEREKLI = ["model", "kategori", "ayirt_edici_ozellikler", "ulke", "uretici",
            "rol", "alternatif_adlar", "motor_sayisi", "silahli"]

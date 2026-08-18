@@ -40,8 +40,9 @@ output/*.avi
 debug_vlm/
 debug_rag/
 *.log
-LLM/reports/runtime/
-LLM/llm_crash.log
+karar_servisi/reports/runtime/
+karar_servisi/llm_crash.log
+backend/tespit_gecmisi.jsonl
 data/databases/*.db
 yuklemeler/
 
@@ -56,10 +57,10 @@ VİDEOLAR/
 # ============================================================
 # VRAG referans fotoğrafları — ham kaynak veri, repo'yu şişiriyordu.
 # İndekslenmiş hali (output/qdrant_db/) çalışması için yeterli ve
-# hâlâ takip ediliyor; veriler/ sadece indeksi yeniden oluşturmak
+# hâlâ takip ediliyor; data/referans/ sadece indeksi yeniden oluşturmak
 # istendiğinde gerekir, elle/ayrı paylaşılır.
 # ============================================================
-veriler/
+data/referans/
 
 # ============================================================
 # Geçici / ajan klasörleri

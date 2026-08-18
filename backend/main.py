@@ -74,8 +74,8 @@ import sys
 llm_process = None
 
 def _meta_tara() -> dict:
-    """VRAG-final/veriler metadata'sından model/ülke/rol listelerini çıkarır."""
-    kok = ayarlar.VRAG_DIZINI / "veriler"
+    """VRAG-final/data/referans metadata'sından model/ülke/rol listelerini çıkarır."""
+    kok = ayarlar.VRAG_DIZINI / "data" / "referans"
     modeller, ulkeler, roller = set(), set(), set()
     for mp in kok.rglob("metadata.json"):
         try:
@@ -99,7 +99,7 @@ async def lifespan(app: FastAPI):
     durum.meta_cache = _meta_tara()
     
     # LLM Modülünü Başlat
-    llm_dir = str((Path(__file__).resolve().parent.parent.parent / "LLM"))
+    llm_dir = str((Path(__file__).resolve().parent.parent / "karar_servisi"))
     print(f"[BACKEND] LLM API başlatılıyor... ({llm_dir})", flush=True)
     try:
         # LLM'i ana ortamın Python'u ile başlat (Kullanıcının .venv'si)
@@ -119,7 +119,7 @@ async def lifespan(app: FastAPI):
         llm_process.terminate()
 
 app = FastAPI(title="VRAG Backend", lifespan=lifespan)
-app.mount("/goruntule", StaticFiles(directory=str(Path(__file__).parent.parent / "web"), html=True), name="goruntule")
+app.mount("/goruntule", StaticFiles(directory=str(Path(__file__).parent / "web"), html=True), name="goruntule")
 
 def _kare_okuyucu(cap, q):
     while durum.calisiyor:
@@ -298,7 +298,7 @@ def _referans_bul(model: str):
         
     target_lower = model.lower().strip()
     
-    for mp in (ayarlar.VRAG_DIZINI / "veriler").rglob("metadata.json"):
+    for mp in (ayarlar.VRAG_DIZINI / "data" / "referans").rglob("metadata.json"):
         try:
             m_data = json.loads(mp.read_text(encoding="utf-8"))
             meta_model = m_data.get("model", "")

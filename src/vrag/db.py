@@ -85,7 +85,7 @@ class QdrantManager:
         Belirli bir (model, source_file) çiftine ait TÜM varyasyon noktalarını
         koleksiyondan siler.
 
-        Neden var: "veriler/" klasöründen bir model/görsel kaldırıldığında
+        Neden var: "data/referans/" klasöründen bir model/görsel kaldırıldığında
         (ör. bir kategorinin tamamen silinmesi), indeksteki eski vektörler
         otomatik silinmiyordu — VRAG artık diskte olmayan bir modeli hâlâ
         "tanıyabiliyordu". ingest.py bunu, disk ile indeksi karşılaştırıp

@@ -9,11 +9,11 @@ from src.config import VRAG_MIN_SCORE
 
 log = logging.getLogger(__name__)
 
-VERI_DIZINI = Path(__file__).resolve().parent.parent.parent / "veriler"
+VERI_DIZINI = Path(__file__).resolve().parent.parent.parent / "data" / "referans"
 
 
 def _metadata_onbellegi_olustur() -> dict[str, dict]:
-    """model adı → {ulke, uretici, rol} eşlemesi (veriler/**/metadata.json'dan).
+    """model adı → {ulke, uretici, rol} eşlemesi (data/referans/**/metadata.json'dan).
 
     BUG-FIX: ingest.py, indeksleme sırasında Qdrant payload'ına yalnızca
     model/class/source_file/variation yazıyordu — ulke/uretici/rol hiç

@@ -101,12 +101,12 @@ services:
       - OPERATIONAL_DECISION_DECISION_MODEL=meta-llama/Llama-3.2-1B-Instruct
     volumes:
       # Kod dışındaki her şey bind-mount — repo'nun kendisi zaten bu verilerle
-      # birlikte klonlanmış olacak, imaja gömmeye gerek yok.
-      - ../veriler:/app/veriler
+      # birlikte klonlanmış olacak, imaja gömmeye gerek yok. data/referans/
+      # (VRAG kaynak fotoğrafları) zaten data/'nın altında, ayrı mount gerekmez.
       - ../output:/app/output
       - ../models:/app/models
       - ../data:/app/data
-      - ../LLM/data:/app/LLM/data
+      - ../karar_servisi/data:/app/karar_servisi/data
     deploy:
       resources:
         reservations:

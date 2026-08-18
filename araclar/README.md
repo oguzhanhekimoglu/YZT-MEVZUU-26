@@ -28,7 +28,7 @@ Airshow/uçuş/drone videosundan eşit aralıklı kareler üretir (`kare_001.jpg
 ## İş akışı (ekle → indeksle)
 1. **Foto topla** (yukarıdaki önceliklerle; video varsa `video_kare.py`).
 2. **Doğru yere koy:**
-   - Mevcut modele: `veriler/<kategori>/<Model>/` klasörüne at.
+   - Mevcut modele: `data/referans/<kategori>/<Model>/` klasörüne at.
    - Yeni model: yeni klasör aç + içine `metadata.json`:
      ```json
      {
