@@ -66,3 +66,9 @@ data/referans/
 # Geçici / ajan klasörleri
 # ============================================================
 .agents/
+
+# ============================================================
+# Docker — henüz bozuk/eksik (boxmot yok, NVIDIA'ya kilitli),
+# üzerinde ayrı çalışılıyor. Yerelde kalsın, repoya girmesin.
+# ============================================================
+docker/
