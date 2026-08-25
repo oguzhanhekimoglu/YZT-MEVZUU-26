@@ -1,0 +1,125 @@
+:root {
+  color-scheme: dark;
+
+  /* Tactical Command dark — birebir code.html/DESIGN.md değerleri. Tasarımda
+     ayrı bir "kart" tonu yok: her yüzey ayni tactical-dark, ayrım sadece
+     1px border ile yapılıyor (bkz. DESIGN.md "Tonal Segmentation and Borders"). */
+  --color-background: #000000;
+  --color-surface: #1a1d23;
+  --color-card: #1a1d23;
+  --color-elevated: #1a1d23;
+  --color-border: #30363d;
+  /* Mockup'ta saf beyaz (dark-text-white) sadece vurgu noktalarında (marka,
+     aktif nav, buton metni) kullanılıyor — genel gövde metni dark-text-main.
+     Vurgu noktaları zaten --color-accent (beyaz) ile ayrı yönetiliyor. */
+  --color-text-primary: #c9d1d9;
+  --color-text-secondary: #aab2bb;
+  --color-text-muted: #8b949e;
+  --color-text-disabled: #545d68;
+  --color-accent: #ffffff;
+  --color-accent-hover: #f0f3f6;
+  --color-information: #58a6ff;
+  --color-success: #2ea043;
+  --color-warning: #d29922;
+  --color-risk-high: #db6d28;
+  --color-critical: #f85149;
+  --color-unknown: #8b949e;
+  --color-risk-low-soft: rgba(46, 160, 67, 0.12);
+  --color-risk-medium-soft: rgba(210, 153, 34, 0.12);
+  --color-risk-high-soft: rgba(219, 109, 40, 0.12);
+  --color-risk-critical-soft: rgba(248, 81, 73, 0.13);
+  --color-risk-unknown-soft: rgba(139, 148, 158, 0.1);
+  --color-process-waiting: #8b949e;
+  --color-process-running: #ffffff;
+  --color-process-completed: #2ea043;
+  --color-process-warning: #d29922;
+  --color-process-error: #f85149;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* Tactical Command: sharp, geometric shapes — 0px on structural elements,
+     pill kept only for LED/status-dot style indicators (bkz. DESIGN.md). */
+  --radius-risk: 0px;
+  --radius-card: 0px;
+  --radius-button: 0px;
+  --radius-panel: 0px;
+  --radius-pill: 999px;
+
+  /* Tactical Command Geist kullanıyor; self-host edilmiş dosyası yok ve
+     CDN'den çekmek offline kuralını bozar (bkz. assets/fonts/README.md).
+     GitHub'ın kendi (self-host gerektirmeyen, sisteme gömülü) font
+     zincirleri en yakın okunaklı eşdeğer — ek dosya/indirme gerektirmez. */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-family-mono: ui-monospace, "SF Mono", Menlo, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  --font-size-technical: 0.75rem;
+  --font-size-helper: 0.8125rem;
+  --font-size-body: 0.875rem;
+  --font-size-panel-title: 1rem;
+  --font-size-page-title: 1.25rem;
+  --font-size-risk: 1.5rem;
+  --font-size-aircraft: 1.75rem;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-body: 1.55;
+
+  --shadow-overlay: 0 20px 60px rgba(0, 0, 0, 0.38);
+  --duration-hover: 140ms;
+  --duration-accordion: 200ms;
+  --duration-drawer: 250ms;
+  --duration-status: 180ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  --breakpoint-mobile: 30rem;
+  --breakpoint-tablet: 48rem;
+  --breakpoint-desktop: 64rem;
+  --breakpoint-wide: 90rem;
+}
+
+/* Light mode — same token names, Tactical Command light palette. Applied by
+   toggling data-theme on <html> (bkz. src/app/theme.tsx); default (no
+   attribute) stays dark so behavior is unchanged until a viewer opts in. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Tactical Command light — birebir code.html light- ve gh- degerleri.
+     gh-green/gh-red kasitli olarak dark ile ayni (mockup'ta da tema bagimsiz). */
+  --color-background: #f6f8fa;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-elevated: #f3f4f6;
+  --color-border: #d0d7de;
+  --color-text-primary: #24292f;
+  --color-text-secondary: #57606a;
+  --color-text-muted: #6e7781;
+  --color-text-disabled: #8c959f;
+  --color-accent: #24292f;
+  --color-accent-hover: #57606a;
+  --color-information: #58a6ff;
+  --color-success: #2ea043;
+  --color-warning: #d29922;
+  --color-risk-high: #db6d28;
+  --color-critical: #f85149;
+  --color-unknown: #6e7781;
+  --color-risk-low-soft: rgba(46, 160, 67, 0.1);
+  --color-risk-medium-soft: rgba(210, 153, 34, 0.1);
+  --color-risk-high-soft: rgba(219, 109, 40, 0.1);
+  --color-risk-critical-soft: rgba(248, 81, 73, 0.1);
+  --color-risk-unknown-soft: rgba(110, 119, 129, 0.08);
+  --color-process-waiting: #6e7781;
+  --color-process-running: #24292f;
+  --color-process-completed: #2ea043;
+  --color-process-warning: #d29922;
+  --color-process-error: #f85149;
+
+  --shadow-overlay: 0 20px 60px rgba(15, 23, 30, 0.14);
+}

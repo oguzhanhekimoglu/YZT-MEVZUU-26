@@ -1,0 +1,20 @@
+.overlay { position: absolute; z-index: 2; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.telemetry { position: absolute; z-index: 2; top: var(--space-3); right: var(--space-3); left: var(--space-3); display: flex; justify-content: space-between; color: rgba(225, 240, 247, .72); font-family: var(--font-family-mono); font-size: var(--font-size-technical); letter-spacing: .08em; text-shadow: 0 1px 3px #000; }
+.frame { position: relative; flex: none; }
+.targetBox { position: absolute; padding: 0; border: 1px solid var(--color-accent); border-radius: 2px; color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 5%, transparent); box-shadow: inset 0 0 14px color-mix(in srgb, var(--color-accent) 7%, transparent), 0 0 8px rgba(0,0,0,.42); cursor: pointer; pointer-events: auto; }
+.targetBox::before, .targetBox::after { position: absolute; width: 13px; height: 13px; content: ""; }
+.targetBox::before { top: -2px; left: -2px; border-top: 3px solid currentColor; border-left: 3px solid currentColor; }
+.targetBox::after { right: -2px; bottom: -2px; border-right: 3px solid currentColor; border-bottom: 3px solid currentColor; }
+.targetBox[data-selected="true"] { border-width: 2px; box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 35%, transparent); }
+.targetBox[data-risk="high"] { color: var(--color-risk-high); border-color: var(--color-risk-high); background: color-mix(in srgb, var(--color-risk-high) 7%, transparent); }
+.targetBox[data-risk="critical"] { color: var(--color-critical); border-color: var(--color-critical); background: color-mix(in srgb, var(--color-critical) 8%, transparent); }
+.targetLabel { position: absolute; bottom: calc(100% + 5px); left: -2px; min-width: max-content; display: grid; grid-template-columns: auto 1fr; gap: 0 var(--space-1); padding: 4px 6px; color: var(--color-text-primary); background: rgba(5, 8, 11, .88); border-left: 2px solid currentColor; text-align: left; }
+.targetLabel svg { grid-row: 1 / 3; align-self: center; color: currentColor; }
+.targetLabel strong { max-width: 160px; overflow: hidden; font-size: var(--font-size-technical); text-overflow: ellipsis; white-space: nowrap; }
+.targetLabel small { color: currentColor; font-family: var(--font-family-mono); font-size: .62rem; }
+.criticalAlert { position: absolute; z-index: 3; top: 38px; left: 50%; width: min(420px, calc(100% - 24px)); min-height: 42px; display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); border: 1px solid color-mix(in srgb, var(--color-critical) 65%, transparent); border-left: 3px solid var(--color-critical); border-radius: var(--radius-card); color: var(--color-critical); background: rgba(20, 8, 10, .9); box-shadow: 0 8px 24px rgba(0,0,0,.28); transform: translateX(-50%); pointer-events: auto; }
+.criticalAlert > span { min-width: 0; display: flex; flex: 1; flex-direction: column; }
+.criticalAlert strong { font-size: var(--font-size-technical); letter-spacing: .06em; }
+.criticalAlert small { overflow: hidden; color: var(--color-text-secondary); font-size: var(--font-size-technical); text-overflow: ellipsis; white-space: nowrap; }
+.criticalAlert button { min-height: 30px; padding: var(--space-1) var(--space-2); border: 1px solid color-mix(in srgb, var(--color-critical) 45%, transparent); border-radius: var(--radius-button); color: var(--color-text-primary); background: transparent; cursor: pointer; font-size: var(--font-size-technical); white-space: nowrap; }
+@media (max-width: 35rem) { .targetLabel strong { max-width: 95px; }.criticalAlert { top: 32px; }.criticalAlert small { display: none; } }

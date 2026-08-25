@@ -1,0 +1,37 @@
+.header {
+  position: relative;
+  min-width: 0;
+  min-height: 88px;
+  display: grid;
+  grid-template-columns: minmax(380px, 1fr) auto;
+  grid-template-areas: "brand telemetry";
+  align-items: center;
+  gap: clamp(var(--space-4), 3vw, 56px);
+  padding: var(--space-3) clamp(var(--space-4), 2vw, 32px);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.brandZone { grid-area: brand; min-width: 0; display: flex; align-items: flex-end; gap: var(--space-4); }
+
+.telemetry { --telemetry-height: 40px; grid-area: telemetry; min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2); }
+.telemetry > section { min-width: 0; height: var(--telemetry-height); }
+
+.metrics { min-width: 142px; height: var(--telemetry-height); display: flex; align-items: center; }
+.timeMetric { width: 100%; height: var(--telemetry-height); display: flex; align-items: center; justify-content: center; gap: var(--space-2); padding: 0 var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: color-mix(in srgb, var(--color-background) 58%, transparent); white-space: nowrap; }
+.timeMetric svg { flex: 0 0 auto; color: var(--color-accent); }
+.timeMetric strong { color: var(--color-text-primary); font-family: var(--font-family-mono); font-size: var(--font-size-helper); }
+.timeMetric small { color: var(--color-text-muted); font-family: var(--font-family-mono); font-size: var(--font-size-technical); }
+
+@media (max-width: 64rem) {
+  .header { grid-template-columns: minmax(350px, 1fr) auto; gap: var(--space-3) var(--space-5); }
+}
+
+@media (max-width: 50rem) {
+  .header { grid-template-columns: 1fr; grid-template-areas: "brand" "telemetry"; gap: var(--space-3); padding: var(--space-3); }
+  .brandZone { justify-content: space-between; }
+  .telemetry { flex-wrap: wrap; justify-content: flex-start; }
+  .telemetry > section { flex: 1 1 290px; }
+  .metrics { flex: 1 1 142px; }
+  .telemetry > section > *, .timeMetric { width: 100%; }
+}

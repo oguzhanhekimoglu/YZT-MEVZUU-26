@@ -1,0 +1,180 @@
+.panel {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.decision,
+.identityCard {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--color-card);
+}
+
+.decision {
+  border-top-color: var(--color-accent);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) 0;
+  color: var(--color-accent);
+  font-family: Arial, sans-serif;
+  font-size: var(--font-size-technical);
+  font-weight: 700;
+  letter-spacing: .09em;
+}
+
+.decisionBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 128px;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.decisionCopy h2 {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: var(--line-height-tight);
+}
+
+.decisionCopy p {
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-helper);
+  line-height: 1.55;
+}
+
+.decisionMeta {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.riskBox {
+  display: grid;
+  place-items: center;
+  min-height: 66px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--color-surface) 76%, transparent);
+  text-align: center;
+}
+
+.riskBox span {
+  color: var(--color-text-muted);
+  font-family: Arial, sans-serif;
+  font-size: .62rem;
+  letter-spacing: .08em;
+}
+
+.riskBox strong {
+  color: var(--color-text-primary);
+  font-size: 1.05rem;
+  text-transform: uppercase;
+}
+
+.riskBox strong[data-risk="medium"] { color: var(--color-risk-medium); }
+.riskBox strong[data-risk="high"] { color: var(--color-risk-high); }
+.riskBox strong[data-risk="critical"] { color: var(--color-critical); }
+.riskBox strong[data-risk="low"] { color: var(--color-success); }
+
+.review {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 6px var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 48%, transparent);
+  border-radius: var(--radius-card);
+  color: var(--color-warning);
+  background: color-mix(in srgb, var(--color-warning) 8%, transparent);
+  font-size: .67rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.identityCard {
+  padding-bottom: var(--space-4);
+}
+
+.identityBody {
+  display: grid;
+  grid-template-columns: 98px minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+.reference {
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-content: center;
+  gap: var(--space-1);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  color: var(--color-text-muted);
+  text-align: center;
+  background: var(--color-surface);
+}
+
+.reference svg { color: var(--color-text-muted); }
+.reference small { font-size: .62rem; }
+.reference img { width: 100%; height: 100%; object-fit: contain; }
+
+.identity { min-width: 0; }
+
+.identity h2 {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.05rem, 1.5vw, var(--font-size-aircraft));
+  line-height: var(--line-height-tight);
+}
+
+.identity dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.identity dt {
+  color: var(--color-text-muted);
+  font-size: .62rem;
+}
+
+.identity dd {
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+  color: var(--color-text-primary);
+  font-family: Arial, sans-serif;
+  font-size: var(--font-size-technical);
+  font-weight: 700;
+}
+
+.empty {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  color: var(--color-text-muted);
+  background: var(--color-card);
+}
+
+@media (max-width: 30rem) {
+  .decisionBody { grid-template-columns: 1fr; }
+  .decisionMeta { grid-template-columns: 1fr 1fr; }
+  .identityBody { grid-template-columns: 80px minmax(0, 1fr); gap: var(--space-3); }
+  .identity dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 22rem) {
+  .decisionMeta,
+  .identityBody { grid-template-columns: 1fr; }
+  .reference { width: 96px; }
+}

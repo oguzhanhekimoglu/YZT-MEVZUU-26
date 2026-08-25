@@ -1,0 +1,64 @@
+:root {
+  font-family: var(--font-family-sans);
+  font-synthesis: none;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  text-rendering: optimizeLegibility;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+body {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  overflow: hidden;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+button,
+[role="button"],
+select,
+summary {
+  font-family: var(--font-family-sans);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+pre,
+code,
+input[type="text"],
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+@media (max-width: 63.99rem) {
+  body { overflow-y: auto; overflow-x: hidden; }
+}
+
+@media (pointer: coarse) {
+  button { min-height: 44px; }
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  outline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+}
+
+::selection {
+  color: var(--color-background);
+  background: var(--color-accent);
+}

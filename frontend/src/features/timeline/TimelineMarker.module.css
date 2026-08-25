@@ -1,0 +1,92 @@
+.marker {
+  width: 118px;
+  height: 82px;
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  translate: -50% 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  color: var(--color-information);
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+}
+
+.marker[data-risk="low"] { color: var(--color-success); }
+.marker[data-risk="medium"] { color: var(--color-warning); }
+.marker[data-risk="high"] { color: var(--color-risk-high); }
+.marker[data-risk="critical"] { color: var(--color-critical); }
+.marker[data-risk="unknown"] { color: var(--color-unknown); }
+
+.symbol {
+  width: 21px;
+  height: 21px;
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  translate: -50% 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--color-card);
+  box-shadow: 0 0 0 3px var(--color-card);
+  font-size: .48rem;
+}
+
+.marker[aria-current="true"] .symbol {
+  color: var(--color-background);
+  background: currentColor;
+  box-shadow: 0 0 0 3px var(--color-card), 0 0 0 4px currentColor;
+}
+
+.marker time {
+  position: absolute;
+  top: 39px;
+  right: 0;
+  left: 0;
+  color: currentColor;
+  font: 700 .61rem var(--font-family-mono);
+}
+
+.title {
+  position: absolute;
+  top: 56px;
+  right: 2px;
+  left: 2px;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--color-text-secondary);
+  font-size: .6rem;
+  line-height: 1.25;
+}
+
+.marker[aria-current="true"] .title { color: var(--color-critical); }
+
+.tooltip {
+  width: 190px;
+  position: fixed;
+  z-index: 60;
+  translate: -50% 0;
+  display: block;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  color: var(--color-text-secondary);
+  background: var(--color-elevated);
+  box-shadow: var(--shadow-overlay);
+  text-align: left;
+  pointer-events: none;
+}
+
+.tooltip[data-placement="top"] { translate: -50% -100%; }
+.tooltip strong,
+.tooltip span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tooltip strong { color: var(--color-text-primary); font-family: var(--font-family-mono); }
+.tooltip span { font-size: .68rem; }
+
+@media (prefers-reduced-motion: reduce) { .tooltip { transition: none; } }

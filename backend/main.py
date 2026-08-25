@@ -49,6 +49,8 @@ class Durum:
         self.son_hedefler: list = []
         self.frame_no = 0
         self.kaynak = ""
+        self.fps = 0.0
+        self.sure_saniye = 0.0
         self.kilit = threading.Lock()
         # BUG-FIX (çifte pipeline / VRAG kilit çakışması): "Başlat"a art arda
         # basılırsa (ör. çift tıklama, hızlı yeniden deneme) iki ayrı
@@ -176,7 +178,16 @@ def _video_dongu(video_yolu: str):
         durum.calisiyor = False
         print(f"Kaynak açılamadı: {video_yolu}", flush=True)
         return
-        
+
+    # Arayüzdeki süre göstergesi videonun gerçek süresiyle eşleşsin: fps ve
+    # toplam kare sayısı OpenCV'den okunur, /durum bu ikisinden hesaplanan
+    # toplam süreyi ve (frame_no/fps ile) o ana kadar geçen süreyi döndürür.
+    okunan_fps = cap.get(cv2.CAP_PROP_FPS) or 0.0
+    toplam_kare = cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0.0
+    with durum.kilit:
+        durum.fps = okunan_fps
+        durum.sure_saniye = (toplam_kare / okunan_fps) if okunan_fps > 0 else 0.0
+
     frame_queue = queue.Queue(maxsize=30)
     reader_thread = threading.Thread(target=_kare_okuyucu, args=(cap, frame_queue), daemon=True)
     reader_thread.start()
@@ -221,6 +232,8 @@ def oturum_baslat(govde: dict):
         durum.son_kare = None
         durum.son_hedefler = []
         durum.frame_no = 0
+        durum.fps = 0.0
+        durum.sure_saniye = 0.0
     durum.calisiyor = True
     durum.kaynak = yol
     durum.thread = threading.Thread(target=_video_dongu, args=(yol,), daemon=True)
@@ -236,9 +249,25 @@ def oturum_durdur():
 
 @app.get("/durum")
 def durum_al():
+    gecen_saniye = (durum.frame_no / durum.fps) if durum.fps > 0 else 0.0
     return {"calisiyor": durum.calisiyor, "kaynak": durum.kaynak,
             "frame_no": durum.frame_no, "hedef_sayisi": len(durum.son_hedefler),
-            "model_sayisi": durum.meta_cache.get("model_sayisi", 0)}
+            "model_sayisi": durum.meta_cache.get("model_sayisi", 0),
+            "sure_saniye": durum.sure_saniye, "gecen_saniye": gecen_saniye}
+
+
+@app.get("/videolar")
+def videolar():
+    """data/videos/ altındaki mevcut test videolarını listeler (arayüzde seçim için)."""
+    video_dizini = ayarlar.VRAG_DIZINI / "data" / "videos"
+    if not video_dizini.exists():
+        return {"videolar": []}
+    uzantilar = {".mp4", ".mov", ".avi", ".mkv"}
+    dosyalar = sorted(
+        (p for p in video_dizini.iterdir() if p.is_file() and p.suffix.lower() in uzantilar),
+        key=lambda p: p.name.lower(),
+    )
+    return {"videolar": [{"ad": p.name, "yol": str(p)} for p in dosyalar]}
 
 
 @app.get("/video")

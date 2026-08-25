@@ -1,0 +1,1 @@
+.summary,.actions { margin-top: var(--space-3); }.summary h4,.actions h4 { margin-bottom: var(--space-1); font-size: var(--font-size-helper); }.summary p { color: var(--color-text-secondary); line-height: 1.65; }.empty { color: var(--color-text-muted); font-size: var(--font-size-helper); }

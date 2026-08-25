@@ -1,0 +1,2 @@
+.waiting { color: var(--color-text-muted); font-size: var(--font-size-helper); }
+.warning,.error { margin-bottom: var(--space-3); padding: var(--space-3); border-left: 2px solid var(--color-warning); border-radius: var(--radius-card); background: var(--color-surface); }.error { border-left-color: var(--color-critical); }.warning strong { color: var(--color-warning); }.error strong { color: var(--color-critical); }.warning p,.error p { margin-top: var(--space-1); color: var(--color-text-secondary); font-size: var(--font-size-helper); }

@@ -1,0 +1,40 @@
+{
+  "name": "mevzuu-frontend-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "build:backend": "tsc -b && vite build --mode backend",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "serve:e2e": "node e2e-backend/static-server.mjs",
+    "test:e2e:backend": "playwright test --config playwright.backend.config.ts"
+  },
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "eslint": "^10.8.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.4",
+    "globals": "^17.11.0",
+    "jsdom": "^29.1.1",
+    "typescript": "latest",
+    "typescript-eslint": "^8.67.0",
+    "vite": "latest",
+    "vitest": "latest"
+  }
+}

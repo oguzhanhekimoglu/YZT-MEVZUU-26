@@ -1,0 +1,7 @@
+.badge { display: inline-flex; align-items: center; gap: var(--space-1); width: fit-content; padding: 2px var(--space-2); border-radius: var(--radius-risk); font-size: var(--font-size-technical); font-weight: var(--font-weight-semibold); text-transform: uppercase; white-space: nowrap; }
+.info { color: var(--color-information); background: rgba(85,149,232,.12); }
+.low { color: var(--color-success); background: var(--color-risk-low-soft); }
+.medium { color: var(--color-warning); background: var(--color-risk-medium-soft); }
+.high { color: var(--color-risk-high); background: var(--color-risk-high-soft); }
+.critical { color: var(--color-critical); background: var(--color-surface); box-shadow: inset 2px 0 var(--color-critical); }
+.unknown { color: var(--color-unknown); background: var(--color-risk-unknown-soft); }

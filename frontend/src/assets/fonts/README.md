@@ -1,0 +1,3 @@
+# Yerel fontlar
+
+Tasarım Geist (sans) + JetBrains Mono (mono) kullanıyor ama ikisinin de self-host edilmiş dosyası yok ve bu makinede sistem fontu olarak da kurulu değil — CDN'den çekmek offline kuralını bozar. Bu yüzden `--font-family-sans`/`--font-family-mono` (bkz. `src/styles/tokens.css`) şimdilik GitHub'ın kendi (sisteme gömülü, ek dosya gerektirmeyen) font zincirlerini kullanıyor — okunaklılık için bilinçli bir tercih. Geist/JetBrains Mono dosyaları eklenirse bu iki token'ı güncelleyip `src/styles/globals.css` içinde yerel `@font-face` tanımlarını etkinleştirin; o zamana kadar merkezi font stack'lerindeki güvenli sistem fallback'leri kullanılır. Çalışma zamanında indirme veya CDN kullanılmaz.

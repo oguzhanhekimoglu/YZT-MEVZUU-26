@@ -1,0 +1,8 @@
+.backdrop { position: fixed; z-index: 50; inset: 0; display: grid; place-items: center; padding: var(--space-4); background: rgba(0,0,0,.68); }
+.dialog { width: min(420px, 100%); max-height: calc(100dvh - 32px); overflow: auto; padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-panel); background: var(--color-elevated); box-shadow: var(--shadow-overlay); }
+.dialog h2 { font-size: var(--font-size-page-title); }
+.dialog p { margin-top: var(--space-3); color: var(--color-text-secondary); }
+.actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-5); }
+.actions button { min-height: 40px; padding: var(--space-2) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-button); color: var(--color-text-primary); background: transparent; cursor: pointer; }
+.actions .danger { border-color: var(--color-critical); color: var(--color-critical); }
+@media (pointer: coarse) { .actions button { min-height: 44px; } }

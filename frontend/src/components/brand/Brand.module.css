@@ -1,0 +1,49 @@
+.brand {
+  position: relative;
+  min-width: 0;
+  padding-left: 14px;
+}
+
+.brand::before {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 0;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  content: "";
+}
+
+.brand h1 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-accent);
+  font-size: clamp(.78rem, 1vw, .9rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: .13em;
+  line-height: 1;
+}
+
+.brand h1::after {
+  width: clamp(38px, 5vw, 82px);
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-accent), transparent);
+  content: "";
+}
+
+.brand p {
+  margin-top: 9px;
+  color: var(--color-text-primary);
+  font-size: clamp(1.2rem, 1.65vw, 1.5rem);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: .015em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+@media (max-width: 30rem) {
+  .brand p { font-size: clamp(1.05rem, 5vw, 1.25rem); white-space: normal; }
+  .brand h1::after { width: 34px; }
+}

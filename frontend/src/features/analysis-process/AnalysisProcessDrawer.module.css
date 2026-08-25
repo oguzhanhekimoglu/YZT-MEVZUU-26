@@ -1,0 +1,6 @@
+.panel { flex: 0 0 auto; min-width: 0; max-height: min(52dvh, 560px); overflow-y: auto; overscroll-behavior: contain; padding: var(--space-2); border: 1px solid var(--color-border); border-top-color: var(--color-accent); border-radius: var(--radius-panel); background: var(--color-card); scrollbar-gutter: stable; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); padding: 0 var(--space-1); }
+.header p { color: var(--color-accent); font-family: Arial, sans-serif; font-size: .65rem; font-weight: 700; letter-spacing: .1em; }
+.header h2 { font-size: var(--font-size-helper); }
+.body { min-width: 0; }
+@media (max-width: 63.99rem) { .panel { max-height: none; overflow: visible; } }

@@ -1,0 +1,3 @@
+.selector { display: flex; gap: var(--space-2); overflow-x: auto; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border); scrollbar-width: thin; }
+.selector button { min-height: 34px; padding: var(--space-1) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-button); color: var(--color-text-secondary); background: var(--color-card); cursor: pointer; white-space: nowrap; }
+.selector button[aria-selected="true"] { border-color: var(--color-accent); color: var(--color-text-primary); background: rgba(60,191,196,.08); }

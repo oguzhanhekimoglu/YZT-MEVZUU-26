@@ -1,0 +1,56 @@
+.cluster {
+  width: 108px;
+  height: 82px;
+  position: absolute;
+  z-index: 3;
+  top: 8px;
+  translate: -50% 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  color: var(--color-warning);
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+}
+
+.cluster[data-critical="true"] { color: var(--color-critical); }
+
+.symbol {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--color-card);
+  box-shadow: 0 0 0 3px var(--color-card);
+  font-size: .45rem;
+}
+
+.symbol strong { font-size: .55rem; }
+.cluster[aria-expanded="true"] .symbol { color: var(--color-background); background: currentColor; }
+
+.cluster time {
+  position: absolute;
+  top: 39px;
+  right: 0;
+  left: 0;
+  color: currentColor;
+  font: 700 .61rem var(--font-family-mono);
+}
+
+.cluster small {
+  position: absolute;
+  top: 56px;
+  right: 0;
+  left: 0;
+  color: var(--color-text-secondary);
+  font-size: .6rem;
+}

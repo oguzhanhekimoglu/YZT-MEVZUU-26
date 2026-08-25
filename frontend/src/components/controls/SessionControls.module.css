@@ -1,0 +1,8 @@
+.controls { min-width: 0; min-height: 48px; display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); overflow-x: auto; border-bottom: 1px solid var(--color-border); background: var(--color-card); }
+.button, .primary { min-height: 32px; display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-button); color: var(--color-text-secondary); background: transparent; cursor: pointer; font-size: var(--font-size-helper); white-space: nowrap; transition: border-color var(--duration-hover), color var(--duration-hover), background var(--duration-hover); }
+.button:hover:not(:disabled) { color: var(--color-text-primary); border-color: var(--color-text-muted); }
+.primary { color: var(--color-accent); border-color: var(--color-accent); border-width: 2px; background: var(--color-surface); font-weight: var(--font-weight-semibold); }
+.primary:hover:not(:disabled) { background: var(--color-elevated); color: var(--color-accent-hover); border-color: var(--color-accent-hover); }
+.button:disabled, .primary:disabled { color: var(--color-text-disabled); border-color: var(--color-border); background: transparent; cursor: not-allowed; opacity: .62; }
+.separator { width: 1px; height: 22px; background: var(--color-border); }
+@media (max-width: 47.99rem) { .controls { flex-wrap: wrap; overflow-x: hidden; padding: var(--space-2); }.separator { display: none; }.button,.primary { flex: 1 1 calc(50% - var(--space-2)); justify-content: center; min-height: 44px; } }
