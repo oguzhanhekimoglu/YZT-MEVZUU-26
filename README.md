@@ -1,6 +1,6 @@
 # Hava Sahası Gözetleme ve İHA Tehdit Tespit Sistemi
 
-Video/kamera görüntüsünden hava araçlarını (uçak, İHA/SİHA, helikopter) tespit eden, tam olarak hangi model olduğunu tanıyan, bağımsız bir görsel dil modeliyle doğrulayan ve son olarak bir LLM karar destek katmanıyla risk değerlendirmesi + Türkçe rapor üreten, **tamamen yerel (offline)** çalışan bir sistem.
+Video/kamera görüntüsünden hava araçlarını (uçak, İHA/SİHA, helikopter) tespit eden, tam olarak hangi model olduğunu tanıyan, bağımsız bir görsel dil modeliyle doğrulayan ve son olarak bir LLM karar destek katmanıyla risk değerlendirmesi + Türkçe rapor üreten bir sistem. Algı hattı (YOLO/SAHI/ByteTrack/VRAG) tamamen yerelde çalışır; VLM ve karar/rapor üretimi SSB'nin TEKNOFEST TYDA için sağladığı EVREN çıkarım servisi üzerinden (internet gerektirir) çalışır.
 
 TEKNOFEST Türkçe Yapay Zeka Dil Ajanları Yarışması (3. Senaryo) kapsamında geliştirilmiştir.
 
@@ -17,7 +17,7 @@ ByteTrack ile Takip                                (src/tracking/tracker.py)
      ↓
 Hedefin Kırpılması (Crop)
      ↓
-Model Tanıma (VRAG) + Görsel Doğrulama (VLM)       (src/vrag/, src/vlm/ — SigLIP2+Qdrant / Ollama)
+Model Tanıma (VRAG) + Görsel Doğrulama (VLM)       (src/vrag/, src/vlm/ — SigLIP2+Qdrant / EVREN)
      ↓
 Karar Destek (LLM — risk + Türkçe rapor)           (karar_servisi/ — ayrı FastAPI servisi)
      ↓
@@ -42,13 +42,10 @@ Operatör
 
 ## Ön Koşullar (her iki platform için)
 
-- **[Ollama](https://ollama.com)** kurulu ve çalışıyor olmalı, şu modeller çekili olmalı:
-  ```
-  ollama pull qwen2.5vl:7b   # VLM — görsel istihbarat/doğrulama
-  ollama pull llama3.2:1b    # LLM karar destek — Türkçe rapor üretimi
-  ```
+- **EVREN erişimi** (TEKNOFEST TYDA — SSB'nin sağladığı OpenAI-uyumlu çıkarım servisi, https://evren-teknofest.ssyz.org.tr). Takım anahtarı e-postayla geliyor; `.env`'e (`karar_servisi/.env`) ve ortam değişkeni olarak (`VLM_API_KEY`) girilmesi gerekiyor — aşağıdaki kurulum adımlarında detaylı.
+- İnternet bağlantısı gerekiyor — VLM ve karar/rapor üretimi artık yerel bir modelle değil, EVREN üzerinden çalışıyor.
 - Python'un kendisini elle kurmanıza gerek yok — aşağıdaki `uv sync` adımı, projenin istediği **Python 3.11**'i sizin için otomatik indirip kuruyor.
-- İlk çalıştırmada **internet gerekir** — VRAG'ın görsel gömme modeli (`google/siglip2-so400m-patch14-384`) Hugging Face'ten otomatik indirilir (~3-4 GB, bir kerelik). Sonrasında sistem tamamen yerel/offline çalışır.
+- İlk çalıştırmada VRAG'ın görsel gömme modeli (`google/siglip2-so400m-patch14-384`) Hugging Face'ten otomatik indirilir (~3-4 GB, bir kerelik) — bunun için internet gerekir. Bunun ötesinde, VLM ve karar/rapor üretimi her çağrıda EVREN'e gittiği için sistem **sürekli internet bağlantısına ihtiyaç duyar**, artık offline çalışmaz.
 
 ---
 
@@ -76,16 +73,22 @@ Operatör
    uv pip install --python .venv\Scripts\python.exe ultralytics opencv-python qdrant-client requests python-multipart boxmot
    cd ..
    ```
-5. **Backend'i başlatın:**
+5. **EVREN anahtarınızı girin** (e-postayla gelen takım anahtarı):
+   ```powershell
+   # karar_servisi/.env içine:
+   #   OPERATIONAL_DECISION_VLLM_API_KEY=sk-evren-teamNN-XXXXXXXX
+   $env:VLM_API_KEY = "sk-evren-teamNN-XXXXXXXX"
+   ```
+6. **Backend'i başlatın:**
    ```powershell
    cd backend
    ..\karar_servisi\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
    `Hazır. N model indeksli.` yazısını görünce hazırdır.
 
-   💡 Adım 5 yerine kök dizindeki `Sistemi_Baslat.bat`'a çift tıklayarak backend'i başlatıp tarayıcıyı otomatik açtırabilirsiniz.
-6. **Arayüzü açın:** Tarayıcıda **http://127.0.0.1:8000/goruntule/** açın.
-7. **Video başlatın:** Arayüzdeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da tarayıcıda `http://127.0.0.1:8000/docs` → `POST /oturum/baslat` → `video_yolu` alanına tam dosya yolunu yazıp Execute'a basın.
+   💡 Adım 6 yerine kök dizindeki `Sistemi_Baslat.bat`'a çift tıklayarak backend'i başlatıp tarayıcıyı otomatik açtırabilirsiniz.
+7. **Arayüzü açın:** Tarayıcıda **http://127.0.0.1:8000/goruntule/** açın.
+8. **Video başlatın:** Arayüzdeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da tarayıcıda `http://127.0.0.1:8000/docs` → `POST /oturum/baslat` → `video_yolu` alanına tam dosya yolunu yazıp Execute'a basın.
 
 ---
 
@@ -113,14 +116,20 @@ Operatör
    uv pip install --python .venv/bin/python ultralytics opencv-python qdrant-client requests python-multipart boxmot
    cd ..
    ```
-5. **Backend'i başlatın:**
+5. **EVREN anahtarınızı girin** (e-postayla gelen takım anahtarı):
+   ```bash
+   # karar_servisi/.env içine:
+   #   OPERATIONAL_DECISION_VLLM_API_KEY=sk-evren-teamNN-XXXXXXXX
+   export VLM_API_KEY="sk-evren-teamNN-XXXXXXXX"
+   ```
+6. **Backend'i başlatın:**
    ```bash
    cd backend
    ../karar_servisi/.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8000
    ```
    `Hazır. N model indeksli.` yazısını görünce hazırdır.
-6. **Arayüzü açın:** Tarayıcıda **http://127.0.0.1:8000/goruntule/** açın — aynı backend'den servis edilen, canlı video akışını ve VRAG/VLM/LLM sonuçlarını sırayla gösteren web arayüzü.
-7. **Video başlatın:** Arayüzdeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da:
+7. **Arayüzü açın:** Tarayıcıda **http://127.0.0.1:8000/goruntule/** açın — aynı backend'den servis edilen, canlı video akışını ve VRAG/VLM/LLM sonuçlarını sırayla gösteren web arayüzü.
+8. **Video başlatın:** Arayüzdeki kutuya videonun tam yolunu yazıp **Başlat**'a basın; ya da:
    ```bash
    curl -X POST http://127.0.0.1:8000/oturum/baslat \
      -H "Content-Type: application/json" \
@@ -164,13 +173,11 @@ Script **güvenli şekilde senkronize eder**: `data/referans/`'ın tamamını he
 
 **"Storage folder ... already accessed by another instance" hatası:** Backend hâlâ açık, önce onu durdurun (`Ctrl+C` veya süreci `kill` edin), sonra ingest'i çalıştırın.
 
-**VLM/LLM'den hiç cevap gelmiyor, `ProxyError` / `Unable to connect to proxy`:** Sistem genelinde bir proxy (GoodbyeDPI vb. DPI-bypass araçları dahil) `localhost`'u istisna listesine almadan aktifse, yerel Ollama çağrıları da o proxy'ye yönlendirilip başarısız olur. Proxy'yi kapatın (Ayarlar → Ağ → Proxy) ve backend'i **yeniden başlatın** (süreç açıkken proxy ayarı değişse bile eski durumu tutabiliyor).
+**VLM/LLM'den hiç cevap gelmiyor, `ProxyError` / `Unable to connect to proxy` / bağlantı hatası:** VLM ve karar/rapor üretimi artık uzaktaki EVREN servisine gidiyor — internet bağlantınızı ve `VLM_API_KEY` / `OPERATIONAL_DECISION_VLLM_API_KEY` ortam değişkenlerinin doğru girildiğini kontrol edin. Bir proxy (GoodbyeDPI vb. DPI-bypass araçları dahil) aktifse EVREN'in host'unu (`evren-llmapi.ssyz.org.tr`) engelliyor olabilir.
 
 **Farklı çözünürlüklü bir videoya geçince çöküyor:** Bu sorun çözüldü — her yeni oturumda tracker + kamera hareketi kompanzasyonu otomatik sıfırlanıyor. Hâlâ oluyorsa güncel kodda olduğunuzdan emin olun.
 
-**Hepsi birlikte (YOLO+VRAG+VLM+LLM) çalışınca VLM/Ollama yanıt vermiyor / donanım yetmiyor gibi görünüyor:** VRAM tıkanıklığı — VRAG bilinçli olarak CPU'da çalışacak şekilde ayarlı (`src/config.py: VRAG_DEVICE = "cpu"`), bunu değiştirmeyin. VRAG ve VLM artık **ayrı kilitlere** sahip (`pipeline.py: self._vrag_gate`, `self._vlm_gate`) — VLM'in Ollama çağrısı (120 saniyeye kadar sürebilir) sırasında VRAG'ın kendi bağımsız aramaları artık bloklanmıyor; eskiden tek bir ortak kilit (`_ai_gate`) ikisini birden sıraya alıyordu ve VLM meşgulken VRAG tamamen donabiliyordu.
-
-**Ollama modelleri VRAM'e sığmıyor:** `src/config.py`'de `VLM_MODEL_NAME`'i daha küçük bir modelle değiştirebilirsiniz (örn. `minicpm-v4.6:1b`), doğruluktan biraz ödün verip VRAM kazanırsınız.
+**Hepsi birlikte (YOLO+VRAG+VLM+LLM) çalışınca donanım yetmiyor gibi görünüyor:** VRAG bilinçli olarak CPU'da çalışacak şekilde ayarlı (`src/config.py: VRAG_DEVICE = "cpu"`), bunu değiştirmeyin. VLM/LLM artık uzakta (EVREN) çalıştığı için yerel GPU/VRAM'i hiç kullanmıyor — bu tıkanıklık artık sadece YOLO+VRAG'ın kendi aralarında paylaştığı yerel kaynaklarla ilgili olabilir.
 
 ## Lisans
 

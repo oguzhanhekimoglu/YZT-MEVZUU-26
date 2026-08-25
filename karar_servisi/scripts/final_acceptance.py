@@ -40,7 +40,6 @@ def _commands() -> list[tuple[str, list[str]]]:
         ("coverage_thresholds", [python, "scripts/check_coverage_thresholds.py"]),
         ("ruff", [python, "-m", "ruff", "check", "."]),
         ("mypy", [python, "-m", "mypy", "src"]),
-        ("real_ollama_acceptance", [python, "scripts/run_ollama_real_smoke.py"]),
         (
             "scn_01_12_end_to_end",
             [

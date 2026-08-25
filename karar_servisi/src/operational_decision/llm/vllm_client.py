@@ -1,8 +1,9 @@
-"""Local vLLM (OpenAI-compatible) structured-output client.
+"""OpenAI-uyumlu (vLLM/EVREN) yapılandırılmış-çıktı istemcisi.
 
-Aynı sözleşmeyi (BaseLLMClient) OllamaLLMClient ile paylaşır — bootstrap.py
-config'teki llm_backend değerine göre ikisinden birini seçer, orchestrator
-hangisinin çalıştığını bilmez/bilmesi gerekmez.
+Tek allowed local LLM transport (BaseLLMClient) — TEKNOFEST TYDA için SSB'nin
+sağladığı EVREN çıkarım servisine (https://evren-llmapi.ssyz.org.tr) veya
+kendi barındırılan bir vLLM sunucusuna bağlanır, wire formatı ikisi için de
+aynı (OpenAI /v1/chat/completions).
 """
 
 from collections.abc import Sequence
@@ -16,27 +17,35 @@ from operational_decision.llm.base_client import BaseLLMClient, LocalLLMError
 
 
 class VLLMClient(BaseLLMClient):
-    """Call one local vLLM (Docker, CUDA) model with schema-constrained JSON output."""
+    """Call one OpenAI-compatible model (EVREN veya kendi barındırılan vLLM) with schema-constrained JSON output."""
 
     def __init__(
         self,
         *,
         model: str,
         base_url: str = "http://127.0.0.1:8003",
+        api_key: str | None = None,
         timeout_seconds: float = 60.0,
         client: httpx.AsyncClient | None = None,
     ) -> None:
-        """Configure a local-only endpoint and per-attempt timeout."""
+        """Configure the endpoint, opsiyonel API anahtarı ve per-attempt timeout.
+
+        Şifresiz (http://) bağlantı yalnızca loopback'te kabul edilir — uzak bir
+        host'a düz http:// ile bağlanmaya çalışmak (kazara şifresiz istek) burada
+        engellenir. Uzak/paylaşımlı bir uç nokta (EVREN gibi) https:// gerektirir.
+        """
         parsed_url = urlparse(base_url)
-        if parsed_url.scheme != "http" or parsed_url.hostname not in {
+        is_loopback_http = parsed_url.scheme == "http" and parsed_url.hostname in {
             "127.0.0.1",
             "localhost",
             "::1",
-        }:
-            raise ValueError("vLLM base_url must be a local loopback endpoint")
+        }
+        if not (is_loopback_http or parsed_url.scheme == "https"):
+            raise ValueError("vLLM base_url must be a loopback http:// endpoint or any https:// endpoint")
         self.model = model
         self._owns_client = client is None
-        self._client = client or httpx.AsyncClient(base_url=base_url, timeout=timeout_seconds)
+        headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
+        self._client = client or httpx.AsyncClient(base_url=base_url, timeout=timeout_seconds, headers=headers)
 
     async def generate(self, messages: Sequence[dict[str, str]]) -> str:
         """Perform exactly one chat request; callers own parse-only repair."""
@@ -47,9 +56,15 @@ class VLLMClient(BaseLLMClient):
             "top_p": 0.8,
             "max_tokens": 800,
             "seed": 42,
-            # vLLM uzantısı (outlines/lm-format-enforcer destekli) — Ollama'daki
-            # "format": <json schema> ile aynı işi görür, şema dışı çıktı engellenir.
-            "guided_json": ollama_decision_json_schema(),
+            # OpenAI standart yapılandırılmış çıktı sözleşmesi — şema dışı çıktı engellenir.
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "operational_decision",
+                    "schema": ollama_decision_json_schema(),
+                    "strict": True,
+                },
+            },
         }
         try:
             response = await self._client.post("/v1/chat/completions", json=payload)

@@ -32,10 +32,10 @@ LLM risk seçmez, tool sonucunu değiştirmez, olmayan source ID kullanamaz ve g
 
 Aynı video eventleri sequential işlenir. Farklı videolarda da LLM inference eşzamanlı çalışmaz. Event tamamlandığında aynı video için başka aktif event yoksa explicit unload çağrılır. Unload başarısızlığı final kararı değiştirmez; warning ve metric üretir.
 
-Gerçek local smoke:
-
-```powershell
-.venv\Scripts\python.exe scripts\run_ollama_real_smoke.py
-```
-
-Model veya localhost Ollama yoksa sonuç `NOT_RUN_ENVIRONMENT_MISSING` olarak açıkça raporlanır; indirme yapılmaz.
+> **GÜNCELLEME:** LLM artık yerel Ollama değil, SSB'nin TEKNOFEST TYDA için sağladığı
+> EVREN çıkarım servisi (uzak, OpenAI-uyumlu) üzerinden çalışıyor — `ollama_client.py`
+> ve bu sayfadaki Ollama'ya özel smoke script'i (`run_ollama_real_smoke.py`) kaldırıldı.
+> Bu sayfanın geri kalanı (canonical model adı, GPU handoff protokolü), yerel GPU'yu
+> YOLO ile paylaşan bir Ollama sürecine göre yazılmıştı; EVREN ayrı donanımda
+> çalıştığı için bu paylaşım/handoff senaryosu artık geçerli değil ve gözden
+> geçirilmeyi bekliyor.

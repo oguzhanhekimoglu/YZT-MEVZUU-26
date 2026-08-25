@@ -4,11 +4,11 @@
 
 - Windows (PowerShell) veya macOS/Linux (bash/zsh)
 - CPython 3.11
-- Yerel Ollama servisi
-- `OPERATIONAL_DECISION_DECISION_MODEL` ile yapılandırılan, önceden indirilmiş/kurulu Ollama modeli (varsayılan: `llama3:latest`, bkz. `.env.example`)
+- EVREN erişimi (TEKNOFEST TYDA — SSB'nin sağladığı OpenAI-uyumlu çıkarım servisi, `OPERATIONAL_DECISION_VLLM_API_KEY` ile yapılandırılır, bkz. `.env.example`)
+- `OPERATIONAL_DECISION_DECISION_MODEL` ile yapılandırılan model alias'ı (varsayılan: `llm-fast`)
 - Repodaki yerel `data/models/qwen3-embedding-0.6b` embedding modeli
 
-Runtime veya kabul sırasında internet ve cloud servis kullanılmaz. Kabul scripti model indirmez.
+Runtime karar/rapor üretimi için internet ve EVREN erişimi gerekir (yerel Ollama artık kullanılmıyor). Kabul scripti model indirmez.
 
 Not: `.venv` platforma özeldir (Windows venv macOS'ta, macOS venv Windows'ta çalışmaz). Platform değiştirdiğinizde `.venv` dizinini silip `uv sync` ile yeniden oluşturun.
 
@@ -125,16 +125,7 @@ Registry veya index doğrulama hatasında sessiz fallback beklenmez; health sonu
 
 ### Health DEGRADED
 
-Ollama çalışıyor fakat canonical model yoksa veya optional model probe başarısızsa beklenen sonuç `DEGRADED` ve HTTP `200`'dür:
-
-```powershell
-ollama list
-.venv\Scripts\python.exe scripts\run_ollama_real_smoke.py
-```
-
-macOS/Linux: `.venv/bin/python scripts/run_ollama_real_smoke.py`
-
-Acceptance script model indirmez.
+EVREN erişilebilir fakat canonical model yoksa veya optional model probe başarısızsa beklenen sonuç `DEGRADED` ve HTTP `200`'dür — `/durum` (health) çıktısındaki `"ollama"` anahtarı (isim tarihsel, sözleşme aynı kalsın diye korunuyor — bkz. `bootstrap.py: _vllm_probes`) bunu gösterir.
 
 ### WAITING_FOR_GPU_HANDOFF
 

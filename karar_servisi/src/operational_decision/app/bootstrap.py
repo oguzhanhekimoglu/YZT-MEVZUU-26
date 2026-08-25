@@ -30,7 +30,6 @@ from operational_decision.inventory.turkey_inventory_registry import (
     load_turkey_inventory_registry,
 )
 from operational_decision.llm.base_client import BaseLLMClient
-from operational_decision.llm.ollama_client import OllamaLLMClient
 from operational_decision.llm.response_parser import StructuredDecisionRunner
 from operational_decision.llm.vllm_client import VLLMClient
 from operational_decision.memory.database import EventMemoryDatabase
@@ -79,12 +78,15 @@ def _vllm_probes(
     Callable[[bool], Awaitable[ComponentHealth]],
     Callable[[bool], Awaitable[ComponentHealth]],
 ]:
-    """vLLM sürümü — Ollama'nın /api/tags'ine karşılık /v1/models kullanır,
-    sağlık sözleşmesi (dönüş şekli, "ollama" component anahtarı) aynı kalır."""
+    """EVREN/vLLM sağlık kontrolü — /v1/models'ı Bearer anahtarıyla sorgular."""
+
+    headers = {"Authorization": f"Bearer {settings.vllm_api_key}"} if settings.vllm_api_key else None
 
     async def models() -> tuple[bool, bool]:
         try:
-            async with httpx.AsyncClient(base_url=settings.vllm_base_url, timeout=2.0) as http:
+            async with httpx.AsyncClient(
+                base_url=settings.vllm_base_url, timeout=5.0, headers=headers
+            ) as http:
                 response = await http.get("/v1/models")
                 response.raise_for_status()
                 payload = response.json()
@@ -127,63 +129,6 @@ def _vllm_probes(
         return ComponentHealth(status=HealthStatus.HEALTHY)
 
     return vllm_probe, model_probe
-
-
-def _ollama_probes(
-    settings: AppSettings, client: OllamaLLMClient
-) -> tuple[
-    Callable[[bool], Awaitable[ComponentHealth]],
-    Callable[[bool], Awaitable[ComponentHealth]],
-]:
-    async def tags() -> tuple[bool, bool]:
-        try:
-            async with httpx.AsyncClient(base_url=settings.ollama_base_url, timeout=2.0) as http:
-                response = await http.get("/api/tags")
-                response.raise_for_status()
-                payload = response.json()
-        except Exception:
-            return False, False
-        models = payload.get("models", []) if isinstance(payload, dict) else []
-        names = {
-            item.get("name")
-            for item in models
-            if isinstance(item, dict) and isinstance(item.get("name"), str)
-        }
-        return True, settings.decision_model in names
-
-    async def ollama_probe(deep: bool) -> ComponentHealth:
-        del deep
-        available, _ = await tags()
-        return ComponentHealth(
-            status=HealthStatus.HEALTHY if available else HealthStatus.DEGRADED,
-            detail=None if available else "OLLAMA_UNAVAILABLE",
-        )
-
-    async def model_probe(deep: bool) -> ComponentHealth:
-        available, model_exists = await tags()
-        if not available:
-            return ComponentHealth(status=HealthStatus.DEGRADED, detail="OLLAMA_UNAVAILABLE")
-        if not model_exists:
-            return ComponentHealth(status=HealthStatus.DEGRADED, detail="CANONICAL_MODEL_MISSING")
-        if deep:
-            try:
-                raw = await client.generate(
-                    [
-                        {
-                            "role": "user",
-                            "content": (
-                                "Return JSON with decision_code INDETERMINATE and a short "
-                                "Turkish summary; use no actions or sources."
-                            ),
-                        }
-                    ]
-                )
-                LLMDecision.model_validate_json(raw, strict=True)
-            except Exception:
-                return ComponentHealth(status=HealthStatus.DEGRADED, detail="DEEP_INFERENCE_FAILED")
-        return ComponentHealth(status=HealthStatus.HEALTHY)
-
-    return ollama_probe, model_probe
 
 
 async def _seed_runtime_operational_data(
@@ -265,20 +210,12 @@ async def build_application_container(
         rag_error = type(error).__name__
 
     token_counter = QwenTokenCounter(resolved.embedding_model_path)
-    llm_client: BaseLLMClient
-    if resolved.llm_backend == "vllm":
-        llm_client = VLLMClient(
-            model=resolved.decision_model,
-            base_url=resolved.vllm_base_url,
-            timeout_seconds=60.0,
-        )
-    else:
-        llm_client = OllamaLLMClient(
-            model=resolved.decision_model,
-            base_url=resolved.ollama_base_url,
-            keep_alive="10m",
-            timeout_seconds=60.0,
-        )
+    llm_client: BaseLLMClient = VLLMClient(
+        model=resolved.decision_model,
+        base_url=resolved.vllm_base_url,
+        api_key=resolved.vllm_api_key or None,
+        timeout_seconds=60.0,
+    )
 
     def platform_factory(event_id: str, request_id: str) -> PlatformTool:
         return PlatformTool(
@@ -346,12 +283,8 @@ async def build_application_container(
         ),
         llm_enabled=resolved.llm_enabled,
     )
-    if resolved.llm_backend == "vllm":
-        assert isinstance(llm_client, VLLMClient)
-        ollama_probe, model_probe = _vllm_probes(resolved, llm_client)
-    else:
-        assert isinstance(llm_client, OllamaLLMClient)
-        ollama_probe, model_probe = _ollama_probes(resolved, llm_client)
+    assert isinstance(llm_client, VLLMClient)
+    ollama_probe, model_probe = _vllm_probes(resolved, llm_client)
     rag_health = ComponentHealth(
         status=HealthStatus.HEALTHY if retriever is not None else HealthStatus.FAILED,
         detail=rag_error,
