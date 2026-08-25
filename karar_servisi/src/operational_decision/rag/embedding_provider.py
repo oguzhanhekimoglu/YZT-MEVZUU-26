@@ -1,10 +1,11 @@
-"""Offline CPU Qwen3 embedding provider with normalized float32 output."""
+"""Offline CPU Qwen3 ve EVREN uzak embedding sağlayıcıları, ikisi de normalized float32 döner."""
 
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Protocol, cast
 
+import httpx
 import numpy as np
 from numpy.typing import NDArray
 from sentence_transformers import SentenceTransformer
@@ -71,3 +72,51 @@ class LocalQwenEmbeddingProvider:
         if np.any(norms == 0):
             raise ValueError("embedding provider returned a zero vector")
         return np.asarray(matrix / norms, dtype=np.float32)
+
+
+class RemoteEmbedProvider:
+    """EVREN'in bge-m3-embed modeliyle (OpenAI-uyumlu /v1/embeddings) çalışan sağlayıcı."""
+
+    model_id = "bge-m3-embed"
+    dimension = 1024
+
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        api_key: str,
+        model: str = "bge-m3-embed",
+        timeout_seconds: float = 60.0,
+        client: httpx.Client | None = None,
+    ) -> None:
+        """Configure the EVREN embeddings endpoint and its team API key."""
+        self.model_id = model
+        self._owns_client = client is None
+        self._client = client or httpx.Client(
+            base_url=base_url,
+            timeout=timeout_seconds,
+            headers={"Authorization": f"Bearer {api_key}"},
+        )
+
+    def encode(self, texts: list[str]) -> FloatMatrix:
+        """Call EVREN's embeddings endpoint and normalize every nonzero row."""
+        if not texts:
+            return np.empty((0, self.dimension), dtype=np.float32)
+        response = self._client.post(
+            "/v1/embeddings", json={"model": self.model_id, "input": texts}
+        )
+        response.raise_for_status()
+        body = response.json()
+        rows = sorted(body["data"], key=lambda item: item["index"])
+        matrix = np.asarray([row["embedding"] for row in rows], dtype=np.float32)
+        if matrix.shape != (len(texts), self.dimension):
+            raise ValueError(f"unexpected EVREN embedding shape: {matrix.shape}")
+        norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+        if np.any(norms == 0):
+            raise ValueError("EVREN embedding provider returned a zero vector")
+        return np.asarray(matrix / norms, dtype=np.float32)
+
+    def close(self) -> None:
+        """Close an internally owned HTTP client."""
+        if self._owns_client:
+            self._client.close()

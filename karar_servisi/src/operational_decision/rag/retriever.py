@@ -9,11 +9,11 @@ from typing import Any
 from operational_decision.contracts.rag import RAGSource
 from operational_decision.rag.document_catalog import DocumentCatalog
 from operational_decision.rag.embedding_provider import EmbeddingProvider
-from operational_decision.rag.faiss_store import FaissStore
 from operational_decision.rag.index_builder import (
     load_chunk_metadata,
     validate_index_artifacts,
 )
+from operational_decision.rag.qdrant_store import QdrantStore
 
 QUERY_INSTRUCTION = (
     "Retrieve authoritative aviation regulation passages relevant to the "
@@ -40,16 +40,22 @@ class TextRetriever:
         *,
         catalog: DocumentCatalog,
         embedding_provider: EmbeddingProvider,
+        store: QdrantStore,
         index_dir: Path,
         candidate_top_k: int = 8,
         final_top_k: int = 4,
         max_chunks_per_document: int = 2,
     ) -> None:
-        """Load a healthy index before accepting any retrieval request."""
+        """Load a healthy index before accepting any retrieval request.
+
+        store, çağıran tarafından zaten bağlanmış (QdrantStore.connect) olmalı —
+        vektörler artık uzakta (EVREN'in Qdrant'ı), sadece metadata/manifest yerelde.
+        """
         if candidate_top_k != 8 or final_top_k != 4 or max_chunks_per_document != 2:
             raise ValueError("V1 retrieval settings must remain 8/4/2")
         self.catalog = catalog
         self.embedding_provider = embedding_provider
+        self.store = store
         self.index_dir = index_dir
         self.candidate_top_k = candidate_top_k
         self.final_top_k = final_top_k
@@ -57,13 +63,11 @@ class TextRetriever:
         validate_index_artifacts(
             catalog=catalog,
             index_dir=index_dir,
+            store=store,
             expected_model_id=embedding_provider.model_id,
             expected_dimension=embedding_provider.dimension,
         )
         self.metadata = load_chunk_metadata(index_dir / "chunk_metadata.jsonl")
-        self.store = FaissStore.load(
-            index_dir / "text.index", dimension=embedding_provider.dimension
-        )
 
     def retrieve(
         self,

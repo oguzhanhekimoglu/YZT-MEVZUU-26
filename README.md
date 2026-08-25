@@ -42,7 +42,7 @@ Operatör
 
 ## Ön Koşullar (her iki platform için)
 
-- **EVREN erişimi** (TEKNOFEST TYDA — SSB'nin sağladığı OpenAI-uyumlu çıkarım servisi, https://evren-teknofest.ssyz.org.tr). Takım anahtarı e-postayla geliyor; `.env`'e (`karar_servisi/.env`) ve ortam değişkeni olarak (`VLM_API_KEY`) girilmesi gerekiyor — aşağıdaki kurulum adımlarında detaylı.
+- **EVREN erişimi** (TEKNOFEST TYDA — SSB'nin sağladığı OpenAI-uyumlu çıkarım servisi, https://evren-teknofest.ssyz.org.tr). E-postayla **iki** anahtar geliyor: LLM/VLM/embedding anahtarı (`sk-evren-teamNN-...`) ve ayrı bir Qdrant anahtarı (`qdr-teamNN-...`, metin RAG'ın vektör deposu için). `.env` dosyaları bunları **otomatik okumuyor** — ikisi de gerçek kabuk ortam değişkeni olarak `export` edilmeli, aşağıdaki kurulum adımlarında detaylı.
 - İnternet bağlantısı gerekiyor — VLM ve karar/rapor üretimi artık yerel bir modelle değil, EVREN üzerinden çalışıyor.
 - Python'un kendisini elle kurmanıza gerek yok — aşağıdaki `uv sync` adımı, projenin istediği **Python 3.11**'i sizin için otomatik indirip kuruyor.
 - İlk çalıştırmada VRAG'ın görsel gömme modeli (`google/siglip2-so400m-patch14-384`) Hugging Face'ten otomatik indirilir (~3-4 GB, bir kerelik) — bunun için internet gerekir. Bunun ötesinde, VLM ve karar/rapor üretimi her çağrıda EVREN'e gittiği için sistem **sürekli internet bağlantısına ihtiyaç duyar**, artık offline çalışmaz.
@@ -73,11 +73,12 @@ Operatör
    uv pip install --python .venv\Scripts\python.exe ultralytics opencv-python qdrant-client requests python-multipart boxmot
    cd ..
    ```
-5. **EVREN anahtarınızı girin** (e-postayla gelen takım anahtarı):
+5. **EVREN anahtarlarınızı girin** (e-postayla gelen iki takım anahtarı — `karar_servisi/.env`'e yazmak yetmiyor, gerçek ortam değişkeni olmalı):
    ```powershell
-   # karar_servisi/.env içine:
-   #   OPERATIONAL_DECISION_VLLM_API_KEY=sk-evren-teamNN-XXXXXXXX
    $env:VLM_API_KEY = "sk-evren-teamNN-XXXXXXXX"
+   $env:OPERATIONAL_DECISION_VLLM_API_KEY = "sk-evren-teamNN-XXXXXXXX"
+   $env:OPERATIONAL_DECISION_QDRANT_API_KEY = "qdr-teamNN-XXXXXXXX"
+   $env:OPERATIONAL_DECISION_QDRANT_COLLECTION_PREFIX = "teamNN"
    ```
 6. **Backend'i başlatın:**
    ```powershell
@@ -116,11 +117,12 @@ Operatör
    uv pip install --python .venv/bin/python ultralytics opencv-python qdrant-client requests python-multipart boxmot
    cd ..
    ```
-5. **EVREN anahtarınızı girin** (e-postayla gelen takım anahtarı):
+5. **EVREN anahtarlarınızı girin** (e-postayla gelen iki takım anahtarı — `karar_servisi/.env`'e yazmak yetmiyor, gerçek ortam değişkeni olmalı):
    ```bash
-   # karar_servisi/.env içine:
-   #   OPERATIONAL_DECISION_VLLM_API_KEY=sk-evren-teamNN-XXXXXXXX
    export VLM_API_KEY="sk-evren-teamNN-XXXXXXXX"
+   export OPERATIONAL_DECISION_VLLM_API_KEY="sk-evren-teamNN-XXXXXXXX"
+   export OPERATIONAL_DECISION_QDRANT_API_KEY="qdr-teamNN-XXXXXXXX"
+   export OPERATIONAL_DECISION_QDRANT_COLLECTION_PREFIX="teamNN"
    ```
 6. **Backend'i başlatın:**
    ```bash

@@ -4,6 +4,7 @@ import asyncio
 from collections.abc import Awaitable, Callable
 
 import httpx
+from qdrant_client import QdrantClient
 
 from operational_decision.app.config import AppSettings
 from operational_decision.app.container import ApplicationContainer
@@ -46,7 +47,8 @@ from operational_decision.platform.platform_registry import (
 )
 from operational_decision.rag.chunker import QwenTokenCounter
 from operational_decision.rag.document_catalog import DocumentCatalog
-from operational_decision.rag.embedding_provider import LocalQwenEmbeddingProvider
+from operational_decision.rag.embedding_provider import RemoteEmbedProvider
+from operational_decision.rag.qdrant_store import QdrantStore
 from operational_decision.rag.retriever import TextRetriever
 from operational_decision.tools.notam_tool import NotamTool
 from operational_decision.tools.permission_flight_plan_tool import PermissionFlightPlanTool
@@ -191,19 +193,28 @@ async def build_application_container(
     notam_repository = NotamRepository(operational_db)
 
     catalog: DocumentCatalog | None = None
-    embedding: LocalQwenEmbeddingProvider | None = None
+    embedding: RemoteEmbedProvider | None = None
     retriever: TextRetriever | None = None
     rag_error: str | None = None
     try:
         catalog = DocumentCatalog(resolved.document_manifest_path)
         await asyncio.to_thread(catalog.validate)
-        embedding = await asyncio.to_thread(
-            LocalQwenEmbeddingProvider, resolved.embedding_model_path
+        embedding = RemoteEmbedProvider(
+            base_url=resolved.vllm_base_url, api_key=resolved.vllm_api_key
+        )
+        qdrant_client = QdrantClient(
+            url=resolved.qdrant_url, port=443, prefix=resolved.qdrant_collection_prefix,
+            api_key=resolved.qdrant_api_key,
+        )
+        rag_collection_name = f"{resolved.qdrant_collection_prefix}-mevzuu-text-rag"
+        rag_store = await asyncio.to_thread(
+            QdrantStore.connect, qdrant_client, rag_collection_name, embedding.dimension
         )
         retriever = await asyncio.to_thread(
             TextRetriever,
             catalog=catalog,
             embedding_provider=embedding,
+            store=rag_store,
             index_dir=resolved.rag_index_dir,
         )
     except Exception as error:
@@ -279,7 +290,7 @@ async def build_application_container(
         action_catalog=load_action_catalog(resolved.action_catalog_path),
         model_versions=ModelVersions(
             decision_llm=resolved.decision_model,
-            text_embedding="Qwen/Qwen3-Embedding-0.6B",
+            text_embedding="bge-m3-embed",
         ),
         llm_enabled=resolved.llm_enabled,
     )

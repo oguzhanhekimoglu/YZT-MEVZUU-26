@@ -35,6 +35,10 @@ class AppSettings(BaseSettings):
     decision_model: str = "llm-fast"
     vllm_base_url: str = "https://evren-llmapi.ssyz.org.tr"
     vllm_api_key: str = ""
+    # Metin RAG vektor deposu - EVREN'in izole takim-Qdrant'i.
+    qdrant_url: str = "https://evren-vektor.ssyz.org.tr"
+    qdrant_api_key: str = ""
+    qdrant_collection_prefix: str = ""
 
     @model_validator(mode="after")
     def require_isolated_production_databases(self) -> "AppSettings":

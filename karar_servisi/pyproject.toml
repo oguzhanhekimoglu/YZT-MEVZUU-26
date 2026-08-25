@@ -17,6 +17,7 @@ dependencies = [
   "PyYAML>=6,<7",
   "numpy>=1.26,<3",
   "faiss-cpu>=1.12,<2",
+  "qdrant-client>=1.19,<2",
   "sentence-transformers>=3,<6",
   "transformers>=4.51,<6",
   "torch>=2.5,<3",

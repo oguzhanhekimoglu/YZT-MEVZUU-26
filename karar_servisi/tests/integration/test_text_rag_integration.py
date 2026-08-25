@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from qdrant_client import QdrantClient
 
 from operational_decision.contracts.common import ToolExecutionStatus
 from operational_decision.contracts.rag import TextRAGRequest
@@ -16,6 +17,7 @@ from operational_decision.rag.index_builder import (
     load_chunk_metadata,
     validate_index_artifacts,
 )
+from operational_decision.rag.qdrant_store import QdrantStore
 from operational_decision.rag.retriever import (
     NoRelevantContext,
     RetrievalFilterError,
@@ -78,11 +80,14 @@ class FakeChunker:
 def build_retriever(tmp_path: Path) -> tuple[DocumentCatalog, TextRetriever]:
     catalog = DocumentCatalog(ROOT / "data/rag/document_manifest.yaml")
     provider = FakeEmbeddingProvider()
+    qdrant_client = QdrantClient(location=":memory:")
+    store = QdrantStore(qdrant_client, "test-text-rag", dimension=provider.dimension)
     builder = TextRAGIndexBuilder(
         catalog=catalog,
         loader=FakeLoader(),  # type: ignore[arg-type]
         chunker=FakeChunker(),  # type: ignore[arg-type]
         embedding_provider=provider,
+        store=store,
         index_dir=tmp_path,
     )
     summary = builder.build()
@@ -91,6 +96,7 @@ def build_retriever(tmp_path: Path) -> tuple[DocumentCatalog, TextRetriever]:
     return catalog, TextRetriever(
         catalog=catalog,
         embedding_provider=provider,
+        store=store,
         index_dir=tmp_path,
     )
 

@@ -13,7 +13,8 @@ from operational_decision.rag.chunker import DocumentChunker, TextChunk
 from operational_decision.rag.document_catalog import DocumentCatalog
 from operational_decision.rag.document_loader import DocumentLoader, ExtractionError
 from operational_decision.rag.embedding_provider import EmbeddingProvider
-from operational_decision.rag.faiss_store import FaissStore, IndexHealthError
+from operational_decision.rag.faiss_store import IndexHealthError
+from operational_decision.rag.qdrant_store import QdrantStore
 
 
 @dataclass(frozen=True)
@@ -48,17 +49,24 @@ class TextRAGIndexBuilder:
         loader: DocumentLoader,
         chunker: DocumentChunker,
         embedding_provider: EmbeddingProvider,
+        store: QdrantStore,
         index_dir: Path,
     ) -> None:
-        """Bind the validated build dependencies and output directory."""
+        """Bind the validated build dependencies, target Qdrant collection, and output directory.
+
+        store, çağıran tarafından (bootstrap.py / build_text_rag_index.py) zaten
+        bağlanmış — hangi Qdrant host/koleksiyon/anahtarın kullanılacağına builder
+        karar vermiyor, sadece verilen store'a yazıyor.
+        """
         self.catalog = catalog
         self.loader = loader
         self.chunker = chunker
         self.embedding_provider = embedding_provider
+        self.store = store
         self.index_dir = index_dir
 
     def build(self) -> IndexBuildSummary:
-        """Build a single global IndexFlatIP and its auditable metadata."""
+        """Chunk, embed, ve Qdrant'a yaz; yerelde sadece metadata + denetim manifestosu kalır."""
         self.catalog.validate()
         chunks: list[TextChunk] = []
         for descriptor in self.catalog.runtime_documents:
@@ -78,14 +86,12 @@ class TextRAGIndexBuilder:
             raise RuntimeError("reference-only document entered runtime chunks")
 
         embeddings = self.embedding_provider.encode([chunk.content for chunk in chunks])
-        store = FaissStore(dimension=self.embedding_provider.dimension)
-        store.add(embeddings)
+        self.store.create()
+        self.store.add(embeddings)
 
         self.index_dir.mkdir(parents=True, exist_ok=True)
-        index_path = self.index_dir / "text.index"
         metadata_path = self.index_dir / "chunk_metadata.jsonl"
         manifest_path = self.index_dir / "index_manifest.json"
-        store.save(index_path)
         with metadata_path.open("w", encoding="utf-8", newline="\n") as stream:
             for chunk in chunks:
                 stream.write(
@@ -96,10 +102,11 @@ class TextRAGIndexBuilder:
             "embedding_model": self.embedding_provider.model_id,
             "dimension": self.embedding_provider.dimension,
             "normalized": True,
-            "index_type": FaissStore.index_type,
+            "index_type": self.store.index_type,
             "document_manifest_sha256": self.catalog.manifest_sha256,
             "chunk_metadata_sha256": _sha256(metadata_path),
-            "index_sha256": _sha256(index_path),
+            "qdrant_collection": self.store.collection_name,
+            "qdrant_point_count": self.store.count,
             "chunk_count": len(chunks),
             "indexed_document_ids": [
                 item.document_id for item in self.catalog.runtime_documents
@@ -113,6 +120,7 @@ class TextRAGIndexBuilder:
         validate_index_artifacts(
             catalog=self.catalog,
             index_dir=self.index_dir,
+            store=self.store,
             expected_model_id=self.embedding_provider.model_id,
             expected_dimension=self.embedding_provider.dimension,
         )
@@ -146,13 +154,14 @@ def validate_index_artifacts(
     *,
     catalog: DocumentCatalog,
     index_dir: Path,
+    store: QdrantStore,
     expected_model_id: str,
     expected_dimension: int = 1024,
 ) -> dict[str, Any]:
-    """Validate index, JSONL, checksums, allowlist, dimension, and model identity."""
+    """Validate metadata, checksums, allowlist, dimension, model identity, ve Qdrant koleksiyonunun
+    manifestoyla eşleştiğini doğrular (vektörler artık yerel dosyada değil, store uzakta)."""
     manifest_path = index_dir / "index_manifest.json"
     metadata_path = index_dir / "chunk_metadata.jsonl"
-    index_path = index_dir / "text.index"
     try:
         raw = json.loads(manifest_path.read_text(encoding="utf-8"))
         if not isinstance(raw, dict):
@@ -168,7 +177,8 @@ def validate_index_artifacts(
         "index_type",
         "document_manifest_sha256",
         "chunk_metadata_sha256",
-        "index_sha256",
+        "qdrant_collection",
+        "qdrant_point_count",
         "chunk_count",
         "indexed_document_ids",
         "excluded_document_ids",
@@ -180,18 +190,20 @@ def validate_index_artifacts(
         raise IndexHealthError("embedding model mismatch")
     if manifest["dimension"] != expected_dimension or manifest["normalized"] is not True:
         raise IndexHealthError("embedding shape/normalization mismatch")
-    if manifest["index_type"] != FaissStore.index_type:
+    if manifest["index_type"] != store.index_type:
         raise IndexHealthError("index type mismatch")
     if manifest["document_manifest_sha256"] != catalog.manifest_sha256:
         raise IndexHealthError("document manifest checksum mismatch")
     if manifest["chunk_metadata_sha256"] != _sha256(metadata_path):
         raise IndexHealthError("chunk metadata checksum mismatch")
-    if manifest["index_sha256"] != _sha256(index_path):
-        raise IndexHealthError("FAISS index checksum mismatch")
+    if manifest["qdrant_collection"] != store.collection_name:
+        raise IndexHealthError("Qdrant collection name mismatch")
 
     metadata = load_chunk_metadata(metadata_path)
-    store = FaissStore.load(index_path, expected_dimension)
-    if len(metadata) != store.count or manifest["chunk_count"] != store.count:
+    point_count = store.count
+    if manifest["qdrant_point_count"] != point_count:
+        raise IndexHealthError("Qdrant collection point count changed since build")
+    if len(metadata) != point_count or manifest["chunk_count"] != point_count:
         raise IndexHealthError("index and metadata counts differ")
     runtime_ids = [item.document_id for item in catalog.runtime_documents]
     reference_ids = [item.document_id for item in catalog.reference_only_documents]
