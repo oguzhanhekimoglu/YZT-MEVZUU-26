@@ -133,7 +133,7 @@ def render_health(health: Any, rag_status: Any) -> None:
         ("Operational DB", "operational_db"),
         ("Event DB", "event_memory_db"),
         ("RAG index", "rag_index"),
-        ("Ollama", "ollama"),
+        ("LLM servisi (EVREN)", "ollama"),  # anahtar "ollama" olarak kaliyor - saglik sozlesmesi sabit (bkz. bootstrap.py: _vllm_probes)
         ("Canonical model", "decision_model"),
     ]
     columns = st.columns(len(labels))

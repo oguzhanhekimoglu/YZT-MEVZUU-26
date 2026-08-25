@@ -86,7 +86,7 @@ class RemoteEmbedProvider:
         base_url: str,
         api_key: str,
         model: str = "bge-m3-embed",
-        timeout_seconds: float = 60.0,
+        timeout_seconds: float = 1800.0,  # EVREN dokumantasyonu: acikca belirtilmemis, tutarlilik icin 1800s onerilmis
         client: httpx.Client | None = None,
     ) -> None:
         """Configure the EVREN embeddings endpoint and its team API key."""

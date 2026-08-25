@@ -264,7 +264,14 @@ VLM_MODEL_NAME             = os.environ.get("VLM_MODEL_NAME") or "llm-fast"
 VLM_API_URL                = os.environ.get("VLM_API_URL") or "https://evren-llmapi.ssyz.org.tr/v1/chat/completions"
 VLM_API_KEY                = os.environ.get("VLM_API_KEY") or ""
 VLM_NUM_PREDICT            = 1024   # KÄ±sa ve Ã¶z JSON cevaplarÄ± iÃ§in yeterli
-VLM_TIMEOUT_S              = 300.0  # 5 dakika timeout (YavaÅŸ bilgisayarlar iÃ§in artÄ±rÄ±ldÄ±)
+
+# EVREN dokumantasyonu chat completions/video icin timeout=1800 "zorunlu" diyor,
+# ama bu cagri burada senkron requests.post + kucuk bir ThreadPoolExecutor
+# (max_workers=4, bkz. pipeline.py) uzerinden yapiliyor - tam 1800s'e cikarmak,
+# EVREN yavaslarsa 4 worker'in hepsini uzun sure kilitleyip canli pipeline'i
+# tamamen durdurabilir (karar_servisi'nin async VLLMClient'inda bu risk yok,
+# o yuzden o 1800s'te birakildi). Bilinçli orta yol: 10 dakika.
+VLM_TIMEOUT_S              = 600.0
 VLM_MIN_RECALL_INTERVAL_S  = 0.7    # [GÃœNCELLENDÄ°] 3.0->0.7: UÃ§ak aniden yakÄ±nlaÅŸÄ±p inanÄ±lmaz net bir kare (Ã¶rnekteki F-4 kuyruÄŸu gibi) verirse 3 saniye bekleme, hemen 0.7 sn iÃ§inde VLM'i tetikle!
 # BUG-FIX: VLM_MIN_RECALL_INTERVAL_S eskiden vlm_engine.py iÃ§inde AYNI ZAMANDA
 # genel spam-koruma cooldown'u olarak da kullanÄ±lÄ±yordu. YukarÄ±daki deÄŸer
@@ -384,12 +391,6 @@ FRAME_READ_BUFFER_SIZE  = 4     # Ön-okuma thread tamponu (frame sayısı)
 # kimlik kaybı olmaz; bedeli çok uzak/minik hedeflerde YOLO recall'ının azıcık düşmesi.
 PROC_MAX_WIDTH          = 1920  # Bu genişlikten büyük kareler bu değere küçültülür (None = kapalı)
 
-# ======================== VLM SAĞLAMLIK ===========================
-# llava-phi3 gibi küçük multimodal modeller format:"json" parametresiyle
-# boş yanıt verebilir. Bu ayar kapatıldığında JSON parse kendi yapılır.
-VLM_FORCE_JSON_FORMAT   = False  # True: Ollama'ya format:"json" gönder. False: ham çıktıyı parse et
-VLM_RETRY_ON_EMPTY      = True   # Boş/geçersiz yanıtta 1 kere tekrar dene
-VLM_RETRY_DELAY_S       = 1.0    # Tekrar deneme öncesi bekleme süresi (saniye)
 
 # ======================== LLM (OPERASİYONEL KARAR) ================
 LLM_ENABLED          = True

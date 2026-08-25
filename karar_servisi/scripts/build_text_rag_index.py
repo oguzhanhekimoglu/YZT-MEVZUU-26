@@ -79,7 +79,7 @@ def main() -> None:
     provider = RemoteEmbedProvider(base_url=settings.vllm_base_url, api_key=settings.vllm_api_key)
     qdrant_client = QdrantClient(
         url=settings.qdrant_url, port=443, prefix=settings.qdrant_collection_prefix,
-        api_key=settings.qdrant_api_key,
+        api_key=settings.qdrant_api_key, timeout=600,
     )
     collection_name = f"{settings.qdrant_collection_prefix}-{COLLECTION_NAME}"
     try:

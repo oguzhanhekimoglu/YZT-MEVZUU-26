@@ -198,8 +198,9 @@ def main():
         print("SONUÇ: VLM geçerli bir analiz döndürmedi (None).")
         print(
             "Olası nedenler:\n"
-            "  • Ollama çalışmıyor (ollama serve)\n"
-            "  • Model adı yanlış (ollama list ile kontrol et)\n"
+            "  • VLM_API_KEY eksik/hatalı (EVREN 401 döner)\n"
+            "  • Model adı yanlış (VLM_MODEL_NAME — EVREN'de 'llm-fast'/'llm-large')\n"
+            "  • İnternet bağlantısı yok (EVREN uzak bir servis)\n"
             "  • JSON parse hatası (yukarıdaki log satırlarına bakın)\n"
             "  • Timeout (VLM_TIMEOUT_S artırılabilir)"
         )

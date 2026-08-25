@@ -25,7 +25,7 @@ class VLLMClient(BaseLLMClient):
         model: str,
         base_url: str = "http://127.0.0.1:8003",
         api_key: str | None = None,
-        timeout_seconds: float = 60.0,
+        timeout_seconds: float = 1800.0,  # EVREN dokumantasyonu: chat completions icin zorunlu
         client: httpx.AsyncClient | None = None,
     ) -> None:
         """Configure the endpoint, opsiyonel API anahtarı ve per-attempt timeout.

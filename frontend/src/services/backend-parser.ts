@@ -102,7 +102,7 @@ export function parseVideoSummary(value: unknown): FinalOutput {
       title: description,
       description,
       risk,
-      critical: false,
+      critical: eventSource?.critical === true,
       status: "completed" as const,
     };
   });

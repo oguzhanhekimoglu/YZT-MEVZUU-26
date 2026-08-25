@@ -59,7 +59,7 @@ async def test_summarize_video_returns_pending_when_no_finalized_events() -> Non
 async def test_summarize_video_synthesizes_from_final_outputs() -> None:
     canned = {
         "summary": "Videoda bir İHA gözlemlendi, tehdit seviyesi düşük.",
-        "events": [{"time": "00:05", "event": "İHA tespit edildi"}],
+        "events": [{"time": "00:05", "event": "İHA tespit edildi", "critical": False}],
         "risk": "düşük",
         "actions": ["Gözlem sürdürülsün"],
     }
@@ -148,3 +148,23 @@ async def test_list_finalized_outputs_for_video_filters_by_video_id_and_status(t
     outputs = await service.list_finalized_outputs_for_video("video-1")
 
     assert [row["output"]["canonical_name"] for row in outputs] == ["A"]
+
+
+@pytest.mark.asyncio
+async def test_summarize_video_tags_only_hostile_or_high_risk_outputs_as_critical() -> None:
+    """Şartname: kritik anlar açıkça vurgulanmalı — prompt'a giden [KRİTİK] etiketi
+    LLM'in serbest yorumuna değil, nihai analizin kendi bayrağına/riskine dayanmalı."""
+    llm = FakeLLMClient(response=json.dumps({"summary": "x", "events": [], "risk": "yüksek", "actions": []}))
+    outputs = [
+        {"output": {"canonical_name": "Sivil hedef", "risk_level": "LOW"}, "created_at_utc": None},
+        {"output": {"canonical_name": "Düşman hedef", "hostile_target_confirmed": True, "risk_level": "LOW"}, "created_at_utc": None},
+        {"output": {"canonical_name": "Yüksek riskli hedef", "risk_level": "HIGH"}, "created_at_utc": None},
+    ]
+    service = FakeEventService(outputs)
+
+    await summarize_video(video_id="video-1", event_service=service, llm_client=llm)
+
+    prompt_text = llm.last_messages[0]["content"]
+    assert "[KRİTİK] Sivil hedef" not in prompt_text
+    assert "[KRİTİK] Düşman hedef" in prompt_text
+    assert "[KRİTİK] Yüksek riskli hedef" in prompt_text

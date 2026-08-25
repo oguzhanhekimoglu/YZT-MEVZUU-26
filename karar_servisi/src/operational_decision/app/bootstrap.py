@@ -204,7 +204,7 @@ async def build_application_container(
         )
         qdrant_client = QdrantClient(
             url=resolved.qdrant_url, port=443, prefix=resolved.qdrant_collection_prefix,
-            api_key=resolved.qdrant_api_key,
+            api_key=resolved.qdrant_api_key, timeout=600,
         )
         rag_collection_name = f"{resolved.qdrant_collection_prefix}-mevzuu-text-rag"
         rag_store = await asyncio.to_thread(
@@ -225,7 +225,7 @@ async def build_application_container(
         model=resolved.decision_model,
         base_url=resolved.vllm_base_url,
         api_key=resolved.vllm_api_key or None,
-        timeout_seconds=60.0,
+        timeout_seconds=1800.0,  # EVREN dokumantasyonu: chat completions icin zorunlu
     )
 
     def platform_factory(event_id: str, request_id: str) -> PlatformTool:

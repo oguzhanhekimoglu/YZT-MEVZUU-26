@@ -26,14 +26,6 @@ SINIF_KATEGORILERI = {
     4: {"SÄ°HA", "Ä°HA", "Kamikaze Ä°HA", "Drone"},                          # combat_uav
 }
 
-# --- VLM doÄŸrulayÄ±cÄ± (ollama gemma â€” VRAG'Ä±n tahminini denetler) ---
-VLM_AKTIF = True
-VLM_MODEL = "gemma4:12b"
-VLM_API = "http://localhost:11434/api/generate"
-VLM_NUM_PREDICT = 2048       # gemma4 thinking modÃ¼lÃ¼ iÃ§in (arkadaÅŸÄ±n config'i)
-VLM_TIMEOUT = 300            # yavaÅŸ (CPU/kÄ±smi offload) â€” 5 dk
-VLM_MIN_HITS = 5             # VLM sadece iyi oturmuÅŸ track'lerde (yavaÅŸ, boÅŸa harcama)
-
 # --- Sunucu ---
 HOST = "127.0.0.1"
 PORT = 8000

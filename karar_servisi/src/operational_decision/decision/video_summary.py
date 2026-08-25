@@ -39,8 +39,9 @@ def _video_summary_json_schema() -> dict[str, object]:
                     "properties": {
                         "time": {"type": "string"},
                         "event": {"type": "string"},
+                        "critical": {"type": "boolean"},
                     },
-                    "required": ["time", "event"],
+                    "required": ["time", "event", "critical"],
                 },
             },
             "risk": {
@@ -59,6 +60,14 @@ def _format_time(value: Any) -> str:
     return "?"
 
 
+def _is_critical(output: dict[str, Any]) -> bool:
+    """Deterministik kritiklik: LLM'in serbestçe uydurmasına bırakılmaz,
+    zaten üretilmiş nihai analizin kendi bayraklarından/riskinden türetilir."""
+    if output.get("hostile_target_confirmed") or output.get("legal_violation_confirmed"):
+        return True
+    return str(output.get("risk_level", "")).upper() in {"HIGH", "CRITICAL"}
+
+
 def _describe_output(row: dict[str, Any]) -> str:
     output = row.get("output") or {}
     identity = output.get("canonical_name") or output.get("matched_platform") or "Bilinmeyen hedef"
@@ -70,7 +79,8 @@ def _describe_output(row: dict[str, Any]) -> str:
         if isinstance(action, dict)
     ]
     time_label = _format_time(row.get("created_at_utc"))
-    line = f"- [{time_label}] {identity} — risk: {risk}. {summary}"
+    critical_tag = " [KRİTİK]" if _is_critical(output) else ""
+    line = f"- [{time_label}]{critical_tag} {identity} — risk: {risk}. {summary}"
     if action_texts:
         line += f" Öneriler: {', '.join(action_texts)}"
     return line
@@ -85,7 +95,10 @@ def _build_prompt(outputs: list[dict[str, Any]]) -> list[dict[str, str]]:
         "videonun genelini özetleyen TEK bir Türkçe paragraf, olayların zaman "
         "damgalı kısa listesi, videonun genel risk seviyesi (verilen bireysel "
         "risklerin en yükseğini yansıtmalı) ve tekrarsız, birleştirilmiş bir "
-        "aksiyon önerisi listesi üret.\n\n"
+        "aksiyon önerisi listesi üret. Her olay için 'critical' alanını SADECE "
+        "girdide '[KRİTİK]' etiketiyle işaretli bir analize karşılık geliyorsa "
+        "true yap, diğer tüm olaylarda false yap — kendi başına yeni bir "
+        "kritiklik değerlendirmesi uydurma.\n\n"
         f"BİREYSEL ANALİZLER:\n{joined}"
     )
     return [{"role": "user", "content": instruction}]
