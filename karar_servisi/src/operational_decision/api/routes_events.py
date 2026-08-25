@@ -17,6 +17,7 @@ from operational_decision.app.demo_scenarios import (
 from operational_decision.contracts.common import EventStatus
 from operational_decision.contracts.final_output import FinalDecisionOutput
 from operational_decision.contracts.request import AnalyzeEventRequest
+from operational_decision.decision.video_summary import summarize_video
 from operational_decision.memory.event_service import EventNotFoundError
 from operational_decision.presentation.teknofest import TeknofestSpecFormatter
 
@@ -93,6 +94,20 @@ async def get_event_trace(
     except EventNotFoundError as error:
         raise HTTPException(status_code=404, detail="EVENT_NOT_FOUND") from error
     return cast(dict[str, Any], jsonable_encoder(trace))
+
+
+@router.get("/api/v1/videos/{video_id}/summary")
+async def get_video_summary(
+    video_id: str,
+    container: Annotated[ApplicationContainer, Depends(get_container)],
+) -> dict[str, Any]:
+    """O videoya ait tüm hedef-bazlı nihai kararlardan tek bir video-geneli özet döner."""
+    summary = await summarize_video(
+        video_id=video_id,
+        event_service=container.event_service,
+        llm_client=container.orchestrator.deps.llm_client,
+    )
+    return cast(dict[str, Any], jsonable_encoder(summary))
 
 
 @router.get("/api/v1/demo/scenarios")

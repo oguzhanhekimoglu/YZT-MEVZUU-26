@@ -170,6 +170,31 @@ class EventRepository:
         row["created_at_utc"] = parse_utc(row["created_at_utc"])
         return row
 
+    async def list_finalized_outputs_for_video(self, video_id: str) -> list[dict[str, Any]]:
+        """Read and decode every finalized event's output for one video, oldest first.
+
+        get_final_output(event_id)'nin toplu hâli — video-geneli özet (bkz.
+        decision/video_summary.py) o videoya ait tüm hedef-bazlı nihai kararları
+        tek seferde okumak için kullanır.
+        """
+        async with self.database.connection() as connection:
+            cursor = await connection.execute(
+                """SELECT final_outputs.* FROM final_outputs
+                JOIN events ON events.event_id = final_outputs.event_id
+                WHERE events.video_id = ? AND events.event_status = ?
+                ORDER BY final_outputs.created_at_utc ASC""",
+                (video_id, EventStatus.FINALIZED.value),
+            )
+            rows = [row_to_dict(row) for row in await cursor.fetchall()]
+        outputs: list[dict[str, Any]] = []
+        for row in rows:
+            if row is None:
+                continue
+            row["output"] = decode_json(row.pop("output_json"))
+            row["created_at_utc"] = parse_utc(row["created_at_utc"])
+            outputs.append(row)
+        return outputs
+
     async def count_for_fingerprint(self, fingerprint: str) -> int:
         """Count persisted events for integration verification."""
         async with self.database.connection() as connection:

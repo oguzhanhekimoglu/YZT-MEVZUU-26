@@ -21,6 +21,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+import requests
 from fastapi import FastAPI, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -173,6 +174,10 @@ def _video_dongu(video_yolu: str):
             durum.fuzyon.last_vlm_payload = None
             durum.fuzyon.last_llm_payload = None
 
+    # Video-geneli özet (karar_servisi tarafında video_id'ye göre gruplanıyor)
+    # gerçek videoyla eşleşsin diye pipeline'a bu oturumun video adını bildiriyoruz.
+    durum.fuzyon.pipeline.video_id = Path(video_yolu).name
+
     cap = cv2.VideoCapture(video_yolu)
     if not cap.isOpened():
         durum.calisiyor = False
@@ -254,6 +259,30 @@ def durum_al():
             "frame_no": durum.frame_no, "hedef_sayisi": len(durum.son_hedefler),
             "model_sayisi": durum.meta_cache.get("model_sayisi", 0),
             "sure_saniye": durum.sure_saniye, "gecen_saniye": gecen_saniye}
+
+
+@app.get("/video/ozet")
+def video_ozet():
+    """Bu oturumun videosuna ait, karar_servisi'nde zaten biriken hedef-bazlı
+    nihai kararlardan sentezlenmiş video-geneli özeti döner (bkz. TYDA
+    şartnamesi: genel video özeti + olaylar + risk + aksiyonlar). video_id,
+    pipeline.py'nin _async_llm_task'ta kullandığı Path(video_yolu).name ile
+    birebir aynı normalize edilmiş biçimde hesaplanır."""
+    if not durum.kaynak:
+        return {"status": "pending", "summary": "", "events": [], "risk": "bilinmiyor", "actions": []}
+    video_id = Path(durum.kaynak).name
+    try:
+        yanit = requests.get(
+            f"http://127.0.0.1:8001/api/v1/videos/{video_id}/summary", timeout=120.0
+        )
+        yanit.raise_for_status()
+        return yanit.json()
+    except requests.exceptions.RequestException as e:
+        print(f"[VIDEO-OZET] karar_servisi'ne erişilemedi: {e}", flush=True)
+        return JSONResponse(
+            {"status": "partial", "summary": "Karar servisine erişilemedi.", "events": [], "risk": "bilinmiyor", "actions": []},
+            status_code=502,
+        )
 
 
 @app.get("/videolar")

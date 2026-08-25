@@ -1,4 +1,4 @@
-import type { ActionRecommendation, AircraftCandidate, LlmDetail, TargetAnalysis, VlmDetail, VragDetail } from "../types";
+import type { ActionRecommendation, AircraftCandidate, FinalOutput, LlmDetail, TargetAnalysis, TimelineEvent, VlmDetail, VragDetail } from "../types";
 import { normalizeRisk } from "./risk-normalization";
 import { referenceImageUrl } from "./backend-url";
 
@@ -77,6 +77,48 @@ function parseLlm(value: unknown): LlmDetail | undefined {
   const risk = normalizeRisk(source.risk);
   if (!summary && risk === "unknown" && actions.length === 0) return undefined;
   return { risk, summary, riskIncreasingFactors: [], riskReducingFactors: [], actions };
+}
+
+function parseTimeLabelToSeconds(label: string): number {
+  const parts = label.split(":").map((part) => Number.parseInt(part, 10));
+  if (parts.some((part) => !Number.isFinite(part))) return 0;
+  return parts.reduce((total, part) => total * 60 + part, 0);
+}
+
+export function parseVideoSummary(value: unknown): FinalOutput {
+  const source = record(value);
+  const status = text(source?.status);
+  const summary = text(source?.summary) ?? "";
+  const risk = normalizeRisk(source?.risk);
+  const rawEvents = Array.isArray(source?.events) ? source.events : [];
+  const events: TimelineEvent[] = rawEvents.map((item, index) => {
+    const eventSource = record(item);
+    const timeLabel = text(eventSource?.time) ?? "00:00";
+    const description = text(eventSource?.event) ?? "";
+    return {
+      id: `video-summary-event-${index + 1}`,
+      timeSeconds: parseTimeLabelToSeconds(timeLabel),
+      timeLabel,
+      title: description,
+      description,
+      risk,
+      critical: false,
+      status: "completed" as const,
+    };
+  });
+  const rawActions = Array.isArray(source?.actions) ? source.actions : [];
+  const actions: ActionRecommendation[] = rawActions
+    .map(text)
+    .filter((item): item is string => Boolean(item))
+    .slice(0, 10)
+    .map((label, index) => ({ id: `video-summary-action-${index + 1}`, label, priority: "normal" }));
+  return {
+    status: status === "final" || status === "partial" ? status : "pending",
+    summary,
+    events,
+    risk,
+    actions,
+  };
 }
 
 function isConflict(vlm?: VlmDetail): boolean {

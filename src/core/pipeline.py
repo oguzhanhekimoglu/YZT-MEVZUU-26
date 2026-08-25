@@ -81,6 +81,11 @@ class TeknoFestPipeline:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
         self._source_fps = max(1.0, source_fps)   # BUG-7: Video FPS doğru kaydedilsin
+        # BUG-FIX (video-geneli özet karışıyordu): _async_llm_task karar_servisi'ne
+        # hep sabit "live_video" video_id'siyle gidiyordu, yani farklı videolardaki
+        # olaylar event_memory.db'de aynı video_id altında karışıyordu. backend/main.py
+        # her yeni oturumda bunu gerçek video adına günceller (bkz. _video_dongu).
+        self.video_id = "live_video"
 
         self.slicer   = SmartSlicer(MODEL_PATH)
         # BUG-FIX: MultiTargetTracker eskiden fps parametresi almıyordu ve
@@ -764,7 +769,7 @@ class TeknoFestPipeline:
             current_time_offset = float(time.time() % 10000)
             adapter_payload = {
                 "raw_vlm": cleaned_vlm_result,
-                "video_id": "live_video",
+                "video_id": self.video_id,
                 "track_id": str(track.track_id),
                 "first_seen_offset_seconds": current_time_offset,
                 "last_seen_offset_seconds": current_time_offset + 1.0,

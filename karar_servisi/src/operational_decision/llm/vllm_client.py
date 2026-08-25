@@ -47,7 +47,12 @@ class VLLMClient(BaseLLMClient):
         headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
         self._client = client or httpx.AsyncClient(base_url=base_url, timeout=timeout_seconds, headers=headers)
 
-    async def generate(self, messages: Sequence[dict[str, str]]) -> str:
+    async def generate(
+        self,
+        messages: Sequence[dict[str, str]],
+        *,
+        response_schema: dict[str, object] | None = None,
+    ) -> str:
         """Perform exactly one chat request; callers own parse-only repair."""
         payload: dict[str, object] = {
             "model": self.model,
@@ -61,7 +66,7 @@ class VLLMClient(BaseLLMClient):
                 "type": "json_schema",
                 "json_schema": {
                     "name": "operational_decision",
-                    "schema": ollama_decision_json_schema(),
+                    "schema": response_schema or ollama_decision_json_schema(),
                     "strict": True,
                 },
             },

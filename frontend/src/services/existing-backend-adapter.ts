@@ -2,7 +2,7 @@ import type { OperatorSession, RiskLevel, TargetAnalysis } from "../types";
 import type { BackendAdapterConfig, OperatorDataSource, OperatorSessionListener, SelectedVideo, ServerVideoOption, Unsubscribe } from "./contracts";
 import { existingBackendCapabilities } from "./capabilities";
 import { NativeBackendTransport, type BackendTransport, type SocketLike } from "./backend-transport";
-import { parseBackendStatus, parseBackendTargets, parseServerVideos, parseTargetsEnvelope } from "./backend-parser";
+import { parseBackendStatus, parseBackendTargets, parseServerVideos, parseTargetsEnvelope, parseVideoSummary } from "./backend-parser";
 import { resolveApiUrl, resolveWebSocketUrl, safeBasename } from "./backend-url";
 import { DataSourceError, unsupported } from "./data-source-error";
 
@@ -106,8 +106,21 @@ export class ExistingBackendAdapter implements OperatorDataSource {
     try {
       await this.transport.postJson(resolveApiUrl(this.config.apiBaseUrl, "/oturum/durdur"));
       this.session = { ...this.session, status: "stopped" };
-      return this.publish();
+      const published = this.publish();
+      void this.fetchVideoSummary();
+      return published;
     } finally { this.stopping = false; }
+  }
+
+  private async fetchVideoSummary(): Promise<void> {
+    try {
+      const finalOutput = parseVideoSummary(await this.transport.getJson(resolveApiUrl(this.config.apiBaseUrl, "/video/ozet")));
+      this.session = { ...this.session, finalOutput };
+      this.publish();
+    } catch {
+      // Video-geneli özet opsiyonel bir eklenti — alınamazsa sessizce pending kalır,
+      // hedef-bazlı analiz akışını etkilemez.
+    }
   }
 
   selectTarget(targetId: number): Promise<OperatorSession> {
@@ -133,6 +146,7 @@ export class ExistingBackendAdapter implements OperatorDataSource {
       const sourceName = safeBasename(payload.kaynak); const sourceChanged = Boolean(sourceName && this.session.sourceName && sourceName !== this.session.sourceName);
       if (sourceChanged) { this.generation += 1; this.streamToken += 1; }
       const running = payload.calisiyor === true;
+      const justStopped = !running && this.session.status === "running";
       this.session = {
         ...this.session, id: `backend-generation-${this.generation}`, sourceName: sourceName ?? this.session.sourceName,
         status: running ? "running" : this.session.status === "running" ? "stopped" : this.session.status,
@@ -140,10 +154,11 @@ export class ExistingBackendAdapter implements OperatorDataSource {
         currentSeconds: payload.gecen_saniye ?? this.session.currentSeconds,
         durationSeconds: payload.sure_saniye ?? this.session.durationSeconds,
         streamUrl: running ? `${resolveApiUrl(this.config.apiBaseUrl, "/video")}?_=${this.streamToken}` : this.session.streamUrl,
-        events: [], finalOutput: pendingFinal,
+        events: [], finalOutput: sourceChanged ? pendingFinal : this.session.finalOutput,
         ...(sourceChanged ? { targets: [], selectedTargetId: undefined, activeTargetCount: 0 } : {}),
       };
       this.publish();
+      if (justStopped) void this.fetchVideoSummary();
     } catch {
       if (!controller.signal.aborted && this.session.connection !== "connected") { this.session = { ...this.session, connection: "disconnected" }; this.publish(); }
     } finally {
@@ -164,7 +179,7 @@ export class ExistingBackendAdapter implements OperatorDataSource {
       const envelope = parseTargetsEnvelope(raw); if (!envelope) return;
       const targets = parseBackendTargets(envelope.hedefler, this.config.apiBaseUrl);
       const selectedId = this.session.selectedTargetId && targets.some((target) => target.id === this.session.selectedTargetId) ? this.session.selectedTargetId : preferredTarget(targets);
-      this.session = { ...this.session, frameNumber: Math.max(this.session.frameNumber, envelope.frame ?? 0), targets: targets.map((target) => ({ ...target, selected: target.id === selectedId })), selectedTargetId: selectedId, activeTargetCount: targets.length, lastMessageAt: new Date(this.now()).toISOString(), events: [], finalOutput: pendingFinal };
+      this.session = { ...this.session, frameNumber: Math.max(this.session.frameNumber, envelope.frame ?? 0), targets: targets.map((target) => ({ ...target, selected: target.id === selectedId })), selectedTargetId: selectedId, activeTargetCount: targets.length, lastMessageAt: new Date(this.now()).toISOString(), events: [], finalOutput: this.session.finalOutput };
       this.publish();
     };
     socket.onclose = () => { if (!this.isCurrentSocket(socket, generation)) return; this.socket = undefined; if (this.disposed || this.listeners.size === 0) return; this.session = { ...this.session, connection: "reconnecting" }; this.publish(); this.scheduleReconnect(); };

@@ -466,6 +466,10 @@ class EventService:
         """Read one persisted final output for API delivery."""
         return await self.repository.get_final_output(event_id)
 
+    async def list_finalized_outputs_for_video(self, video_id: str) -> list[dict[str, Any]]:
+        """Read every persisted final output for one video (video-geneli özet için)."""
+        return await self.repository.list_finalized_outputs_for_video(video_id)
+
     async def get_active_by_fingerprint(self, fingerprint: str) -> dict[str, Any] | None:
         """Read an active event for resume checks without creating a duplicate."""
         async with self.database.connection() as connection:
