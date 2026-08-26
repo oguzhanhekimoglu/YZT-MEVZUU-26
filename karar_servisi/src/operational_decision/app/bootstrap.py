@@ -301,7 +301,11 @@ async def build_application_container(
         detail=rag_error,
     )
     embedding_health = ComponentHealth(
-        status=HealthStatus.HEALTHY if embedding is not None else HealthStatus.FAILED,
+        # NOT: RemoteEmbedProvider'in kurulmasi (embedding is not None) hicbir
+        # ag cagrisi yapmiyor - LocalQwenEmbeddingProvider'in aksine gercekten
+        # calistigini kanitlamiyor. Asil kanit dizinin sonuna kadar hersey
+        # (Qdrant baglantisi dahil) basarili oldugunda kurulan retriever'dir.
+        status=HealthStatus.HEALTHY if retriever is not None else HealthStatus.FAILED,
         detail=rag_error,
     )
     inventory_health = ComponentHealth(

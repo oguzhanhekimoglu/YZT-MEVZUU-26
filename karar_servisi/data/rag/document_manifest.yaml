@@ -87,34 +87,6 @@ documents:
     effective_date: 2024-07-11
     sha256: a58c1357eaa72ab18cfc90b4ff47567c34a0f1401266c6e10dbef3aca26a8ba5
 
-  - document_id: LT_ENR_5_1
-    filename: LT_ENR_5_1_en.pdf
-    authority: DHMI_AIP
-    document_type: AIP_ENR
-    language: en
-    topics: [prohibited_areas, restricted_areas, danger_areas, notam_domain_model]
-    source_priority: 100
-    authoritative: true
-    runtime_rag: false
-    role: REFERENCE_ONLY
-    revision_date: 2025-11-12
-    effective_date: 2025-12-25
-    sha256: db13ad4f8f4f2d27a3579b886ee32c782b2711b3840846e70d26cc649cccd2e9
-
-  - document_id: LT_ENR_5_3
-    filename: LT_ENR_5_3_en.pdf
-    authority: DHMI_AIP
-    document_type: AIP_ENR
-    language: en
-    topics: [hazardous_activities, operational_area, notam_activation, notam_domain_model]
-    source_priority: 100
-    authoritative: true
-    runtime_rag: false
-    role: REFERENCE_ONLY
-    revision_date: 2025-02-19
-    effective_date: 2025-04-17
-    sha256: 2e8c094dd7a4d60c764ecc3165a4183a00992649003527bcf8099c6e0e575919
-
   - document_id: UCUS_IZINLERINE_ILISKIN_EL_KITABI
     filename: ucus_izinlerine_iliskin_el_kitabi.pdf
     authority: SHGM
@@ -129,16 +101,3 @@ documents:
     effective_date: null
     sha256: 4d8dd2da7b84ce4a45af7fb8c7a5145330d91a45b673640ee1593086f3b4ce03
 
-  - document_id: UCUS_IZNI_TALEP_FORMU
-    filename: ucus_izni_talep_formu.docx
-    authority: SHGM
-    document_type: FORM_TEMPLATE
-    language: tr
-    topics: [permission_application_fields, operational_area_fields, aircraft_and_operator_fields]
-    source_priority: 70
-    authoritative: false
-    runtime_rag: false
-    role: REFERENCE_ONLY
-    revision_date: 2014-02-14
-    effective_date: null
-    sha256: 74eac891e63cf4e0d8f2819e7100f9eefc0f3c1362e58af36292069aef1072a7

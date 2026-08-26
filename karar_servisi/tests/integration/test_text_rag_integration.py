@@ -92,7 +92,7 @@ def build_retriever(tmp_path: Path) -> tuple[DocumentCatalog, TextRetriever]:
     )
     summary = builder.build()
     assert summary.indexed_document_count == 6
-    assert summary.excluded_document_count == 4
+    assert summary.excluded_document_count == 1
     return catalog, TextRetriever(
         catalog=catalog,
         embedding_provider=provider,
@@ -102,7 +102,7 @@ def build_retriever(tmp_path: Path) -> tuple[DocumentCatalog, TextRetriever]:
 
 
 def test_builder_indexes_only_runtime_allowlist(tmp_path: Path) -> None:
-    catalog, _ = build_retriever(tmp_path)
+    catalog, retriever = build_retriever(tmp_path)
     metadata = load_chunk_metadata(tmp_path / "chunk_metadata.jsonl")
     assert len(metadata) == 6
     assert {row["document_id"] for row in metadata} == {
@@ -114,6 +114,7 @@ def test_builder_indexes_only_runtime_allowlist(tmp_path: Path) -> None:
     manifest = validate_index_artifacts(
         catalog=catalog,
         index_dir=tmp_path,
+        store=retriever.store,
         expected_model_id=FakeEmbeddingProvider.model_id,
     )
     assert manifest["chunk_count"] == 6
@@ -129,7 +130,7 @@ def test_retriever_filters_before_exact_search_and_has_no_threshold(tmp_path: Pa
     with pytest.raises(RetrievalFilterError):
         retriever.retrieve(
             "wrong role",
-            document_ids=["LT_ENR_5_1"],
+            document_ids=["UCUS_IZINLERINE_ILISKIN_EL_KITABI"],
         )
     with pytest.raises(NoRelevantContext):
         retriever.retrieve("valid empty result", topics=["topic_that_does_not_exist"])

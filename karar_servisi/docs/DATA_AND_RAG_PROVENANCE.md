@@ -35,12 +35,11 @@ Runtime RAG belgeleri:
 
 Reference-only belgeler:
 
-- `LT_ENR_5_1`
-- `LT_ENR_5_3`
 - `UCUS_IZINLERINE_ILISKIN_EL_KITABI`
-- `UCUS_IZNI_TALEP_FORMU`
 
-Altı `runtime_rag=true` belge indekslenir. Dört `runtime_rag=false` belge reference-only kalır ve hiçbir koşulda FAISS indeksine alınmaz. PDF/DOCX belgeler runtime operational kayıt değildir; yalnız kontrollü metin bağlamı sağlar.
+(Eskiden `LT_ENR_5_1`, `LT_ENR_5_3` ve `UCUS_IZNI_TALEP_FORMU` da manifestte REFERENCE_ONLY olarak listeliydi; gerçek dosyaları hiç repoya eklenmemişti ve `DocumentCatalog.validate()`'i başarısız kılıyordu. Runtime RAG'a hiç dahil olmadıkları (aramaya girmiyorlardı) için manifestten çıkarıldı.)
+
+Altı `runtime_rag=true` belge indekslenir. Kalan tek `runtime_rag=false` belge reference-only kalır ve hiçbir koşulda arama indeksine alınmaz. PDF/DOCX belgeler runtime operational kayıt değildir; yalnız kontrollü metin bağlamı sağlar.
 
 ## FAISS index ve embedding modeli
 

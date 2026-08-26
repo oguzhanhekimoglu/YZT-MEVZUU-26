@@ -20,10 +20,7 @@ RISK_COLORS = {
     "UNKNOWN": "#616161",
 }
 REFERENCE_ONLY_DOCUMENT_IDS = {
-    "LT_ENR_5_1",
-    "LT_ENR_5_3",
     "UCUS_IZINLERINE_ILISKIN_EL_KITABI",
-    "UCUS_IZNI_TALEP_FORMU",
 }
 VIDEO_EVENTS_PENDING_MESSAGE = (
     "Zaman damgalı olaylar, video olay çıkarım modülü entegre edildiğinde gösterilecektir."

@@ -49,7 +49,7 @@ def test_catalog_validates_roles_checksums_and_sht_metadata() -> None:
     catalog = DocumentCatalog(ROOT / "data/rag/document_manifest.yaml")
     catalog.validate()
     assert len(catalog.runtime_documents) == 6
-    assert len(catalog.reference_only_documents) == 4
+    assert len(catalog.reference_only_documents) == 1
     sht = catalog.get("SHT_IHA_REV_05")
     assert sht.official_runtime_label == "Rev-05"
     assert sht.internal_change_number == "04"
