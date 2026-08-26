@@ -263,7 +263,13 @@ COLLAGE_BG_COLOR   = (30, 30, 30)  # Siyah deÄŸil koyu gri zemin â€” VLM 
 VLM_MODEL_NAME             = os.environ.get("VLM_MODEL_NAME") or "llm-fast"
 VLM_API_URL                = os.environ.get("VLM_API_URL") or "https://evren-llmapi.ssyz.org.tr/v1/chat/completions"
 VLM_API_KEY                = os.environ.get("VLM_API_KEY") or ""
-VLM_NUM_PREDICT            = 1024   # KÄ±sa ve Ã¶z JSON cevaplarÄ± iÃ§in yeterli
+
+# BUG-FIX: 1024 iken EVREN'in "llm-fast" modeli (reasoning modeli - cevaptan
+# once uzun bir ic mumhakeme/"reasoning_content" ureten) butun butceyi
+# dusunmeye harciyor, gercek JSON cevabina (content) hic sira gelmiyordu
+# (finish_reason="length", content=null -> pipeline'de "gorsel analiz
+# tamamlanamadi" olarak dusuyordu). Muhakeme + JSON'a yetecek kadar buyutuldu.
+VLM_NUM_PREDICT            = 4096
 
 # EVREN dokumantasyonu chat completions/video icin timeout=1800 "zorunlu" diyor,
 # ama bu cagri burada senkron requests.post + kucuk bir ThreadPoolExecutor

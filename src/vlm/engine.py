@@ -357,8 +357,12 @@ class VLMEngine:
             resp_json = response.json()
 
             choices = resp_json.get("choices") or []
-            raw_text = choices[0].get("message", {}).get("content", "").strip() if choices else ""
-            
+            # BUG-FIX: .get("content", "") sadece key hic yoksa "" doner; EVREN
+            # bazen key'i "content": null olarak gonderiyor (ornegin model
+            # gorsel girdiyi desteklemiyorsa) - bu durumda None doner ve
+            # .strip() cokerdi, gercek hatayi (asagidaki log) hic gormeden.
+            raw_text = (choices[0].get("message", {}).get("content") or "").strip() if choices else ""
+
             if not raw_text:
                 log.warning(f"[VLM] Sunucu bos yanit dondu veya format taninmadi! Full API Cevabi: {resp_json}")
 
