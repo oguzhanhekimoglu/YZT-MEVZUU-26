@@ -28,7 +28,7 @@ from src.config import VLM_API_URL, VLM_API_KEY, VLM_TIMEOUT_S
 log = logging.getLogger(__name__)
 
 VIDEO_CLIP_FPS = 10.0          # kaydedilen klip fps'i (kaynak fps'ten düşük - boyut/hız için)
-VIDEO_CLIP_DURATION_S = 2.0    # klip süresi
+VIDEO_CLIP_DURATION_S = 0.5    # klip süresi — aynı zamanda tekrar tetikleme aralığı (bkz. TrackVideoBuffer)
 VIDEO_CLIP_CANVAS = 480        # letterbox hedef kare boyutu (kare, sabit)
 VIDEO_MAX_CONCURRENT = 2       # eş zamanlı video-VLM çağrısı limiti (image VLM'den AYRI)
 
@@ -38,7 +38,15 @@ _video_semaphore = threading.Semaphore(VIDEO_MAX_CONCURRENT)
 
 
 class TrackVideoBuffer:
-    """Tek bir track için son birkaç saniyenin kırpılmış karelerini tutar.
+    """Tek bir track için son VIDEO_CLIP_DURATION_S saniyenin kırpılmış
+    karelerini tutar. TEKRARLI çalışır — track yaşadığı sürece, her dolup
+    boşaldığında (bkz. pipeline.py'deki tetikleme) yeniden dolar ve tekrar
+    tetiklenebilir hale gelir; "track başına 1 kez" kısıtı YOK.
+
+    Bir video-VLM çağrısı hâlâ sürüyorsa (is_video_vlm_querying) pipeline.py
+    yeni bir tetiklemeyi atlar — bu yüzden gerçek tekrar aralığı, VIDEO_CLIP_
+    DURATION_S ile bir önceki çağrının süresinden büyük olanı kadardır (çağrı
+    yığılması/kuyruklanması yok, bilinçli).
 
     MVP kısıtı: histerezisli pencere/Kalman fallback YOK — her karede
     track'in o anki (ham) bbox'ı, biraz payla kırpılır. Hedef ekrandan
@@ -57,7 +65,6 @@ class TrackVideoBuffer:
         self.max_frames = max(1, int(round(VIDEO_CLIP_DURATION_S * VIDEO_CLIP_FPS)))
         self._tick = 0
         self.frames: list[np.ndarray] = []
-        self.sent_once: bool = False  # MVP: track başına en fazla 1 video-VLM çağrısı
 
     def add(self, crop_bgr: np.ndarray) -> None:
         self._tick += 1

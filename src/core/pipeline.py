@@ -400,16 +400,18 @@ class TeknoFestPipeline:
             # Aynı kalite kapısını (vlm_ready) kullanır ama image tetiklemesinden
             # TAMAMEN bağımsız çalışır — image sonucu bekletmez/etkilemez, ve
             # image evidence'ı ASLA ezmez (ayrı bir sonuç alanına yazılır,
-            # bkz. _async_video_vlm_task). Track başına en fazla bir kez.
+            # bkz. _async_video_vlm_task). TEKRARLI: track başına 1 kez değil,
+            # tampon her dolup gönderildiğinde yeniden dolup tekrar tetiklenir
+            # (~VIDEO_CLIP_DURATION_S aralıklarla — bir önceki çağrı hâlâ
+            # sürüyorsa is_video_vlm_querying bu turu atlar, yığılma olmaz).
             video_buf = self._video_buffers.get(track.track_id)
             if (
-                video_buf is not None and video_buf.ready and not video_buf.sent_once
+                video_buf is not None and video_buf.ready
                 and vlm_ready and not getattr(track, "is_video_vlm_querying", False)
             ):
-                video_buf.sent_once = True
                 track.is_video_vlm_querying = True
                 frames_to_send = list(video_buf.frames)
-                video_buf.frames.clear()  # gönderildi, karo belleğini serbest bırak
+                video_buf.frames.clear()  # gönderildi, tampon yeniden dolmaya başlar
                 log.info(
                     f"[VIDEO-VLM] Track {track.track_id} → {len(frames_to_send)} karelik "
                     f"video-kanıtı gönderiliyor."
