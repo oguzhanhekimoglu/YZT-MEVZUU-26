@@ -47,8 +47,14 @@ class TrackVideoBuffer:
     """
 
     def __init__(self, fps: float):
-        self.max_frames = max(1, int(round(VIDEO_CLIP_DURATION_S * fps)))
+        # BUG-FIX: max_frames kaynak fps'e göre hesaplanıyordu ama tampona
+        # sadece ÖRNEKLENMİŞ (her _every_n karede bir) kareler giriyor - bu
+        # yüzden "2 saniyelik" hedef aslında ~4 saniye gerçek zaman
+        # gerektiriyordu (25fps kaynak, 10fps hedefte 2'de 1 örnekleme).
+        # max_frames artık hedef encode fps'ine göre (örneklenmiş kare
+        # sayısı), gerçek zaman ~VIDEO_CLIP_DURATION_S'e yakınsıyor.
         self._every_n = max(1, int(round(fps / VIDEO_CLIP_FPS)))
+        self.max_frames = max(1, int(round(VIDEO_CLIP_DURATION_S * VIDEO_CLIP_FPS)))
         self._tick = 0
         self.frames: list[np.ndarray] = []
         self.sent_once: bool = False  # MVP: track başına en fazla 1 video-VLM çağrısı
