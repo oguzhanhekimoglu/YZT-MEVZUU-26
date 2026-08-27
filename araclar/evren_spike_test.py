@@ -18,8 +18,11 @@ yazdirir, yorumu sana birakir.
 import base64
 import os
 import sys
+import tempfile
 from pathlib import Path
 
+import cv2
+import numpy as np
 import requests
 
 API_URL = os.environ.get("VLM_API_URL") or "https://evren-llmapi.ssyz.org.tr/v1/chat/completions"
@@ -78,6 +81,60 @@ def test_video_kabulu(video_path: Path) -> None:
     _post(payload)
 
 
+def test_canli_encode_kabulu(video_path: Path) -> None:
+    """TrackEvidenceBuilder'ın gerçekte yapacağı şeyi taklit eder: hazır bir
+    dosyayı OLDUĞU GİBİ göndermek yerine, birkaç kareyi OpenCV ile YENİDEN
+    encode edip (pipeline'ın canlı üreteceği klip gibi) gönderir. Test 1
+    hazır bir dosyanın kabul edildiğini gösterdi ama pipeline kendi klibini
+    anlık üretecek - farklı bir codec/konteyner EVREN tarafından reddedilebilir.
+    """
+    print("\n=== TEST 3: OpenCV ile YENİDEN ENCODE edilmiş klip kabul ediliyor mu? ===")
+    if not video_path.is_file():
+        print(f"  -> Video bulunamadi: {video_path}")
+        return
+    cap = cv2.VideoCapture(str(video_path))
+    frames = []
+    for _ in range(30):  # ~1-1.5 saniyelik klip
+        ok, frame = cap.read()
+        if not ok:
+            break
+        frames.append(frame)
+    cap.release()
+    if not frames:
+        print("  -> Videodan kare okunamadi.")
+        return
+    h, w = frames[0].shape[:2]
+
+    with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
+        tmp_path = Path(tmp.name)
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    writer = cv2.VideoWriter(str(tmp_path), fourcc, 25.0, (w, h))
+    for f in frames:
+        writer.write(f)
+    writer.release()
+
+    size_kb = tmp_path.stat().st_size / 1024
+    print(f"  -> {len(frames)} kare, mp4v codec, {w}x{h}, {size_kb:.0f} KB olarak encode edildi")
+    clip_b64 = base64.b64encode(tmp_path.read_bytes()).decode("ascii")
+    tmp_path.unlink(missing_ok=True)
+
+    payload = {
+        "model": "vlm",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Bu kisa klipte ne goruyorsun? Kisaca Turkce anlat."},
+                    {"type": "video_url", "video_url": {"url": f"data:video/mp4;base64,{clip_b64}"}},
+                ],
+            }
+        ],
+        "temperature": 0.0,
+        "max_tokens": 512,
+    }
+    _post(payload)
+
+
 def test_thinking_kapatma() -> None:
     print("\n=== TEST 2: 'llm-fast' + chat_template_kwargs.enable_thinking=False ===")
     prompt = "1 ile 10 arasinda asal sayilari virgulle ayirarak yaz. Sadece sayilari yaz, baska hicbir sey yazma."
@@ -106,4 +163,5 @@ if __name__ == "__main__":
         sys.exit(1)
     video_arg = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_VIDEO
     test_video_kabulu(video_arg)
+    test_canli_encode_kabulu(video_arg)
     test_thinking_kapatma()
