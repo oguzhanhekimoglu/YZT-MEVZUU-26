@@ -100,9 +100,10 @@ class TeknoFestPipeline:
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=4, thread_name_prefix="VLMPool")
 
         # BUG-FIX (VRAG'ın süresiz donması): Tek bir kilit (_ai_gate) eskiden VRAG
-        # (SigLIP2 embedding) ile VLM (Ollama) çağrılarının İKİSİNİ BİRDEN
-        # sıralıyordu. Ama VRAG artık CPU'da çalışıyor (VRAG_DEVICE=cpu) ve Ollama
-        # ayrı bir process/GPU kullanıyor — aralarında gerçek kaynak çakışması yok.
+        # (SigLIP2 embedding) ile VLM çağrılarının İKİSİNİ BİRDEN sıralıyordu.
+        # Aralarında gerçek kaynak çakışması yok — VLM artık uzak EVREN API'sine
+        # gidiyor (yerel GPU/CPU hiç kullanmıyor), VRAG kendi hızlandırıcısında
+        # (DEVICE/VRAG_DEVICE, bkz. config.py) bağımsız çalışıyor.
         # Ortak kilidin bedeli ağırdı: VLM'in zaman aşımı 120 saniye, ve bu süre
         # boyunca TÜM VRAG aramaları (ve diğer track'lerin VLM çağrıları) donuyordu
         # (canlı testte doğrulandı — bir VRAG görevi kilidi hiç alamadan

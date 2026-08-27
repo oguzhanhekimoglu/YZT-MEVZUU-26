@@ -10,15 +10,21 @@ from pathlib import Path
 import torch
 
 # ======================== DONANIM ============================
-DEVICE       = "cuda:0" if torch.cuda.is_available() else "cpu"
-# NOT: MPS (Apple GPU) iki kez denendi — Ollama (VLM/LLM) aynı Metal GPU'yu
-# kullandığı için VLM/LLM çağrısı sırasında YOLO'nun FPS'i 20'den 2'ye kadar
-# düşüyordu (iki süreç arasında GPU kuyruk çakışması, uygulama seviyesinde
-# çözülemedi). CPU'da kararlı ~7 FPS tercih edildi. Alternatif: vLLM/CUDA
-# (Windows) — bkz. VLM_API_URL, orada bu çakışma yaşanmıyor.
-# VRAM tıkanıklığı (YOLO + VRAG + VLM/Ollama + LLM aynı GPU'da yarışıyordu) için
-# VRAG (SigLIP2) kalıcı olarak CPU'ya alındı — GPU'da yalnızca YOLO ve Ollama kalsın.
-VRAG_DEVICE  = "cpu"
+# GUNCELLEME: MPS (Apple GPU) daha once iki kez denenip vazgecilmisti, sebebi
+# Ollama'nin (yerel VLM/LLM) AYNI Metal GPU'yu kullanip YOLO'nun FPS'ini
+# 20'den 2'ye dusurmesiydi (uygulama seviyesinde cozulemeyen GPU kuyruk
+# cakismasi). VLM/LLM artik EVREN'e (uzak API) tasindigi icin bu makinede
+# hicbir local model GPU'yu YOLO/VRAG ile paylasmiyor - cakisma sebebi ortadan
+# kalkti, MPS tekrar guvenle denenebilir.
+DEVICE       = (
+    "cuda:0" if torch.cuda.is_available()
+    else "mps" if torch.backends.mps.is_available()
+    else "cpu"
+)
+# Ayni sebeple VRAG (SigLIP2) da artik CPU'ya kilitlenmiyor - DEVICE ile ayni
+# hizlandiriciyi paylasiyor (eskiden "YOLO + VRAG + VLM/Ollama + LLM ayni
+# GPU'da yarisiyordu" gerekcesiyle CPU'ya sabitlenmisti, o gerekce gecersiz).
+VRAG_DEVICE  = DEVICE
 MODEL_PATH   = str(Path(__file__).parent.parent / "models" / "best.pt")
 # YOLO fp16 çıkarım: yalnızca CUDA'da anlamlı hız kazandırır (tensor core'lar),
 # CPU'da fp16 desteklenmez/hızlandırmaz — bu yüzden cihaza göre otomatik seçilir,
