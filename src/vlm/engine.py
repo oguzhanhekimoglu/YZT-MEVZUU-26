@@ -348,6 +348,12 @@ class VLMEngine:
             "seed": 42,
             "max_tokens": VLM_NUM_PREDICT,
             "response_format": {"type": "json_object"},
+            # BUG-FIX: spike testinde dogrulandi (chat_template_kwargs.
+            # enable_thinking=False) - "llm-fast" reasoning'i kapatiyor,
+            # ayni dogru sonucu %92 daha az token'la ve reasoning_content
+            # hic uretmeden veriyor. VLM_NUM_PREDICT'in tukenip content:null
+            # donmesi (canli testte iki kez gozlemlendi) artik olmuyor.
+            "chat_template_kwargs": {"enable_thinking": False},
         }
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else None
 

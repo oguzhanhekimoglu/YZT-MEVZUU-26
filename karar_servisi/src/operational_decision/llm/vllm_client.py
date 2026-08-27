@@ -61,6 +61,11 @@ class VLLMClient(BaseLLMClient):
             "top_p": 1.0,
             "max_tokens": 800,
             "seed": 42,
+            # BUG-FIX: ana pipeline'in spike testinde dogrulandi - "llm-fast"
+            # reasoning'i chat_template_kwargs.enable_thinking=False ile
+            # kapatinca ayni dogru sonucu %92 daha az token'la, hic
+            # reasoning_content uretmeden veriyor.
+            "chat_template_kwargs": {"enable_thinking": False},
             # OpenAI standart yapılandırılmış çıktı sözleşmesi — şema dışı çıktı engellenir.
             "response_format": {
                 "type": "json_schema",
