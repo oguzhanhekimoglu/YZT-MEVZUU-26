@@ -34,7 +34,10 @@ def parse_llm_decision(raw: str) -> LLMDecision:
     try:
         return LLMDecision.model_validate_json(raw, strict=True)
     except (ValidationError, ValueError) as exc:
-        raise LLMResponseParseError("response is not valid LLMDecision JSON") from exc
+        raw_snippet = raw[:300]
+        raise LLMResponseParseError(
+            f"response is not valid LLMDecision JSON: {exc!s} | raw={raw_snippet!r}"
+        ) from exc
 
 
 class StructuredDecisionRunner:

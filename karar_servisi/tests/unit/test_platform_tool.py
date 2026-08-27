@@ -84,7 +84,7 @@ async def test_candidate_unique_ambiguity_and_contextless_resolution() -> None:
     )
     assert unique.data is not None
     assert unique.data.platform_id == "PLT_F16"
-    assert unique.data.platform_status is PlatformStatus.UNKNOWN
+    assert unique.data.platform_status is PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN
 
     ambiguous = await tool.execute(
         PlatformToolRequest(

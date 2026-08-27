@@ -225,11 +225,19 @@ async def test_package6_raw_vlm_end_to_end_policy(
         assert notam_execution["execution_status"] == "SKIPPED"
 
 
-def test_generic_boeing_737_alias_remains_unresolved() -> None:
+def test_generic_boeing_737_alias_resolves_to_generic_family_record() -> None:
+    """VRAG'in referans veri seti Boeing 737'yi tek (versiyonsuz) aile olarak
+    tutuyor - bu yuzden generic "Boeing 737"/"B737" artik PLT_BOEING_737_GENERIC'e
+    cozumleniyor (kullanicinin acikca istedigi degisiklik). Eskiden "PLT_BOEING_737"
+    ID'siyle bir kayit varmis ve kaldirilmisti (bkz. test_platform_allowlist.py'deki
+    REMOVED_PLATFORM_IDS) - bu yeni kayit BILEREK farkli bir ID (PLT_BOEING_737_GENERIC)
+    kullaniyor, kaldirilan ID'yi geri getirmiyor."""
     registry = load_platform_registry(REGISTRY_PATH)
     index = PlatformRegistryIndex(registry, load_platform_aliases(ALIASES_PATH))
-    assert index.find_exact_match("Boeing 737") is None
-    assert index.find_exact_match("B737") is None
+    match = index.find_exact_match("Boeing 737")
+    assert match is not None
+    assert match.platform_id == "PLT_BOEING_737_GENERIC"
+    assert index.find_exact_match("B737").platform_id == "PLT_BOEING_737_GENERIC"
 
 
 def test_package6_ui_catalog_marks_all_new_platforms_outside_inventory() -> None:

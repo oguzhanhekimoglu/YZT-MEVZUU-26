@@ -726,7 +726,8 @@
         "NOT_EXPECTED",
         "UNKNOWN",
         "AMBIGUOUS",
-        "NON_AIRCRAFT"
+        "NON_AIRCRAFT",
+        "IDENTIFIED_CONTEXT_UNKNOWN"
       ],
       "title": "PlatformStatus",
       "type": "string"

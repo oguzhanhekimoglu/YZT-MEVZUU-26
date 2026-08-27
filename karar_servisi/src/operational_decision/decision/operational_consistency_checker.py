@@ -153,14 +153,24 @@ class OperationalConsistencyChecker:
             emitted.add(OperationalConsistencyFlag.REQUIRED_OPERATIONAL_CHECK_UNAVAILABLE)
 
         flags = [flag for flag in _FLAG_ORDER if flag in emitted]
-        indeterminate = bool(
-            {
-                OperationalConsistencyFlag.CONTEXT_UNAVAILABLE,
-                OperationalConsistencyFlag.INVENTORY_CHECK_UNAVAILABLE,
-                OperationalConsistencyFlag.REQUIRED_OPERATIONAL_CHECK_UNAVAILABLE,
-            }
-            & emitted
+        # CONTEXT_UNAVAILABLE alone should not force INDETERMINATE when the
+        # platform's identity is resolved (IDENTIFIED_CONTEXT_UNKNOWN) and
+        # Inventory still ran successfully — only genuinely unavailable
+        # identity-independent checks should block. CONTEXT_UNAVAILABLE
+        # still appears in `flags` for the audit trail either way.
+        identity_resolved_despite_missing_context = (
+            facts.platform_execution_status is ToolExecutionStatus.SUCCESS
+            and platform is not None
+            and platform.platform_status is PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN
+            and not inventory_unavailable
         )
+        blocking_flags = {
+            OperationalConsistencyFlag.INVENTORY_CHECK_UNAVAILABLE,
+            OperationalConsistencyFlag.REQUIRED_OPERATIONAL_CHECK_UNAVAILABLE,
+        }
+        if not identity_resolved_despite_missing_context:
+            blocking_flags = blocking_flags | {OperationalConsistencyFlag.CONTEXT_UNAVAILABLE}
+        indeterminate = bool(blocking_flags & emitted)
         if indeterminate:
             status = OperationalConsistencyStatus.INDETERMINATE
         elif emitted & _PROBLEM_FLAGS:

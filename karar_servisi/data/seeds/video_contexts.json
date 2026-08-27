@@ -1480,5 +1480,18 @@
     "environment": "DEMO",
     "status": "ACTIVE",
     "source_type": "DEMO_MOCK"
+  },
+  {
+    "video_id": "f35.mp4",
+    "camera_id": "CAM_RAW_VLM_TEST",
+    "context_id": "RAW_VLM_TEST_CONTEXT",
+    "operational_area_id": "AREA_RAW_VLM_TEST",
+    "scenario_id": "SCN_RAW_VLM_TEST_F35",
+    "expected_platform_id": null,
+    "video_start_time_utc": "2026-01-01T00:00:00.000Z",
+    "description": "Ham VRAG referans test videosu (gerçek dosya adıyla context kaydı - backend/main.py entegrasyon testi)",
+    "environment": "DEMO",
+    "status": "ACTIVE",
+    "source_type": "DEMO_MOCK"
   }
 ]

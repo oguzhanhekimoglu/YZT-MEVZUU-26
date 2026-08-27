@@ -18,6 +18,11 @@ from operational_decision.memory.event_service import EventService
 
 log = logging.getLogger(__name__)
 
+# BUG-FIX: sabit 800 token'lık varsayılan, birden çok hedef analizini tek
+# JSON'da birleştiren bu sentezde çıktının yarıda kesilip geçersiz JSON
+# üretmesine (JSONDecodeError: Unterminated string) yol açıyordu.
+_MAX_TOKENS = 3000
+
 _PENDING_RESULT: dict[str, Any] = {
     "status": "pending",
     "summary": "",
@@ -117,7 +122,9 @@ async def summarize_video(
 
     messages = _build_prompt(outputs)
     try:
-        raw = await llm_client.generate(messages, response_schema=_video_summary_json_schema())
+        raw = await llm_client.generate(
+            messages, response_schema=_video_summary_json_schema(), max_tokens=_MAX_TOKENS
+        )
         parsed = json.loads(raw)
     except Exception as exc:  # noqa: BLE001 - en iyi çaba sentezi, herhangi bir hata "partial"a düşmeli
         log.warning("[VIDEO-OZET] video_id=%s için özet üretilemedi: %s", video_id, exc)

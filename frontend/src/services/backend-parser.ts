@@ -70,13 +70,26 @@ function parseVlm(value: unknown): VlmDetail | undefined {
   return Object.values(detail).some((item) => item !== undefined && item !== "unknown") ? detail : undefined;
 }
 
+function textList(value: unknown): string[] {
+  return Array.isArray(value) ? value.map(text).filter((item): item is string => Boolean(item)) : [];
+}
+
 function parseLlm(value: unknown): LlmDetail | undefined {
   const source = record(value); if (!source) return undefined;
   const summary = text(source.summary); const rawActions = Array.isArray(source.actions) ? source.actions : [];
   const actions: ActionRecommendation[] = rawActions.map(text).filter((item): item is string => Boolean(item)).slice(0, 10).map((label, index) => ({ id: `backend-action-${index + 1}`, label, priority: "normal" }));
   const risk = normalizeRisk(source.risk);
+  const decision = text(source.decision); const inventoryStatus = text(source.inventory_status);
+  const permissionStatus = text(source.permission_status); const flightPlanStatus = text(source.flight_plan_status);
+  const notamStatus = text(source.notam_status);
+  const humanReviewRequired = typeof source.human_review_required === "boolean" ? source.human_review_required : undefined;
+  const riskIncreasingFactors = textList(source.risk_increasing_factors);
+  const riskReducingFactors = textList(source.risk_reducing_factors);
   if (!summary && risk === "unknown" && actions.length === 0) return undefined;
-  return { risk, summary, riskIncreasingFactors: [], riskReducingFactors: [], actions };
+  return {
+    risk, summary, decision, inventoryStatus, permissionStatus, flightPlanStatus, notamStatus,
+    humanReviewRequired, riskIncreasingFactors, riskReducingFactors, actions,
+  };
 }
 
 function parseTimeLabelToSeconds(label: string): number {

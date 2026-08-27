@@ -516,7 +516,10 @@
       "aliases": [
         "AKSUNGUR",
         "TUSAS AKSUNGUR",
-        "TUSAŞ AKSUNGUR-like"
+        "TUSAŞ AKSUNGUR-like",
+        "TUSAŞ ANKA-II AKSUNGUR",
+        "ANKA-II AKSUNGUR",
+        "ANKA-2 AKSUNGUR"
       ],
       "platform_origin": "DOMESTIC_ORIGIN",
       "manufacturer_country_code": "TR",
@@ -1269,7 +1272,8 @@
         "S70",
         "Sikorsky S-70",
         "Black Hawk",
-        "Sikorsky S-70 Black Hawk-like"
+        "Sikorsky S-70 Black Hawk-like",
+        "S-70 Black Hawk - Sikorsky"
       ],
       "category": "HELICOPTER",
       "taxonomy": {
@@ -1450,7 +1454,8 @@
         "FA-18E/F",
         "Super Hornet",
         "F/A-18 Super Hornet",
-        "F/A-18E/F Super Hornet-like"
+        "F/A-18E/F Super Hornet-like",
+        "F-A-18 Super Hornet"
       ],
       "category": "FIGHTER_JET",
       "taxonomy": {
@@ -1740,7 +1745,8 @@
         "A330-243 MRTT",
         "A330 MRTT",
         "Airbus A330 MRTT",
-        "Airbus A330-243 MRTT-like"
+        "Airbus A330-243 MRTT-like",
+        "Airbus A330-243MRTT"
       ],
       "category": "TRANSPORT_AIRCRAFT",
       "taxonomy": {
@@ -1800,7 +1806,8 @@
         "C17",
         "Globemaster III",
         "Boeing C-17 Globemaster III",
-        "C-17 Globemaster III-like"
+        "C-17 Globemaster III-like",
+        "C-17 Globemaster"
       ],
       "category": "TRANSPORT_AIRCRAFT",
       "taxonomy": {
@@ -1890,7 +1897,8 @@
         "V22",
         "Osprey",
         "Bell V-22 Osprey",
-        "Bell Boeing V-22 Osprey-like"
+        "Bell Boeing V-22 Osprey-like",
+        "V-22 Osprey"
       ],
       "category": "TRANSPORT_AIRCRAFT",
       "taxonomy": {
@@ -2931,7 +2939,8 @@
         "F-5E Tiger 2 Swiss Air Force",
         "Tiger II",
         "F-5E",
-        "F-5E Tiger II-like"
+        "F-5E Tiger II-like",
+        "F-5E Tiger"
       ],
       "category": "FIGHTER_JET",
       "taxonomy": {
@@ -3272,6 +3281,34 @@
       "manufacturer_country_code": "US",
       "active": true,
       "default_expectation": "NOT_EXPECTED",
+      "context_overrides": {},
+      "source_type": "DEMO_MOCK"
+    },
+    {
+      "platform_id": "PLT_BOEING_737_GENERIC",
+      "canonical_name": "Boeing 737",
+      "aliases": [
+        "B737",
+        "Boeing-737",
+        "Boeing 737-like"
+      ],
+      "category": "CIVILIAN_AIRCRAFT",
+      "taxonomy": {
+        "base_category": "FIXED_WING_AIRCRAFT",
+        "usage_domain": "CIVIL",
+        "primary_role": "PASSENGER_TRANSPORT",
+        "operational_class": "NARROWBODY_AIRLINER",
+        "traits": [
+          "MANNED",
+          "JET_POWERED"
+        ],
+        "identity_scope": "MODEL_FAMILY",
+        "variant_policy": "METADATA_ONLY"
+      },
+      "platform_origin": "FOREIGN_ORIGIN",
+      "manufacturer_country_code": "US",
+      "active": true,
+      "default_expectation": "EXPECTED",
       "context_overrides": {},
       "source_type": "DEMO_MOCK"
     }

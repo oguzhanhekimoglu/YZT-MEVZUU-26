@@ -164,9 +164,9 @@ def test_package13_allowlist_registry_and_demo_scope_are_complete() -> None:
     active_ids = {item.platform_id for item in registry.platforms if item.active}
     allowlist_ids = {item["platform_id"] for item in allowlist["platforms"]}
     scenarios = json.loads((ROOT / "data/seeds/demo_scenarios.json").read_text(encoding="utf-8"))
-    assert len(registry.platforms) == 112
-    assert len(active_ids) == 111
-    assert len(allowlist_ids) == 111
+    assert len(registry.platforms) == 113
+    assert len(active_ids) == 112
+    assert len(allowlist_ids) == 112
     assert active_ids == allowlist_ids
     assert [item["scenario_id"] for item in scenarios] == [
         f"SCN-{number:02d}" for number in range(1, 24)

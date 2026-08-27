@@ -74,9 +74,9 @@
   {
     "scenario_id": "SCN-10",
     "name": "Kullanılamayan context",
-    "description": "Operational context aktif olmadığı için araç doğrulamalarının atlandığı deterministik DEMO_MOCK senaryosu.",
-    "expected_verification_status": "INDETERMINATE",
-    "expected_risk_level": "UNKNOWN",
+    "description": "Operational context aktif olmadığı için Permission/NOTAM kontrollerinin atlandığı, ancak platform kimliği bağımsız çözüldüğünden Inventory kontrolünün yine de çalıştığı deterministik DEMO_MOCK senaryosu.",
+    "expected_verification_status": "UNVERIFIED",
+    "expected_risk_level": "MEDIUM",
     "source_type": "DEMO_MOCK"
   },
   {

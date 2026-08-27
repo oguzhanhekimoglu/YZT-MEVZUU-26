@@ -220,6 +220,13 @@ async def test_llm_runtime_states_preserve_all_canonical_decision_fields(tmp_pat
 async def test_missing_production_context_is_explicit_and_never_uses_demo_fallback(
     tmp_path: Path,
 ) -> None:
+    """An unregistered video_id never falls back to demo context data.
+
+    SCN-13's platform (Boeing 747) still resolves by identity alone, so
+    Inventory still runs (IDENTIFIED_CONTEXT_UNKNOWN) — but Permission/NOTAM
+    correctly stay SKIPPED since no real context/area is known, and the
+    decision is honestly UNVERIFIED_AIRCRAFT (not the demo's VERIFIED path).
+    """
     harness = await build_harness(ROOT, tmp_path)
     payload = scenario_payload(ROOT, 13)
     payload["video_id"] = "VIDEO_REAL_CONTEXT_NOT_REGISTERED"
@@ -228,9 +235,13 @@ async def test_missing_production_context_is_explicit_and_never_uses_demo_fallba
     assert outcome.http_status == 200 and outcome.output is not None
     assert outcome.output["video_id"] == "VIDEO_REAL_CONTEXT_NOT_REGISTERED"
     assert outcome.output["context_status"] == "MISSING"
-    assert outcome.output["verification_status"] == "INDETERMINATE"
-    assert outcome.output["risk_level"] == "UNKNOWN"
-    assert outcome.output["decision"] == "PLATFORM_UNRESOLVED"
+    assert outcome.output["platform_status"] == "IDENTIFIED_CONTEXT_UNKNOWN"
+    assert outcome.output["verification_status"] == "UNVERIFIED"
+    assert outcome.output["risk_level"] == "MEDIUM"
+    assert outcome.output["decision"] == "UNVERIFIED_AIRCRAFT"
+    assert outcome.output["tool_execution_summary"]["turkey_inventory_tool"][
+        "execution_status"
+    ] == "SUCCESS"
     for tool_name in ("permission_flight_plan_tool", "notam_tool"):
         execution = outcome.output["tool_execution_summary"][tool_name]
         assert execution["execution_status"] == "SKIPPED"

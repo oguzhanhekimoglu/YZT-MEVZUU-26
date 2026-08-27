@@ -25,6 +25,11 @@ rules:
     when:
       context_status:
         in: [MISSING, INVALID, INACTIVE]
+      # IDENTIFIED_CONTEXT_UNKNOWN (identity resolved, only context missing)
+      # is deliberately excluded — see RULE_UNVERIFIED_CONTEXT_* below, which
+      # assess real risk from the resolved identity instead of forcing UNKNOWN.
+      platform_status:
+        in: [UNKNOWN, AMBIGUOUS, NON_AIRCRAFT]
     minimum_risk: UNKNOWN
     human_review: true
 
@@ -41,6 +46,33 @@ rules:
       platform_status:
         in: [UNKNOWN, AMBIGUOUS]
     minimum_risk: UNKNOWN
+    human_review: true
+
+  - id: RULE_UNVERIFIED_CONTEXT_MILITARY_NOT_LISTED
+    priority: 970
+    when:
+      platform_status: IDENTIFIED_CONTEXT_UNKNOWN
+      platform_usage_domain: MILITARY
+      inventory_execution_status: SUCCESS
+      inventory_status: NOT_LISTED
+    minimum_risk: HIGH
+    human_review: true
+
+  - id: RULE_UNVERIFIED_CONTEXT_MILITARY_LISTED
+    priority: 780
+    when:
+      platform_status: IDENTIFIED_CONTEXT_UNKNOWN
+      platform_usage_domain: MILITARY
+      inventory_execution_status: SUCCESS
+      inventory_status: CONFIRMED
+    minimum_risk: MEDIUM
+    human_review: true
+
+  - id: RULE_UNVERIFIED_CONTEXT_GENERIC
+    priority: 500
+    when:
+      platform_status: IDENTIFIED_CONTEXT_UNKNOWN
+    minimum_risk: MEDIUM
     human_review: true
 
   - id: RULE_UNREGISTERED_MILITARY_PLATFORM

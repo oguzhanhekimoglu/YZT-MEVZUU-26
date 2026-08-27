@@ -556,6 +556,11 @@
       "platform_id": "PLT_B21_RAIDER",
       "canonical_name": "B-21 Raider",
       "group": "STRATEGIC_BOMBER"
+    },
+    {
+      "platform_id": "PLT_BOEING_737_GENERIC",
+      "canonical_name": "Boeing 737",
+      "group": "CIVIL_AIRCRAFT"
     }
   ]
 }

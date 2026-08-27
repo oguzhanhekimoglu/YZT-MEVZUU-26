@@ -45,12 +45,33 @@ async def test_selected_scenarios_return_teknofest_spec_from_persisted_canonical
 
     assert response.status_code == 200
     body = response.json()
-    assert set(body) == {"summary", "events", "risk", "actions"}
+    assert set(body) == {
+        "summary",
+        "events",
+        "risk",
+        "actions",
+        "decision",
+        "inventory_status",
+        "permission_status",
+        "flight_plan_status",
+        "notam_status",
+        "human_review_required",
+        "risk_increasing_factors",
+        "risk_reducing_factors",
+    }
     assert body["summary"]
     assert body["events"] == [{"time": "00:08", "event": expected_event}]
     assert body["risk"] == expected_risk
     assert isinstance(body["actions"], list)
     assert all(isinstance(action, str) and action for action in body["actions"])
+    assert isinstance(body["decision"], str) and body["decision"]
+    assert isinstance(body["inventory_status"], str) and body["inventory_status"]
+    assert isinstance(body["permission_status"], str) and body["permission_status"]
+    assert isinstance(body["flight_plan_status"], str) and body["flight_plan_status"]
+    assert isinstance(body["notam_status"], str) and body["notam_status"]
+    assert isinstance(body["human_review_required"], bool)
+    assert isinstance(body["risk_increasing_factors"], list)
+    assert isinstance(body["risk_reducing_factors"], list)
 
     assert canonical_response.status_code == 200
     event_id = canonical_response.json()["event_id"]

@@ -200,7 +200,7 @@ def test_package8_keeps_allowlist_and_demo_scenario_scope() -> None:
         (ROOT / "data/platforms/platform_allowlist.json").read_text(encoding="utf-8")
     )
     scenarios = json.loads((ROOT / "data/seeds/demo_scenarios.json").read_text(encoding="utf-8"))
-    assert len(allowlist["platforms"]) == 111
+    assert len(allowlist["platforms"]) == 112
     assert [item["scenario_id"] for item in scenarios] == [
         f"SCN-{number:02d}" for number in range(1, 24)
     ]

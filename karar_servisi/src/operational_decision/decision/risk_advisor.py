@@ -227,6 +227,12 @@ def _risk_factors(
         increasing.append("Platform seçilen operasyon bağlamında beklenmiyor.")
     elif facts.platform_status in {PlatformStatus.UNKNOWN, PlatformStatus.AMBIGUOUS}:
         increasing.append("Platform kimliği Registry üzerinde kesin çözümlenemedi.")
+    elif facts.platform_status is PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN:
+        increasing.append(
+            "Platform kimliği Registry üzerinde çözümlendi ancak operasyonel context "
+            "(kamera/bölge/senaryo) bulunamadığından beklenen/beklenmeyen durumu "
+            "doğrulanamadı."
+        )
     elif facts.platform_status is PlatformStatus.EXPECTED:
         reducing.append("Platform seçilen operasyon bağlamında beklenen olarak kayıtlı.")
 

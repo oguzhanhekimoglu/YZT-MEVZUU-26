@@ -88,6 +88,11 @@ class PlatformStatus(StrEnum):
     UNKNOWN = "UNKNOWN"
     AMBIGUOUS = "AMBIGUOUS"
     NON_AIRCRAFT = "NON_AIRCRAFT"
+    # Identity resolved (single exact match) but operational context
+    # (camera/area/scenario) is missing, so EXPECTED/NOT_EXPECTED cannot be
+    # computed. Distinct from UNKNOWN (identity itself unresolved) so
+    # identity-only checks (e.g. Turkey Inventory lookup) are not skipped.
+    IDENTIFIED_CONTEXT_UNKNOWN = "IDENTIFIED_CONTEXT_UNKNOWN"
 
 
 class InventoryStatus(StrEnum):

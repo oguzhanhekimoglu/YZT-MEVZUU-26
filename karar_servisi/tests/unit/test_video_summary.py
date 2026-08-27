@@ -20,10 +20,12 @@ class FakeLLMClient:
         self.error = error
         self.last_messages: list[dict[str, str]] | None = None
         self.last_schema: dict[str, object] | None = None
+        self.last_max_tokens: int | None = None
 
-    async def generate(self, messages, *, response_schema=None) -> str:  # type: ignore[no-untyped-def]
+    async def generate(self, messages, *, response_schema=None, max_tokens=800) -> str:  # type: ignore[no-untyped-def]
         self.last_messages = list(messages)
         self.last_schema = response_schema
+        self.last_max_tokens = max_tokens
         if self.error is not None:
             raise self.error
         assert self.response is not None
@@ -90,6 +92,9 @@ async def test_summarize_video_synthesizes_from_final_outputs() -> None:
     assert "Bayraktar TB2" in prompt_text
     assert "Bilinen bir İHA modeli" in prompt_text
     assert llm.last_schema is not None
+    # BUG-FIX regresyonu: sabit 800 token'lık varsayılan, çok hedefli
+    # sentezde çıktının yarıda kesilmesine (geçersiz JSON) yol açıyordu.
+    assert llm.last_max_tokens is not None and llm.last_max_tokens > 800
 
 
 @pytest.mark.asyncio

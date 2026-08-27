@@ -162,7 +162,13 @@ def resolve_context_expectation(
     context_id: str | None,
     context_status: ContextStatus = ContextStatus.COMPLETE,
 ) -> PlatformStatus:
-    """Resolve expectation only when context is complete and identified."""
+    """Resolve expectation only when context is complete and identified.
+
+    Identity is already resolved by the caller (this is only reached after an
+    exact registry match) — so a missing/incomplete context returns
+    IDENTIFIED_CONTEXT_UNKNOWN, not UNKNOWN. UNKNOWN stays reserved for "we
+    could not identify the platform at all".
+    """
     if context_status is not ContextStatus.COMPLETE or context_id is None:
-        return PlatformStatus.UNKNOWN
+        return PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN
     return platform.context_overrides.get(context_id, platform.default_expectation)

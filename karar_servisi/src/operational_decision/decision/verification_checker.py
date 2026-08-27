@@ -103,9 +103,13 @@ def derive_required_tools(
     if strong_non_aircraft:
         return ()
     required = [PLATFORM_TOOL]
-    platform_resolved = (
-        facts.platform_execution_status is ToolExecutionStatus.SUCCESS
-        and facts.platform_status in {PlatformStatus.EXPECTED, PlatformStatus.NOT_EXPECTED}
+    platform_resolved = facts.platform_execution_status is ToolExecutionStatus.SUCCESS and (
+        facts.platform_status
+        in {
+            PlatformStatus.EXPECTED,
+            PlatformStatus.NOT_EXPECTED,
+            PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN,
+        }
     )
     if not platform_resolved:
         return tuple(required)
@@ -137,11 +141,20 @@ def calculate_tool_health(
     """Calculate health without treating successful NOT_LISTED as a tool failure."""
     if strong_non_aircraft:
         return ToolHealthStatus.HEALTHY
-    if facts.context_status is not ContextStatus.COMPLETE:
-        return ToolHealthStatus.FAILED
-    required = derive_required_tools(facts)
     if facts.platform_execution_status is not ToolExecutionStatus.SUCCESS:
         return ToolHealthStatus.FAILED
+    if facts.context_status is not ContextStatus.COMPLETE:
+        if facts.platform_status is not PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN:
+            return ToolHealthStatus.FAILED
+        # Identity is resolved and Inventory can still run without context;
+        # only Permission/NOTAM are unavailable — degraded, not failed.
+        if (
+            facts.inventory_status is InventoryStatus.UNKNOWN
+            or facts.inventory_execution_status in _FAILED_EXECUTIONS
+        ):
+            return ToolHealthStatus.FAILED
+        return ToolHealthStatus.DEGRADED
+    required = derive_required_tools(facts)
     if (
         facts.inventory_status is InventoryStatus.UNKNOWN
         or facts.inventory_execution_status in _FAILED_EXECUTIONS
@@ -189,6 +202,9 @@ def _reason_codes(facts: VerificationInput) -> list[VerificationReasonCode]:
         PlatformStatus.NOT_EXPECTED: VerificationReasonCode.PLATFORM_NOT_EXPECTED,
         PlatformStatus.UNKNOWN: VerificationReasonCode.PLATFORM_UNKNOWN,
         PlatformStatus.AMBIGUOUS: VerificationReasonCode.PLATFORM_AMBIGUOUS,
+        PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN: (
+            VerificationReasonCode.PLATFORM_IDENTIFIED_CONTEXT_UNKNOWN
+        ),
     }.get(facts.platform_status)
     if platform_reason is not None:
         reasons.append(platform_reason)
@@ -289,7 +305,11 @@ class VerificationChecker:
             ContextStatus.INVALID,
             ContextStatus.INACTIVE,
         }:
-            status = VerificationStatus.INDETERMINATE
+            status = (
+                VerificationStatus.UNVERIFIED
+                if facts.platform_status is PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN
+                else VerificationStatus.INDETERMINATE
+            )
         elif health is ToolHealthStatus.FAILED:
             status = VerificationStatus.INDETERMINATE
         elif facts.platform_status in {PlatformStatus.UNKNOWN, PlatformStatus.AMBIGUOUS}:

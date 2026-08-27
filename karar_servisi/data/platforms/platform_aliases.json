@@ -2235,6 +2235,58 @@
     {
       "alias": "B-21 Raider-like",
       "platform_id": "PLT_B21_RAIDER"
+    },
+    {
+      "alias": "F-5E Tiger",
+      "platform_id": "PLT_F5E_TIGER_II"
+    },
+    {
+      "alias": "F-A-18 Super Hornet",
+      "platform_id": "PLT_FA18EF_SUPER_HORNET"
+    },
+    {
+      "alias": "Airbus A330-243MRTT",
+      "platform_id": "PLT_A330_243_MRTT"
+    },
+    {
+      "alias": "C-17 Globemaster",
+      "platform_id": "PLT_C17_GLOBEMASTER_III"
+    },
+    {
+      "alias": "V-22 Osprey",
+      "platform_id": "PLT_V22_OSPREY"
+    },
+    {
+      "alias": "S-70 Black Hawk - Sikorsky",
+      "platform_id": "PLT_SIKORSKY_S70"
+    },
+    {
+      "alias": "TUSAŞ ANKA-II AKSUNGUR",
+      "platform_id": "PLT_TUSAS_AKSUNGUR"
+    },
+    {
+      "alias": "ANKA-II AKSUNGUR",
+      "platform_id": "PLT_TUSAS_AKSUNGUR"
+    },
+    {
+      "alias": "ANKA-2 AKSUNGUR",
+      "platform_id": "PLT_TUSAS_AKSUNGUR"
+    },
+    {
+      "alias": "Boeing 737",
+      "platform_id": "PLT_BOEING_737_GENERIC"
+    },
+    {
+      "alias": "B737",
+      "platform_id": "PLT_BOEING_737_GENERIC"
+    },
+    {
+      "alias": "Boeing-737",
+      "platform_id": "PLT_BOEING_737_GENERIC"
+    },
+    {
+      "alias": "Boeing 737-like",
+      "platform_id": "PLT_BOEING_737_GENERIC"
     }
   ]
 }

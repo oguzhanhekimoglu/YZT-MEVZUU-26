@@ -156,6 +156,13 @@ def test_all_active_platforms_have_expected_taxonomy_migration() -> None:
             "MODEL_FAMILY",
             "METADATA_ONLY",
         ),
+        "PLT_BOEING_737_GENERIC": (
+            "CIVIL",
+            "PASSENGER_TRANSPORT",
+            "NARROWBODY_AIRLINER",
+            "MODEL_FAMILY",
+            "METADATA_ONLY",
+        ),
         "PLT_BAYRAKTAR_TB2": (
             "MILITARY",
             "ISR_STRIKE",

@@ -47,7 +47,7 @@ def test_final_allowlist_schema_count_and_uniqueness() -> None:
     payload = _load(ALLOWLIST_PATH)
     assert set(payload) == {"schema_version", "description", "platforms"}
     assert payload["schema_version"] == "platform-allowlist/1.0"
-    assert len(payload["platforms"]) == 111
+    assert len(payload["platforms"]) == 112
     for item in payload["platforms"]:
         assert set(item) == {"platform_id", "canonical_name", "group"}
         assert all(isinstance(value, str) and value.strip() for value in item.values())

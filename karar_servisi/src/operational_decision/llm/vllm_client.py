@@ -52,6 +52,7 @@ class VLLMClient(BaseLLMClient):
         messages: Sequence[dict[str, str]],
         *,
         response_schema: dict[str, object] | None = None,
+        max_tokens: int = 800,
     ) -> str:
         """Perform exactly one chat request; callers own parse-only repair."""
         payload: dict[str, object] = {
@@ -59,7 +60,7 @@ class VLLMClient(BaseLLMClient):
             "messages": list(messages),
             "temperature": 0.0,
             "top_p": 1.0,
-            "max_tokens": 800,
+            "max_tokens": max_tokens,
             "seed": 42,
             # BUG-FIX: ana pipeline'in spike testinde dogrulandi - "llm-fast"
             # reasoning'i chat_template_kwargs.enable_thinking=False ile
@@ -87,7 +88,13 @@ class VLLMClient(BaseLLMClient):
             if not isinstance(message, dict) or not isinstance(message.get("content"), str):
                 raise LocalLLMError("vLLM response is missing message.content")
             return cast(str, message["content"])
-        except (httpx.TimeoutException, httpx.NetworkError, httpx.HTTPStatusError) as exc:
+        except httpx.HTTPStatusError as exc:
+            body_snippet = exc.response.text[:300]
+            raise LocalLLMError(
+                f"vLLM request failed: HTTPStatusError status={exc.response.status_code} "
+                f"body={body_snippet!r}"
+            ) from exc
+        except (httpx.TimeoutException, httpx.NetworkError) as exc:
             raise LocalLLMError(f"vLLM request failed: {type(exc).__name__}") from exc
         except ValueError as exc:
             raise LocalLLMError("vLLM response body is not valid JSON") from exc

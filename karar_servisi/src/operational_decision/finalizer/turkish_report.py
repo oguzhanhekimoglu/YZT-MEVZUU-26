@@ -177,11 +177,17 @@ def _platform_sentence(output: Mapping[str, Any]) -> str:
         return "Platform kontrolü çalıştırılmamıştır."
     if status in {"UNKNOWN", "AMBIGUOUS", None} or not matched:
         return "Platform Registry üzerinde platform kesin olarak çözümlenememiştir."
-    expectation = (
-        "operasyon bağlamında beklenen"
-        if status == "EXPECTED"
-        else "operasyon bağlamında beklenmeyen"
-    )
+    if status == "IDENTIFIED_CONTEXT_UNKNOWN":
+        expectation = (
+            "operasyonel context (kamera/bölge/senaryo) bulunamadığı için "
+            "beklenen/beklenmeyen durumu doğrulanamayan"
+        )
+    else:
+        expectation = (
+            "operasyon bağlamında beklenen"
+            if status == "EXPECTED"
+            else "operasyon bağlamında beklenmeyen"
+        )
     if (
         output.get("platform_identity_scope") == "MODEL_FAMILY"
         and output.get("platform_variant_policy") == "EXPLICIT_CHILD_RECORDS"

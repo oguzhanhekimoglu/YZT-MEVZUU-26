@@ -4,7 +4,16 @@ from math import isfinite
 
 from pydantic import Field
 
-from operational_decision.contracts.common import RiskLevel, StrictContract, VisualClass
+from operational_decision.contracts.common import (
+    DecisionCode,
+    FlightPlanStatus,
+    InventoryStatus,
+    NotamStatus,
+    PermissionStatus,
+    RiskLevel,
+    StrictContract,
+    VisualClass,
+)
 from operational_decision.contracts.final_output import FinalDecisionOutput
 from operational_decision.contracts.risk import ActionCatalog
 
@@ -23,6 +32,17 @@ class TeknofestSpecOutput(StrictContract):
     events: list[TeknofestEvent] = Field(default_factory=list)
     risk: str = Field(min_length=1, max_length=20)
     actions: list[str] = Field(default_factory=list)
+    # Additive step-detail fields for the analysis-process UI (analysis
+    # progress panel) — the compact summary/risk/actions triplet above stays
+    # unchanged for existing consumers (e.g. the final decision card).
+    decision: str = Field(min_length=1, max_length=100)
+    inventory_status: str = Field(min_length=1, max_length=60)
+    permission_status: str = Field(min_length=1, max_length=60)
+    flight_plan_status: str = Field(min_length=1, max_length=60)
+    notam_status: str = Field(min_length=1, max_length=60)
+    human_review_required: bool
+    risk_increasing_factors: list[str] = Field(default_factory=list)
+    risk_reducing_factors: list[str] = Field(default_factory=list)
 
 
 _VISUAL_CLASS_LABELS = {
@@ -36,6 +56,63 @@ _RISK_LABELS = {
     RiskLevel.HIGH: "Yüksek",
     RiskLevel.CRITICAL: "Kritik",
     RiskLevel.UNKNOWN: "Bilinmiyor",
+}
+
+_DECISION_LABELS = {
+    DecisionCode.AUTHORIZED_OPERATIONAL_MATCH: "Operasyonel kayıtlarla uyumlu yetkili operasyon",
+    DecisionCode.PARTIALLY_VERIFIED_OPERATION: "Operasyon kısmen doğrulandı",
+    DecisionCode.UNVERIFIED_AIRCRAFT: "Hava aracı operasyonel olarak doğrulanamadı",
+    DecisionCode.OPERATIONAL_AUTHORIZATION_UNVERIFIED: "Operasyonel yetkilendirme doğrulanamadı",
+    DecisionCode.UNREGISTERED_MILITARY_AIRCRAFT: (
+        "Türkiye Envanterinde kayıtlı olmayan askerî hava aracı"
+    ),
+    DecisionCode.UNEXPECTED_PLATFORM: "Operasyon bağlamında beklenmeyen platform",
+    DecisionCode.EXPIRED_OR_INVALID_PERMISSION: "Uçuş izni geçersiz veya süresi dolmuş",
+    DecisionCode.ACTIVE_NOTAM_PROHIBITION: "Aktif NOTAM operasyonu yasaklıyor",
+    DecisionCode.CONFLICTING_OPERATIONAL_RECORDS: "Operasyonel kayıtlar birbiriyle çelişiyor",
+    DecisionCode.PLATFORM_UNRESOLVED: "Platform çözümlenemedi",
+    DecisionCode.NON_AIRCRAFT: "Hava aracı olmayan hedef",
+    DecisionCode.INDETERMINATE: "Sonuç insan incelemesi olmadan belirlenemedi",
+    DecisionCode.REJECTED_OUT_OF_SCOPE: "Türkiye Envanteri kapsamı dışında",
+}
+
+_INVENTORY_LABELS = {
+    InventoryStatus.CONFIRMED: "Envanterde kayıtlı",
+    InventoryStatus.NOT_LISTED: "Envanterde kayıtlı değil",
+    InventoryStatus.UNKNOWN: "Envanter sonucu belirlenemedi",
+    InventoryStatus.NOT_APPLICABLE: "Envanter kontrolü uygulanmadı",
+}
+
+_PERMISSION_LABELS = {
+    PermissionStatus.VALID: "Geçerli izin bulundu",
+    PermissionStatus.NOT_FOUND: "İzin kaydı bulunamadı",
+    PermissionStatus.EXPIRED: "İzin süresi dolmuş",
+    PermissionStatus.NOT_YET_VALID: "İzin henüz geçerli değil",
+    PermissionStatus.REVOKED: "İzin iptal edilmiş",
+    PermissionStatus.AMBIGUOUS: "İzin kaydı belirsiz",
+    PermissionStatus.CONFLICTING: "İzin kayıtları çelişkili",
+    PermissionStatus.NOT_APPLICABLE: "İzin kontrolü uygulanmadı",
+}
+
+_FLIGHT_PLAN_LABELS = {
+    FlightPlanStatus.FILED: "Uçuş planı dosyalandı",
+    FlightPlanStatus.NOT_FOUND: "Uçuş planı bulunamadı",
+    FlightPlanStatus.EXPIRED: "Uçuş planı süresi dolmuş",
+    FlightPlanStatus.NOT_YET_ACTIVE: "Uçuş planı henüz aktif değil",
+    FlightPlanStatus.CANCELLED: "Uçuş planı iptal edilmiş",
+    FlightPlanStatus.AMBIGUOUS: "Uçuş planı belirsiz",
+    FlightPlanStatus.CONFLICTING: "Uçuş planları çelişkili",
+    FlightPlanStatus.NOT_APPLICABLE: "Uçuş planı kontrolü uygulanmadı",
+}
+
+_NOTAM_LABELS = {
+    NotamStatus.ACTIVE_RELEVANT: "İlgili aktif NOTAM var",
+    NotamStatus.ACTIVE_NOT_RELEVANT: "Aktif NOTAM var, operasyonla ilgisiz",
+    NotamStatus.NONE_ACTIVE: "Aktif NOTAM yok",
+    NotamStatus.EXPIRED_ONLY: "Yalnızca süresi dolmuş NOTAM var",
+    NotamStatus.NOT_YET_ACTIVE: "NOTAM henüz aktif değil",
+    NotamStatus.AMBIGUOUS: "NOTAM durumu belirsiz",
+    NotamStatus.CONFLICTING: "NOTAM kayıtları çelişkili",
 }
 
 
@@ -99,4 +176,28 @@ class TeknofestSpecFormatter:
             events=events,
             risk=_RISK_LABELS[canonical.risk_level],
             actions=actions,
+            decision=_DECISION_LABELS[canonical.decision],
+            inventory_status=(
+                _INVENTORY_LABELS[canonical.inventory_status]
+                if canonical.inventory_status is not None
+                else "Envanter kontrolü çalıştırılmadı"
+            ),
+            permission_status=(
+                _PERMISSION_LABELS[canonical.permission_status]
+                if canonical.permission_status is not None
+                else "Uçuş izni kontrolü çalıştırılmadı"
+            ),
+            flight_plan_status=(
+                _FLIGHT_PLAN_LABELS[canonical.flight_plan_status]
+                if canonical.flight_plan_status is not None
+                else "Uçuş planı kontrolü çalıştırılmadı"
+            ),
+            notam_status=(
+                _NOTAM_LABELS[canonical.notam_status]
+                if canonical.notam_status is not None
+                else "NOTAM kontrolü çalıştırılmadı"
+            ),
+            human_review_required=canonical.human_approval_required,
+            risk_increasing_factors=canonical.risk_increasing_factors,
+            risk_reducing_factors=canonical.risk_reducing_factors,
         )

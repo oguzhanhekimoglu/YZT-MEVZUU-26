@@ -318,13 +318,23 @@ async def test_military_listed_turkey_origin_still_allows_low_for_bayraktar_tb2(
 
 
 @pytest.mark.asyncio
-async def test_incomplete_context_skips_inventory_and_downstream(tmp_path: Path) -> None:
-    """Incomplete context prevents Inventory confirmation and downstream checks."""
+async def test_incomplete_context_skips_permission_and_notam_but_runs_inventory(
+    tmp_path: Path,
+) -> None:
+    """Incomplete context prevents Permission/NOTAM checks but not Inventory.
+
+    SCN-10's platform (F-16) is resolved by identity alone (candidate match),
+    independent of context — only the EXPECTED/NOT_EXPECTED expectation needs
+    a complete context. Inventory only needs a resolved platform_id, so it
+    still runs and returns a real result (IDENTIFIED_CONTEXT_UNKNOWN is
+    deliberately distinct from UNKNOWN so identity-only checks are not
+    forced to skip; see PlatformStatus.IDENTIFIED_CONTEXT_UNKNOWN).
+    """
     harness = await build_harness(ROOT, tmp_path)
     outcome = await harness.orchestrator.analyze(scenario_payload(ROOT, 10))
     rows = tool_rows(await harness.event_service.get_event_trace(outcome.event_id))
-    assert rows["turkey_inventory_tool"]["execution_status"] == "SKIPPED"
-    assert rows["turkey_inventory_tool"]["domain_status"] == "UNKNOWN"
+    assert rows["turkey_inventory_tool"]["execution_status"] == "SUCCESS"
+    assert rows["turkey_inventory_tool"]["domain_status"] == "CONFIRMED"
     assert rows["permission_flight_plan_tool"]["execution_status"] == "SKIPPED"
     assert rows["notam_tool"]["execution_status"] == "SKIPPED"
     assert rows["permission_flight_plan_tool"]["response"]["warnings"] == ["CONTEXT_INCOMPLETE"]
