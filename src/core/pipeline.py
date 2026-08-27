@@ -400,16 +400,17 @@ class TeknoFestPipeline:
             # Aynı kalite kapısını (vlm_ready) kullanır ama image tetiklemesinden
             # TAMAMEN bağımsız çalışır — image sonucu bekletmez/etkilemez, ve
             # image evidence'ı ASLA ezmez (ayrı bir sonuç alanına yazılır,
-            # bkz. _async_video_vlm_task). TEKRARLI: track başına 1 kez değil,
-            # tampon her dolup gönderildiğinde yeniden dolup tekrar tetiklenir
-            # (~VIDEO_CLIP_DURATION_S aralıklarla — bir önceki çağrı hâlâ
-            # sürüyorsa is_video_vlm_querying bu turu atlar, yığılma olmaz).
+            # bkz. _async_video_vlm_task). TEKRARLI ama YAVAŞLATILMIŞ: track
+            # başına en az VIDEO_REPEAT_COOLDOWN_S (varsayılan 8sn) aralıkla —
+            # image-VLM'in EVREN kapasitesini video isteklerine kaptırıp
+            # ciddi gecikmesi (~6sn->~40sn, canlı testte gözlemlendi) önlendi.
             video_buf = self._video_buffers.get(track.track_id)
             if (
                 video_buf is not None and video_buf.ready
                 and vlm_ready and not getattr(track, "is_video_vlm_querying", False)
             ):
                 track.is_video_vlm_querying = True
+                video_buf.last_sent_time = time.monotonic()
                 frames_to_send = list(video_buf.frames)
                 video_buf.frames.clear()  # gönderildi, tampon yeniden dolmaya başlar
                 log.info(

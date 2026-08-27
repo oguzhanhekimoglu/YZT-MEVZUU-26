@@ -17,6 +17,7 @@ import logging
 import re
 import tempfile
 import threading
+import time
 from pathlib import Path
 
 import cv2
@@ -28,9 +29,15 @@ from src.config import VLM_API_URL, VLM_API_KEY, VLM_TIMEOUT_S
 log = logging.getLogger(__name__)
 
 VIDEO_CLIP_FPS = 10.0          # kaydedilen klip fps'i (kaynak fps'ten düşük - boyut/hız için)
-VIDEO_CLIP_DURATION_S = 0.5    # klip süresi — aynı zamanda tekrar tetikleme aralığı (bkz. TrackVideoBuffer)
+VIDEO_CLIP_DURATION_S = 0.5    # klip süresi (encode edilen görüntü uzunluğu)
+# BUG-FIX (image VLM'i ciddi yavaşlatıyordu, ~6sn -> ~40sn): "0.5 saniyede
+# bir" sadece klip UZUNLUĞUnu belirtmeliydi, tekrar ARALIĞINI değil - tampon
+# dolar dolmaz hemen gönderiliyordu, birden fazla track için sürekli EVREN'e
+# istek gidince image-VLM (aynı EVREN altyapısını paylaşan) kuyrukta kalıp
+# ciddi gecikti. Artık track başına gerçek bir minimum bekleme (cooldown) var.
+VIDEO_REPEAT_COOLDOWN_S = 8.0  # track başına iki video-VLM çağrısı arası min süre
 VIDEO_CLIP_CANVAS = 480        # letterbox hedef kare boyutu (kare, sabit)
-VIDEO_MAX_CONCURRENT = 2       # eş zamanlı video-VLM çağrısı limiti (image VLM'den AYRI)
+VIDEO_MAX_CONCURRENT = 1       # eş zamanlı video-VLM çağrısı limiti (image VLM'den AYRI) - image hattına öncelik
 
 # Image path (ThreadPoolExecutor max_workers=4) ile aynı kaynağı paylaşmasın
 # diye ayrı bir sayaç — video çağrıları çok daha ağır (encode + büyük upload).
@@ -65,6 +72,7 @@ class TrackVideoBuffer:
         self.max_frames = max(1, int(round(VIDEO_CLIP_DURATION_S * VIDEO_CLIP_FPS)))
         self._tick = 0
         self.frames: list[np.ndarray] = []
+        self.last_sent_time: float = 0.0
 
     def add(self, crop_bgr: np.ndarray) -> None:
         self._tick += 1
@@ -76,7 +84,8 @@ class TrackVideoBuffer:
 
     @property
     def ready(self) -> bool:
-        return len(self.frames) >= self.max_frames
+        cooldown_ok = (time.monotonic() - self.last_sent_time) >= VIDEO_REPEAT_COOLDOWN_S
+        return len(self.frames) >= self.max_frames and cooldown_ok
 
 
 def _letterbox(frame: np.ndarray, target: int) -> np.ndarray:
