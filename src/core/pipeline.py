@@ -18,6 +18,7 @@ from src.detection.slicer import SmartSlicer
 from src.tracking.tracker import MultiTargetTracker, Track
 from src.utils.enhancer import ImageEnhancer
 from src.vlm.engine import VLMEngine
+from src.vlm.video_evidence import TrackVideoBuffer, analyze_track_video
 from src.core.visualizer import PipelineVisualizer
 from src.config import (
     MODEL_PATH, OUTPUT_DIR, SHOW_WINDOW, SAVE_VIDEO, MIN_CROP_SIZE,
@@ -72,6 +73,7 @@ class TrackedTarget:
     vrag_matches: list[dict] = field(default_factory=list)
     vlm_result: Optional[dict] = None
     llm_result: Optional[dict] = None
+    video_vlm_result: Optional[dict] = None
 
 
 class TeknoFestPipeline:
@@ -111,6 +113,12 @@ class TeknoFestPipeline:
         # Artık VRAG ve VLM ayrı kilitlere sahip.
         self._vrag_gate = threading.Lock()
         self._vlm_gate = threading.Lock()
+
+        # Video-kanıtı (MVP TrackEvidenceBuilder-lite, bkz. src/vlm/video_evidence.py):
+        # Track nesnesine gömülmez, track_id -> TrackVideoBuffer ile ayrı tutulur.
+        # Image (crop) yolunun yanında, ondan bağımsız ikinci bir kanıt kaynağı —
+        # biri diğerinin yerini almaz, ikisi de kalıcı olarak birlikte çalışır.
+        self._video_buffers: dict[int, TrackVideoBuffer] = {}
         
         # --- CUDA WARMUP ---
         # PyTorch modelleri (YOLO ve SigLIP) ilk çalıştıklarında CUDA bellek tahsisi ve derleme
@@ -346,6 +354,21 @@ class TeknoFestPipeline:
                         track.vrag_is_running = True
                         self.executor.submit(self._async_vrag_task, track, live_crop)
 
+            # --- [YENİ] Video-kanıtı toplama (MVP) ---
+            # Image (crop) yolundan bağımsız — her karede ayrı bir tampona
+            # eklenir, image tetiklemesini beklemez/etkilemez.
+            if size_ok:
+                x1i, y1i, x2i, y2i = map(int, track.bbox)
+                pad_x, pad_y = int(bw * 0.25), int(bh * 0.25)
+                vx1, vy1 = max(0, x1i - pad_x), max(0, y1i - pad_y)
+                vx2, vy2 = min(frame_bgr.shape[1], x2i + pad_x), min(frame_bgr.shape[0], y2i + pad_y)
+                video_crop = frame_bgr[vy1:vy2, vx1:vx2]
+                buf = self._video_buffers.get(track.track_id)
+                if buf is None:
+                    buf = TrackVideoBuffer(fps=self._source_fps)
+                    self._video_buffers[track.track_id] = buf
+                buf.add(video_crop)
+
             # Prensip 3: Kontrastı ve köşe netliği en yüksek olan EN İYİ kareyi seç.
             # BUG-FIX: Eskiden crop_buffer_ready sadece "en az 1 kare var mı?" diye
             # bakıyordu — bu yüzden hedef daha 8. frame'de, buffer 3-6 kareyken
@@ -372,6 +395,26 @@ class TeknoFestPipeline:
             # (muhtemelen yaprak/dal/gürültü) hedefler artık VLM'e gitmiyor.
             edge_ok = track.edge_touch_frames < EDGE_MAX_FRAMES
             vlm_ready = in_arena and size_ok and crop_buffer_ready and conf_ok and hits_ok and edge_ok
+
+            # --- [YENİ] Video-kanıtı tetikleme (MVP) ---
+            # Aynı kalite kapısını (vlm_ready) kullanır ama image tetiklemesinden
+            # TAMAMEN bağımsız çalışır — image sonucu bekletmez/etkilemez, ve
+            # image evidence'ı ASLA ezmez (ayrı bir sonuç alanına yazılır,
+            # bkz. _async_video_vlm_task). Track başına en fazla bir kez.
+            video_buf = self._video_buffers.get(track.track_id)
+            if (
+                video_buf is not None and video_buf.ready and not video_buf.sent_once
+                and vlm_ready and not getattr(track, "is_video_vlm_querying", False)
+            ):
+                video_buf.sent_once = True
+                track.is_video_vlm_querying = True
+                frames_to_send = list(video_buf.frames)
+                video_buf.frames.clear()  # gönderildi, karo belleğini serbest bırak
+                log.info(
+                    f"[VIDEO-VLM] Track {track.track_id} → {len(frames_to_send)} karelik "
+                    f"video-kanıtı gönderiliyor."
+                )
+                self.executor.submit(self._async_video_vlm_task, track, frames_to_send)
 
             # IQA kalitesi artış kontrolü (Recall): Uçak yan dönüp bayrak/geniş silüet açığa çıktığında skor %25 artmışsa VLM analizi yenilenir
             current_best_iqa = max((c[1] for c in track._crop_buffer), default=0.0) if track._crop_buffer else 0.0
@@ -486,7 +529,8 @@ class TeknoFestPipeline:
                 type_confidence = cls_conf,
                 vrag_matches  = getattr(track, "vrag_matches", []),
                 vlm_result    = getattr(track, "vlm_result", None),
-                llm_result    = getattr(track, "llm_result", None)
+                llm_result    = getattr(track, "llm_result", None),
+                video_vlm_result = getattr(track, "video_vlm_result", None),
             ))
 
         # ======================================================
@@ -591,6 +635,21 @@ class TeknoFestPipeline:
             # DENEYSEL (SIRALI_DONGU_MODU): VRAG turunu bitirdi, sırayı VLM'e devret.
             if SIRALI_DONGU_MODU:
                 track.dongu_asamasi = "vlm"
+
+    def _async_video_vlm_task(self, track, frames):
+        """MVP video-kanıtı çağrısı (bkz. src/vlm/video_evidence.py). Image
+        VLM'den tamamen bağımsız kilit/sonuç alanı kullanır — image
+        sonucunu beklemez, ezmez. RETRY YOK (video_evidence.py'de bilinçli)."""
+        try:
+            result = analyze_track_video(frames, track.track_id)
+            track.video_vlm_result = result
+            if result:
+                log.info(
+                    f"[VIDEO-VLM] Track {track.track_id} → sınıf={result.get('arac_sinifi')} "
+                    f"hareket={result.get('hareket_tanimi')!r} model_ipucu={result.get('model_ipucu')}"
+                )
+        finally:
+            track.is_video_vlm_querying = False
 
     def _async_vlm_task(self, track, crops, speed, zigzag, threat_score, yolo_class="bilinmeyen", yolo_conf=0.5):
         vrag_matches = getattr(track, "vrag_matches", [])
