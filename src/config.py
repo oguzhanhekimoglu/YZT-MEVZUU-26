@@ -380,14 +380,12 @@ VRAG_VOTE_WINDOW     = 5
 # cok yavas dolar, kisa gorunen hedefler tam turu hic tamamlayamayabilir. Kolayca
 # geri alinabilmesi icin tek bir bayrak - False yapmak eski (bagimsiz) davranisa
 # aninda doner.
-SIRALI_DONGU_MODU    = False
-# BUG-FIX (EVREN'e gecince donme sorunu buyudu): Yerelde (Ollama) tam dongu
-# ~3-5sn surdugu icin VRAG'in donuk kalmasi gozle gorulmuyordu. EVREN'de VLM
-# turu tek basina 2-25sn surebiliyor (canli testte olculdu), LLM turu de
-# ~5-10sn - tam dongu 7-35sn'ye cikti. VRAG'in kendi zamansal oylamasi
-# (VRAG_VOTE_WINDOW, yukarida) zaten titremeyi ayrica cozuyor, o yuzden
-# bagimsiz calismaya donmek "titrek ham veri"ye donmek degil - sadece VRAG
-# artik VLM/LLM turunu beklemeden guncel kalabiliyor.
+SIRALI_DONGU_MODU    = True
+# GERI ALINDI: False (bagimsiz VRAG) canli testte kullanici tarafindan
+# denendi ve daha kotu sonuc verdi (rapor edildi, kok sebep ayrica
+# incelenmedi). True'ya geri donuldu. Yukaridaki "donma" analizi hala
+# gecerli bir bilgi olarak duruyor, ama pratikte bagimsiz mod baska bir
+# sorunu (muhtemelen kaynak cekismesi/tutarsizlik) ortaya cikardi.
 
 # --- DENEYSEL: VRAG skoru esik-ustuyse VLM'e direkt guven ---
 # UYARI: Bu oturumda VRAG'in >= %90 skorla dahi confidently YANLIS oldugu
