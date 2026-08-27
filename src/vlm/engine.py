@@ -418,17 +418,42 @@ class VLMEngine:
 
             arac_sinifi_raw = str(result.get("arac_sinifi", "bilinmeyen")).strip().lower()
             # Eşanlamlı eşleştirmeler
-            if "uçak" in arac_sinifi_raw or "ucak" in arac_sinifi_raw or "jet" in arac_sinifi_raw or "sabit" in arac_sinifi_raw:
+            # BUG-FIX: "uçak" kelimesi Türkçe'de çekim eklerinde k->ğ dönüşümüne
+            # uğruyor ("uçağı", "uçağın", "uçaklar") - eski kod tam "uçak"/"ucak"
+            # substring'ini arıyordu, bu yüzden model "savaş uçağı" gibi çekimli
+            # bir form yazınca (canlı testte defalarca gözlemlendi) hiç eşleşmeyip
+            # "bilinmeyen"a düşüyordu. Artık ortak kök "uça"/"uca" aranıyor.
+            if ("uça" in arac_sinifi_raw or "uca" in arac_sinifi_raw or "jet" in arac_sinifi_raw
+                    or "sabit" in arac_sinifi_raw or "kanat" in arac_sinifi_raw):
                 arac_sinifi_raw = "sabit_kanat"
-            elif "helikopter" in arac_sinifi_raw or "drone" in arac_sinifi_raw or "doner" in arac_sinifi_raw or "döner" in arac_sinifi_raw:
+            elif ("helikopter" in arac_sinifi_raw or "drone" in arac_sinifi_raw
+                    or "doner" in arac_sinifi_raw or "döner" in arac_sinifi_raw
+                    or "rotor" in arac_sinifi_raw or "pervane" in arac_sinifi_raw):
                 arac_sinifi_raw = "doner_kanat"
-                
+            elif "kuş" in arac_sinifi_raw or "kus" in arac_sinifi_raw or "bird" in arac_sinifi_raw:
+                arac_sinifi_raw = "kus"
+
+            if arac_sinifi_raw not in valid_sınıf:
+                log.warning(f"[VLM] arac_sinifi eslesmedi, 'bilinmeyen'e dusuyor - ham deger: {arac_sinifi_raw!r}")
             result["arac_sinifi"] = arac_sinifi_raw
             result["tehdit_seviyesi"] = str(result.get("tehdit_seviyesi", "dusuk")).strip().lower()
-            
+
             tip_raw = str(result.get("tahmini_hedef_tipi", "tanimsiz")).strip().lower()
-            if "savaş" in tip_raw or "savas" in tip_raw or "avcı" in tip_raw:
+            if "savaş" in tip_raw or "savas" in tip_raw or "avcı" in tip_raw or "avci" in tip_raw or "askeri" in tip_raw or "saldırı" in tip_raw or "saldiri" in tip_raw or "bombardıman" in tip_raw or "bombardiman" in tip_raw:
                 tip_raw = "askeri_ucak"
+            elif "keşif" in tip_raw or "kesif" in tip_raw or "istihbarat" in tip_raw or "gözetleme" in tip_raw or "gozetleme" in tip_raw:
+                tip_raw = "gozetleme"
+            elif "yolcu" in tip_raw or "sivil" in tip_raw or "ticari uçak" in tip_raw or "ticari ucak" in tip_raw:
+                tip_raw = "yolcu_ucagi"
+            elif "kamikaze" in tip_raw or "intihar" in tip_raw:
+                tip_raw = "kamikaze"
+            elif "siha" in tip_raw:
+                tip_raw = "siha"
+            elif "iha" in tip_raw:
+                tip_raw = "iha"
+
+            if tip_raw not in valid_tip:
+                log.warning(f"[VLM] tahmini_hedef_tipi eslesmedi, 'tanimsiz'e dusuyor - ham deger: {tip_raw!r}")
             result["tahmini_hedef_tipi"] = tip_raw
 
             if result["arac_sinifi"] not in valid_sınıf:
