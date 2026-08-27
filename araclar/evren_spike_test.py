@@ -25,6 +25,9 @@ import cv2
 import numpy as np
 import requests
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from src.vlm.prompts import generate_vlm_prompt  # noqa: E402
+
 API_URL = os.environ.get("VLM_API_URL") or "https://evren-llmapi.ssyz.org.tr/v1/chat/completions"
 API_KEY = os.environ.get("VLM_API_KEY") or ""
 DEFAULT_VIDEO = Path(__file__).resolve().parent.parent / "data" / "videos" / "00.mp4"
@@ -157,6 +160,58 @@ def test_thinking_kapatma() -> None:
     })
 
 
+def test_thinking_kapatma_gercek_prompt(video_path: Path) -> None:
+    """Test 2, basit bir soruyla yapilmisti - reasoning hic tetiklenmedigi
+    icin flag'in gercek etkisi hic gorulemedi. Burada image-VLM'in gercekte
+    kullandigi UZUN, karmasik prompt + gercek bir goruntuyle deniyoruz -
+    canli testte tam bu tur promptlarda reasoning 4096 token'i tuketip
+    content:None dondurmustu (iki kez gozlemlendi)."""
+    print("\n=== TEST 4: Gercek image-VLM prompt'uyla 'llm-fast' thinking kapatma ===")
+    if not video_path.is_file():
+        print(f"  -> Video bulunamadi: {video_path}")
+        return
+    cap = cv2.VideoCapture(str(video_path))
+    ok, frame = cap.read()
+    cap.release()
+    if not ok:
+        print("  -> Videodan kare okunamadi.")
+        return
+    ok, buf = cv2.imencode(".jpg", frame)
+    img_b64 = base64.b64encode(buf.tobytes()).decode("ascii")
+
+    prompt = generate_vlm_prompt(
+        speed=49.5, zigzag=0.08, threat=0.6,
+        yolo_class="hava_araci (ucak, iha veya helikopter)", yolo_conf=0.78,
+        n_crops=1,
+        vrag_context="1. Vestel KARAYEL (Sinif: 1. Turkiye oncelikli IHA, Ulke: Bilinmiyor, Benzerlik: 88%)\n"
+                     "2. F-35a lightning ii (Sinif: 3. Yabanci savas ucaklari, Ulke: Bilinmiyor, Benzerlik: 86%)",
+    )
+
+    def _payload(extra: dict) -> dict:
+        base = {
+            "model": "llm-fast",
+            "messages": [{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"}},
+                ],
+            }],
+            "temperature": 0.0,
+            "top_p": 1.0,
+            "max_tokens": 4096,
+            "response_format": {"type": "json_object"},
+        }
+        base.update(extra)
+        return base
+
+    print("-- 4a) kontrol (flag YOK, canli testteki gercek davranis) --")
+    _post(_payload({}))
+
+    print("-- 4b) chat_template_kwargs ile dusunme kapatilmaya calisiliyor --")
+    _post(_payload({"chat_template_kwargs": {"enable_thinking": False}}))
+
+
 if __name__ == "__main__":
     if not API_KEY:
         print("HATA: VLM_API_KEY ortam degiskeni bos. Once export et.")
@@ -165,3 +220,4 @@ if __name__ == "__main__":
     test_video_kabulu(video_arg)
     test_canli_encode_kabulu(video_arg)
     test_thinking_kapatma()
+    test_thinking_kapatma_gercek_prompt(video_arg)
