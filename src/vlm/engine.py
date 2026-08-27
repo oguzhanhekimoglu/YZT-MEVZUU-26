@@ -344,7 +344,8 @@ class VLMEngine:
                 }
             ],
             "temperature": 0.0,
-            "top_p": 0.9,
+            "top_p": 1.0,
+            "seed": 42,
             "max_tokens": VLM_NUM_PREDICT,
             "response_format": {"type": "json_object"},
         }

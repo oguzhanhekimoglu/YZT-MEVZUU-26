@@ -256,7 +256,6 @@ COLLAGE_BORDER_PX  = 3        # HÃ¼creler arasÄ± ince gri Ã§izgi (px)
 COLLAGE_BG_COLOR   = (30, 30, 30)  # Siyah deÄŸil koyu gri zemin â€” VLM gece sanmasÄ±n
 
 # ======================== VLM ================================
-# dÃ¼ÅŸÃ¼nmeye token hÄ±rcar, JSON Ã§Ä±kmaz.
 # TEKNOFEST TYDA icin SSB'nin sagladigi EVREN cikarim servisi (OpenAI uyumlu,
 # https://evren-teknofest.ssyz.org.tr) - tek yol, yerel Ollama/vLLM kaldirildi.
 # Uc ayar da ortam degiskeniyle ezilebilir.

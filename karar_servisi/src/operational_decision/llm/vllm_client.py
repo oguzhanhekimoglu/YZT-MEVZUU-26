@@ -57,8 +57,8 @@ class VLLMClient(BaseLLMClient):
         payload: dict[str, object] = {
             "model": self.model,
             "messages": list(messages),
-            "temperature": 0.1,
-            "top_p": 0.8,
+            "temperature": 0.0,
+            "top_p": 1.0,
             "max_tokens": 800,
             "seed": 42,
             # OpenAI standart yapılandırılmış çıktı sözleşmesi — şema dışı çıktı engellenir.
