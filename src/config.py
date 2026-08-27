@@ -283,7 +283,14 @@ VLM_NUM_PREDICT            = 4096
 # tamamen durdurabilir (karar_servisi'nin async VLLMClient'inda bu risk yok,
 # o yuzden o 1800s'te birakildi). Bilinçli orta yol: 10 dakika.
 VLM_TIMEOUT_S              = 600.0
-VLM_MIN_RECALL_INTERVAL_S  = 0.7    # [GÃœNCELLENDÄ°] 3.0->0.7: UÃ§ak aniden yakÄ±nlaÅŸÄ±p inanÄ±lmaz net bir kare (Ã¶rnekteki F-4 kuyruÄŸu gibi) verirse 3 saniye bekleme, hemen 0.7 sn iÃ§inde VLM'i tetikle!
+
+# BUG-FIX (image-VLM kuyruk gecikmesine katkısı): 0.7sn iken bir track, önceki
+# çağrısı EVREN'den (birkaç saniye sonra) hâlâ dönmeden kendini tekrar
+# kuyruğa sokabiliyordu - Semaphore(2) ile bile bu gereksiz kuyruk baskısı
+# yaratıyordu. 2.0sn'ye çıkarıldı; "süper kare" yakalama tepkisi hâlâ hızlı
+# (2sn), ama artık EVREN'in tipik yanıt süresinden (birkaç sn) daha kısa
+# aralıklarla kendi kendini kuyruğa sokmuyor.
+VLM_MIN_RECALL_INTERVAL_S  = 2.0
 # BUG-FIX: VLM_MIN_RECALL_INTERVAL_S eskiden vlm_engine.py iÃ§inde AYNI ZAMANDA
 # genel spam-koruma cooldown'u olarak da kullanÄ±lÄ±yordu. YukarÄ±daki deÄŸer
 # 3.0'dan 0.7'ye dÃ¼ÅŸÃ¼rÃ¼lÃ¼nce (pipeline.py'deki "sÃ¼per kare" hÄ±zlÄ± yeniden-

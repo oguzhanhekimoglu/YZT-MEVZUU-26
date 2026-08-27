@@ -112,7 +112,15 @@ class TeknoFestPipeline:
         # dakikalarca askıda kaldı, kuyruktaki sonraki hedefler hiç başlayamadı).
         # Artık VRAG ve VLM ayrı kilitlere sahip.
         self._vrag_gate = threading.Lock()
-        self._vlm_gate = threading.Lock()
+        # BUG-FIX (image-VLM'de 40sn'ye varan kuyruk gecikmesi): tam bir Lock()
+        # aynı anda SADECE 1 image-VLM çağrısına izin veriyordu - birden fazla
+        # track (+ VLM_MIN_RECALL_INTERVAL_S'in agresif tekrar tetiklemesi)
+        # aynı anda kuyruğa girince, kuyruğun sonundaki iş "istek sayısı ×
+        # ortalama çağrı süresi" kadar bekliyordu (canlı testte 5 istek ×
+        # ~8sn ≈ 40sn olarak gözlemlendi). Semaphore(2) ile en az 2 istek
+        # paralel gidebiliyor - EVREN'in key başına eş zamanlı istek limitini
+        # bilmiyoruz, 2 ihtiyatlı bir başlangıç (429 gözlenirse 1'e dönülür).
+        self._vlm_gate = threading.Semaphore(2)
 
         # Video-kanıtı (MVP TrackEvidenceBuilder-lite, bkz. src/vlm/video_evidence.py):
         # Track nesnesine gömülmez, track_id -> TrackVideoBuffer ile ayrı tutulur.
