@@ -12,10 +12,17 @@ export function VideoWorkspace({ session, dataSource, onPlaybackTimeChange, onVi
   const [source, setSource] = useState<VideoSource>({ type: "placeholder" });
   const [metadata, setMetadata] = useState<VideoMetadataState>();
   const [error, setError] = useState("");
+  // BUG-FIX (yeni özellik — sürükle-bırak video yükleme): videoUpload artık
+  // gerçek backend'de de true - bu yüzden dosya sadece yerel önizleme için
+  // değil, GERÇEKTEN sunucuya yüklenip dönen serverPath saklanıyor. Video
+  // süresi öğrenilince (readMetadata) selectVideo TEKRAR çağrılıyor - bu
+  // yolu da tekrar göndermezsek ExistingBackendAdapter'daki pendingServerPath
+  // sessizce sıfırlanıp "Başlat" hata verirdi.
+  const [serverPath, setServerPath] = useState<string>();
 
   useEffect(() => () => { if (source.type === "local-preview") URL.revokeObjectURL(source.url); }, [source]);
 
-  function selectFile(file: File) {
+  async function selectFile(file: File) {
     if (!isAcceptedVideo(file)) {
       setError("Geçersiz dosya türü. Lütfen MP4, MOV, AVI veya MKV formatında bir video seçin.");
       return;
@@ -31,13 +38,23 @@ export function VideoWorkspace({ session, dataSource, onPlaybackTimeChange, onVi
     };
     setSource({ type: "local-preview", url, name: file.name });
     setMetadata(nextMetadata);
-    void dataSource.selectVideo({ name: file.name });
+    setServerPath(undefined);
+    if (dataSource.capabilities.videoUpload) {
+      try {
+        const uploaded = await dataSource.uploadVideo(file);
+        setServerPath(uploaded.serverPath);
+      } catch (uploadError) {
+        setError(`Video yüklenemedi: ${uploadError instanceof Error ? uploadError.message : "bilinmeyen hata"}`);
+      }
+    } else {
+      void dataSource.selectVideo({ name: file.name });
+    }
   }
 
   function readMetadata(event: React.SyntheticEvent<HTMLVideoElement>) {
     const video = event.currentTarget;
     setMetadata((current) => current ? { ...current, durationSeconds: video.duration, width: video.videoWidth, height: video.videoHeight } : current);
-    if (metadata) void dataSource.selectVideo({ name: metadata.name, durationSeconds: video.duration });
+    if (metadata) void dataSource.selectVideo({ name: metadata.name, durationSeconds: video.duration, serverPath });
   }
 
   // Oturum durdurulduktan/bitikten sonra streamUrl backend'de eski değerini korur

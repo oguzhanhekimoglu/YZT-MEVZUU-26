@@ -52,6 +52,9 @@ yuklemeler/
 data/videos/*.mp4
 data/videos/*.avi
 data/videos/*.mkv
+# Sürükle-bırak/dosya seçimiyle arayüzden yüklenen videolar (bkz.
+# backend/main.py POST /video/yukle) - kullanıcı test verisi, referans değil.
+data/videos/yuklenenler/
 VİDEOLAR/
 
 # ============================================================

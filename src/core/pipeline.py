@@ -949,6 +949,17 @@ class TeknoFestPipeline:
 
     def _async_llm_task(self, track, vlm_result, video_id):
         import requests
+        # BUG-FIX (kök neden araştırması — "LLM yanıt vermiyor"): last_llm_vlm_hash
+        # bu görev SUNULURKEN (aşağıdaki iki tetikleme noktasında) yazılıyor,
+        # BAŞARIYA bakılmaksızın. Yani adapter/analyze çağrısı bir kere
+        # başarısız olursa (ağ hatası, 5xx, zaman aşımı — tam olarak biraz önce
+        # düzelttiğimiz 500 hatası gibi), _confirm_stable_vlm_hash o kimlik
+        # imzasını "zaten denendi" sanıp track'in KALAN ÖMRÜ boyunca BİR DAHA
+        # HİÇ yeniden denemiyordu - tek bir geçici hata, o hedef için nihai
+        # kararı kalıcı olarak imkansız kılıyordu. Artık başarısızlıkta
+        # last_llm_vlm_hash sıfırlanıyor; aynı kimlik yeniden 2 kez ardışık
+        # doğrulanırsa (bir sonraki VLM turlarında) tekrar denenebiliyor.
+        basarili = False
         try:
             # 1. Adapt Raw VLM
             allowed_vlm_keys = {
@@ -1026,6 +1037,7 @@ class TeknoFestPipeline:
                         # gösterilen kimlik ve zaman damgası bundan sonra sabit
                         # kalır.
                         track.decision_locked = True
+                        basarili = True
                         log.info(f"[LLM] Track {track.track_id} için Stratejik Karar alındı — kimlik kilitlendi.")
                     else:
                         log.warning(f"[LLM] Analyze Error: {analyze_res.text}")
@@ -1034,6 +1046,8 @@ class TeknoFestPipeline:
         except Exception as e:
             log.error(f"[LLM] Asenkron Hata: {e}")
         finally:
+            if not basarili:
+                track.last_llm_vlm_hash = None
             track.is_llm_querying = False
             # DENEYSEL (SIRALI_DONGU_MODU): Tur tamamlandı, VRAG'a yeni crop ile geri dön.
             if SIRALI_DONGU_MODU:

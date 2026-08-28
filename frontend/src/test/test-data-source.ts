@@ -10,7 +10,7 @@ import type { OperatorSession, SessionStatus } from "../types";
 import { idleSessionFixture, preparingSessionFixture, detectionSessionFixture, vragRunningSessionFixture, vlmRunningSessionFixture, runningSessionFixture, completedSessionFixture } from "./fixtures";
 
 export const testCapabilities: OperatorCapabilities = {
-  localFilePreview: true, videoUpload: true, serverPathStart: false, start: true,
+  localFilePreview: true, videoUpload: true, liveCamera: true, serverPathStart: false, start: true,
   pause: true, resume: true, stop: true, restart: true, mjpegStream: false,
   liveTargets: true, persistentEvents: true, finalOutput: true, referenceImages: false,
   metrics: false, eventSnapshots: true, seekToEvent: false,
@@ -72,6 +72,21 @@ export class TestOperatorDataSource implements OperatorDataSource {
   }
 
   listServerVideos(): Promise<ServerVideoOption[]> { return Promise.resolve([]); }
+
+  uploadVideo(file: File): Promise<SelectedVideo> {
+    const video: SelectedVideo = { name: file.name };
+    void this.selectVideo(video);
+    return Promise.resolve(video);
+  }
+
+  startCamera(index = 0): Promise<OperatorSession> {
+    this.clearTimer();
+    this.index = 1;
+    this.applySnapshot();
+    this.session = { ...this.session, sourceName: `Kamera ${index}`, durationSeconds: undefined };
+    this.startTimer();
+    return Promise.resolve(this.publish());
+  }
 
   start(): Promise<OperatorSession> {
     this.index = 1;

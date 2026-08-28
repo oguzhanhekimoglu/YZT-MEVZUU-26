@@ -3,6 +3,8 @@
 
 Uçlar:
   POST /oturum/baslat {video_yolu}  → video işlemeyi başlat (arka plan thread)
+  POST /video/yukle   (dosya)       → video dosyasını sunucuya yükle, path döner
+  POST /kamera/baslat {index?}      → sunucudaki canlı kamerayı aç (varsayılan index 0)
   POST /oturum/durdur               → durdur
   GET  /durum                       → oturum durumu
   GET  /video                       → MJPEG (kutulu kare akışı)
@@ -150,6 +152,20 @@ def _kare_okuyucu(cap, q):
             continue
     q.put(None)
 
+# BUG-FIX (yeni özellik — canlı kamera): _video_dongu her zaman bir dosya
+# yoluyla cv2.VideoCapture(str) açıyordu. Kamera açmak için OpenCV'ye bir
+# TAMSAYI cihaz index'i vermek gerekiyor (string "0" güvenilir şekilde
+# cihaz index'i olarak yorumlanmıyor) - bu yüzden çağıran taraf (kamera_baslat)
+# "camera:0" gibi bir önek kullanıyor, burada ayrıştırılıp int'e çevriliyor.
+_KAMERA_ONEKI = "camera:"
+
+
+def _video_kaynagini_ac(video_yolu: str) -> cv2.VideoCapture:
+    if video_yolu.startswith(_KAMERA_ONEKI):
+        return cv2.VideoCapture(int(video_yolu[len(_KAMERA_ONEKI):]))
+    return cv2.VideoCapture(video_yolu)
+
+
 def _video_dongu(video_yolu: str):
     durum.calisiyor = True
 
@@ -190,7 +206,7 @@ def _video_dongu(video_yolu: str):
     # gerçek videoyla eşleşsin diye pipeline'a bu oturumun video adını bildiriyoruz.
     durum.fuzyon.pipeline.video_id = Path(video_yolu).name
 
-    cap = cv2.VideoCapture(video_yolu)
+    cap = _video_kaynagini_ac(video_yolu)
     if not cap.isOpened():
         durum.calisiyor = False
         print(f"Kaynak açılamadı: {video_yolu}", flush=True)
@@ -200,7 +216,11 @@ def _video_dongu(video_yolu: str):
     # toplam kare sayısı OpenCV'den okunur, /durum bu ikisinden hesaplanan
     # toplam süreyi ve (frame_no/fps ile) o ana kadar geçen süreyi döndürür.
     okunan_fps = cap.get(cv2.CAP_PROP_FPS) or 0.0
-    toplam_kare = cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0.0
+    # BUG-FIX (yeni özellik — canlı kamera): canlı kaynaklarda OpenCV kare
+    # sayısını genelde -1 (bilinmiyor) döndürür - "or 0.0" bunu YAKALAMAZ
+    # çünkü -1 Python'da truthy'dir, bu da aşağıda negatif bir "video süresi"
+    # hesaplanmasına yol açardı. max(0.0, ...) ile bilinmeyen durum 0'a sabitlenir.
+    toplam_kare = max(0.0, cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0.0)
     with durum.kilit:
         durum.fps = okunan_fps
         durum.sure_saniye = (toplam_kare / okunan_fps) if okunan_fps > 0 else 0.0
@@ -235,12 +255,12 @@ def _video_dongu(video_yolu: str):
     print("Video bitti / durduruldu.", flush=True)
 
 
-@app.post("/oturum/baslat")
-def oturum_baslat(govde: dict):
-    yol = govde.get("video_yolu", "")
-    if not Path(yol).exists():
-        return JSONResponse({"hata": f"Video bulunamadÄ±: {yol}"}, status_code=400)
-    # Ã‡alÄ±ÅŸan oturum varsa Ã¶nce DURDUR (yeni videoya sorunsuz geÃ§iÅŸ).
+# BUG-FIX (yeni özellik — dosya yükleme + canlı kamera): /oturum/baslat ve
+# /kamera/baslat aynı "eski oturumu durdur, state'i sıfırla, yeni arka plan
+# thread'i başlat" mantığını paylaşıyor - kopyala-yapıştır iki yerin
+# birbirinden sapma riskini taşırdı, tek fonksiyonda toplandı.
+def _oturum_baslat_ortak(kaynak_gosterim: str, video_dongu_kaynagi: str) -> dict:
+    # Çalışan oturum varsa önce DURDUR (yeni kaynağa sorunsuz geçiş).
     if durum.calisiyor:
         durum.calisiyor = False
         eski = durum.thread
@@ -255,11 +275,59 @@ def oturum_baslat(govde: dict):
         durum.kare_genislik = 0
         durum.kare_yukseklik = 0
     durum.calisiyor = True
-    durum.kaynak = yol
+    durum.kaynak = kaynak_gosterim
     durum.oturum_baslangic_utc = datetime.now(UTC)
-    durum.thread = threading.Thread(target=_video_dongu, args=(yol,), daemon=True)
+    durum.thread = threading.Thread(target=_video_dongu, args=(video_dongu_kaynagi,), daemon=True)
     durum.thread.start()
-    return {"ok": True, "kaynak": yol}
+    return {"ok": True, "kaynak": kaynak_gosterim}
+
+
+@app.post("/oturum/baslat")
+def oturum_baslat(govde: dict):
+    yol = govde.get("video_yolu", "")
+    if not Path(yol).exists():
+        return JSONResponse({"hata": f"Video bulunamadÄ±: {yol}"}, status_code=400)
+    return _oturum_baslat_ortak(kaynak_gosterim=yol, video_dongu_kaynagi=yol)
+
+
+# BUG-FIX (yeni özellik — sürükle-bırak video yükleme): tarayıcı gerçek yerel
+# dosya yolunu veremediği için (bkz. frontend SelectedVideo.serverPath notu),
+# önceden yalnızca sunucudaki data/videos/ altından PATH ile başlatmak
+# mümkündü. Artık dosyanın kendisi yüklenip sunucuya kaydedilebiliyor, dönen
+# yol normal /oturum/baslat akışıyla aynı şekilde kullanılabiliyor.
+_YUKLENEN_VIDEO_DIZINI = ayarlar.VRAG_DIZINI / "data" / "videos" / "yuklenenler"
+_IZIN_VERILEN_VIDEO_UZANTILARI = {".mp4", ".mov", ".avi", ".mkv"}
+
+
+@app.post("/video/yukle")
+async def video_yukle(dosya: UploadFile = File(...)):
+    uzanti = Path(dosya.filename or "").suffix.lower()
+    if uzanti not in _IZIN_VERILEN_VIDEO_UZANTILARI:
+        return JSONResponse(
+            {"hata": f"Desteklenmeyen video formatı: {uzanti or '(uzantısız)'}"},
+            status_code=400,
+        )
+    _YUKLENEN_VIDEO_DIZINI.mkdir(parents=True, exist_ok=True)
+    # BUG-FIX: aynı dosya adıyla art arda yükleme eski videonun üzerine
+    # yazmasın diye zaman damgası ekleniyor.
+    hedef_ad = f"{int(time.time())}_{Path(dosya.filename).name}"
+    hedef_yol = _YUKLENEN_VIDEO_DIZINI / hedef_ad
+    icerik = await dosya.read()
+    hedef_yol.write_bytes(icerik)
+    return {"ok": True, "yol": str(hedef_yol)}
+
+
+@app.post("/kamera/baslat")
+def kamera_baslat(govde: dict | None = None):
+    """Backend'in çalıştığı makinedeki canlı kamerayı açar - video dosyası
+    yerine aynı YOLO/VRAG/VLM/LLM işleme hattından geçirir (bkz.
+    _video_kaynagini_ac)."""
+    index = (govde or {}).get("index", 0)
+    if not isinstance(index, int) or isinstance(index, bool) or index < 0:
+        return JSONResponse({"hata": "Geçersiz kamera index'i"}, status_code=400)
+    return _oturum_baslat_ortak(
+        kaynak_gosterim=f"Kamera {index}", video_dongu_kaynagi=f"{_KAMERA_ONEKI}{index}"
+    )
 
 
 @app.post("/oturum/durdur")

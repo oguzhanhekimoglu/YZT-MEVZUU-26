@@ -11,11 +11,13 @@ class FakeSocket implements SocketLike {
 }
 
 class FakeTransport implements BackendTransport {
-  gets: string[] = []; posts: string[] = []; postBodies: unknown[] = []; sockets: FakeSocket[] = [];
+  gets: string[] = []; posts: string[] = []; postBodies: unknown[] = []; uploadedFiles: File[] = []; sockets: FakeSocket[] = [];
   status: unknown = { calisiyor: true, kaynak: "C:\\secret\\gorev.mp4", frame_no: 5 };
   videos: unknown = { videolar: [] };
+  uploadResponse: unknown = { ok: true, yol: "/data/videos/yuklenenler/1_test.mp4" };
   getJson(url: string) { this.gets.push(url); return Promise.resolve(url.endsWith("/videolar") ? this.videos : this.status); }
   postJson(url: string, body?: unknown) { this.posts.push(url); this.postBodies.push(body); return Promise.resolve({ ok: true }); }
+  postFile(url: string, file: File) { this.posts.push(url); this.uploadedFiles.push(file); return Promise.resolve(this.uploadResponse); }
   createSocket() { const socket = new FakeSocket(); this.sockets.push(socket); return socket; }
 }
 

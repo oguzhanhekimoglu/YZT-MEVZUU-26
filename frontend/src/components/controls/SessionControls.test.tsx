@@ -24,8 +24,12 @@ describe("SessionControls capabilities", () => {
     render(<SessionControls session={runningSessionFixture} capabilities={existingBackendCapabilities} {...handlers} />);
     expect(screen.getByRole("button", { name: "Durdur" })).toBeEnabled(); expect(screen.queryByRole("button", { name: "Tam Ekran" })).not.toBeInTheDocument(); expect(screen.queryByRole("button", { name: "Duraklat" })).not.toBeInTheDocument();
   });
-  it("videoUpload desteklemeyen backend'de video varken de Video Değiştir'i gizler (seçim alanı zaten görünür)", () => {
+  it("videoUpload destekleyen backend'de durdurulmuş videoda Video Değiştir'i gösterir (yeni video yükleme/kamera özelliği)", () => {
     render(<SessionControls session={{ ...runningSessionFixture, status: "stopped", sourceName: "f15.mp4" }} capabilities={existingBackendCapabilities} {...handlers} />);
+    expect(screen.getByRole("button", { name: /Video Değiştir/ })).toBeInTheDocument();
+  });
+  it("videoUpload desteklemeyen backend'de Video Değiştir'i gizler", () => {
+    render(<SessionControls session={{ ...runningSessionFixture, status: "stopped", sourceName: "f15.mp4" }} capabilities={{ ...existingBackendCapabilities, videoUpload: false }} {...handlers} />);
     expect(screen.queryByRole("button", { name: /Video Değiştir/ })).not.toBeInTheDocument();
   });
   it("durdurulan yerel videoda baştan başlat eylemini gösterir", () => {

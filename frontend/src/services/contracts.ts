@@ -20,6 +20,8 @@ export interface ServerVideoOption {
 export interface OperatorCapabilities {
   localFilePreview: boolean;
   videoUpload: boolean;
+  /** Sunucudaki (backend'in çalıştığı makinedeki) canlı kamerayı açabilme. */
+  liveCamera: boolean;
   serverPathStart: boolean;
   start: boolean;
   pause: boolean;
@@ -44,6 +46,15 @@ export interface OperatorDataSource {
   /** Sunucudaki data/videos/ altında seçilebilir video listesi. Desteklenmeyen
    * adaptörlerde boş dizi döner (hata fırlatmaz). */
   listServerVideos(): Promise<ServerVideoOption[]>;
+  /** Dosyayı (sürükle-bırak veya "Dosya Seç") sunucuya yükler ve seçili video
+   * olarak işaretler - başlatmak için ayrıca start() çağrılması gerekir
+   * (mevcut sunucu-yolu akışıyla aynı iki adımlı davranış). Çözümlenen
+   * `serverPath`'i döner ki çağıran taraf (bkz. VideoWorkspace) videonun
+   * gerçek süresi öğrenildiğinde tekrar selectVideo çağırırken bu yolu
+   * kaybetmesin. */
+  uploadVideo(file: File): Promise<SelectedVideo>;
+  /** Sunucudaki canlı kamerayı doğrudan başlatır (dosya seçimine gerek yok). */
+  startCamera(index?: number): Promise<OperatorSession>;
   start(): Promise<OperatorSession>;
   pause(): Promise<OperatorSession>;
   resume(): Promise<OperatorSession>;

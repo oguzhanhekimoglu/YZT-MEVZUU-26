@@ -115,6 +115,26 @@ def test_only_underscore_metadata_is_permitted_and_preserved() -> None:
     assert visual.producer_metadata.created_at_utc == ADAPTED_AT
 
 
+def test_weak_vrag_vote_share_raises_uncertainty_to_high() -> None:
+    """BUG-FIX (kök neden araştırması): zayıf VRAG oy oranı da artık HIGH
+    belirsizlik tetiklemeli, öncesinde sadece VLM'in kendi iç çelişkisi
+    tetikliyordu."""
+    result = _adapt(_vrag_oy_orani=0.5)
+    visual = result.analyze_request.visual_evidence
+    assert visual.uncertainty_level is UncertaintyLevel.HIGH
+    assert "VRAG_VOTE_SHARE_WEAK" in visual.uncertainty_flags
+
+
+def test_strong_vrag_vote_share_never_produces_low_uncertainty() -> None:
+    """BUG-FIX (canlı testte bulundu): çok güçlü bir VRAG oy oranı (ör. %95)
+    bile FinalVisualEvidencePackage'ın "VLM_ONLY modunda uncertainty asla LOW
+    olamaz" kuralını ihlal edip 500 hatasına yol açmamalı - bu yol bağımsız
+    bir retrieval doğrulaması (candidate_matches) OLMADAN çalışıyor."""
+    result = _adapt(_vrag_oy_orani=0.95)
+    visual = result.analyze_request.visual_evidence
+    assert visual.uncertainty_level is UncertaintyLevel.MEDIUM
+
+
 def test_normal_unknown_field_is_rejected() -> None:
     with pytest.raises(ValidationError, match="unknown raw VLM field"):
         RawVLMOutput.model_validate(_raw(hedef_modelli="F-16"))

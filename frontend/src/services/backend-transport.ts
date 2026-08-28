@@ -14,6 +14,11 @@ export interface BackendTransport {
   // uzun suren LLM sentezleri icin (bkz. existing-backend-adapter.ts).
   getJson(url: string, signal?: AbortSignal, timeoutMs?: number): Promise<unknown>;
   postJson(url: string, body?: unknown, signal?: AbortSignal, timeoutMs?: number): Promise<unknown>;
+  // BUG-FIX (yeni özellik — sürükle-bırak video yükleme): postJson her zaman
+  // content-type: application/json + JSON.stringify kullanıyor, bir dosyanın
+  // ham baytlarını (multipart/form-data) göndermeye uygun değil - ayrı bir
+  // metod olarak eklendi.
+  postFile(url: string, file: File, fieldName?: string, signal?: AbortSignal, timeoutMs?: number): Promise<unknown>;
   createSocket(url: string): SocketLike;
 }
 
@@ -24,6 +29,14 @@ export class NativeBackendTransport implements BackendTransport {
   postJson(url: string, body?: unknown, signal?: AbortSignal, timeoutMs?: number): Promise<unknown> {
     return this.request(url, { method: "POST", headers: { "content-type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body), signal }, timeoutMs);
   }
+  postFile(url: string, file: File, fieldName = "dosya", signal?: AbortSignal, timeoutMs?: number): Promise<unknown> {
+    const form = new FormData();
+    form.append(fieldName, file);
+    // content-type kasıtlı olarak BELİRTİLMİYOR - tarayıcı FormData body için
+    // kendi multipart/form-data; boundary=... başlığını otomatik ekler.
+    return this.request(url, { method: "POST", body: form, signal }, timeoutMs);
+  }
+
   createSocket(url: string): SocketLike { return new WebSocket(url); }
 
   private async request(url: string, init: RequestInit, timeoutMs?: number): Promise<unknown> {

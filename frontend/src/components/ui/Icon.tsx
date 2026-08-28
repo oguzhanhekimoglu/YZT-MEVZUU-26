@@ -1,8 +1,9 @@
-export type IconName = "upload" | "play" | "pause" | "stop" | "restart" | "chevron-down" | "chevron-up" | "image" | "warning" | "target" | "clock" | "close" | "sun" | "moon" | "check";
+export type IconName = "upload" | "play" | "pause" | "stop" | "restart" | "chevron-down" | "chevron-up" | "image" | "warning" | "target" | "clock" | "close" | "sun" | "moon" | "check" | "camera";
 
 const paths: Record<IconName, React.ReactNode> = {
   upload: <><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 14v5h14v-5"/></>,
   check: <path d="M5 12.5 10 17 19 7"/>,
+  camera: <><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.3"/></>,
   close: <path d="M18 6 6 18M6 6l12 12"/>,
   play: <path d="m8 5 11 7-11 7V5Z"/>,
   pause: <><path d="M8 5v14M16 5v14"/></>,

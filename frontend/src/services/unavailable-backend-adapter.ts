@@ -21,6 +21,8 @@ export abstract class UnavailableBackendAdapter implements OperatorDataSource {
 
   selectVideo(_video: SelectedVideo): Promise<OperatorSession> { return this.unavailable(); }
   listServerVideos(): Promise<ServerVideoOption[]> { return Promise.resolve([]); }
+  uploadVideo(_file: File): Promise<SelectedVideo> { return Promise.reject(new Error(`${this.adapterName} henüz etkin değil.`)); }
+  startCamera(_index?: number): Promise<OperatorSession> { return this.unavailable(); }
   start(): Promise<OperatorSession> { return this.unavailable(); }
   pause(): Promise<OperatorSession> { return this.unavailable(); }
   resume(): Promise<OperatorSession> { return this.unavailable(); }

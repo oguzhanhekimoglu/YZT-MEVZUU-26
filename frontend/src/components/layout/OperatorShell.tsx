@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { OperatorDataSource } from "../../services/contracts";
-import type { OperatorSession, TimelineEvent } from "../../types";
+import type { OperatorSession, TargetAnalysis, TimelineEvent } from "../../types";
 import { SystemHeader } from "./SystemHeader";
 import { SessionControls } from "../controls/SessionControls";
 import { VideoWorkspace } from "../../features/video/VideoWorkspace";
@@ -21,13 +21,35 @@ interface OperatorShellProps {
   onRestart: () => void;
 }
 
+// BUG-FIX (kullanıcı isteği — "sağ taraftaki panel bounding box gidince
+// sürekli gidip geliyor"): hedef kısa süreliğine ekrandan/algılamadan
+// kaybolduğunda (oklüzyon, tek karelik kayıp vb.) backend'in o karedeki
+// hedef listesi geçici olarak boş dönebiliyor - eskiden bu, seçili hedefin
+// ANINDA `undefined`'a (ya da yanlışlıkla başka bir hedefe) düşüp sağ
+// paneli boşaltmasına/titremesine yol açıyordu. Artık aynı oturumda ve aynı
+// selectedTargetId'de kalındığı sürece SON BİLİNEN hedef nesnesi saklanıp
+// gösteriliyor - bounding box'ın kendisi (TacticalOverlay) hâlâ doğru
+// şekilde kayboluyor, sadece bilgi paneli gereksiz yere titremiyor.
+function useStableSelectedTarget(targets: TargetAnalysis[], selectedTargetId: number | undefined, sessionId: string): TargetAnalysis | undefined {
+  const cache = useRef<{ sessionId: string; selectedTargetId: number | undefined; target: TargetAnalysis | undefined }>({ sessionId, selectedTargetId, target: undefined });
+  const resolved = targets.find((target) => target.id === selectedTargetId) ?? (selectedTargetId === undefined ? targets[0] : undefined);
+
+  if (cache.current.sessionId !== sessionId || cache.current.selectedTargetId !== selectedTargetId) {
+    cache.current = { sessionId, selectedTargetId, target: resolved };
+  } else if (resolved) {
+    cache.current.target = resolved;
+  }
+
+  return cache.current.target;
+}
+
 export function OperatorShell({ session, dataSource, onChangeVideo, onRestart }: OperatorShellProps) {
   const { isOpen, openAnalysis, closeAnalysis } = useAnalysisDrawer();
   const [playbackTime, setPlaybackTime] = useState<{ currentSeconds: number; durationSeconds: number }>();
   const [videoEnded, setVideoEnded] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent>();
   const targets = session.targets.filter((target) => target.id !== -1);
-  const selectedTarget = targets.find((target) => target.id === session.selectedTargetId) ?? targets[0];
+  const selectedTarget = useStableSelectedTarget(targets, session.selectedTargetId, session.id);
 
   useEffect(() => {
     if (session.status === "file-selected") setVideoEnded(false);

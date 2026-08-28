@@ -10,7 +10,7 @@ import { SelectedEventPanel } from "./SelectedEventPanel";
 import { testCapabilities } from "../../test/test-data-source";
 
 function dataSource(): OperatorDataSource & { selectTarget: ReturnType<typeof vi.fn> } {
-  return { capabilities: testCapabilities, getSession: vi.fn().mockResolvedValue(idleSessionFixture), subscribe: vi.fn(() => () => undefined), selectVideo: vi.fn(), listServerVideos: vi.fn().mockResolvedValue([]), start: vi.fn(), pause: vi.fn(), resume: vi.fn(), stop: vi.fn(), restart: vi.fn(), selectTarget: vi.fn().mockResolvedValue(completedSessionFixture), dispose: vi.fn() } as OperatorDataSource & { selectTarget: ReturnType<typeof vi.fn> };
+  return { capabilities: testCapabilities, getSession: vi.fn().mockResolvedValue(idleSessionFixture), subscribe: vi.fn(() => () => undefined), selectVideo: vi.fn(), listServerVideos: vi.fn().mockResolvedValue([]), uploadVideo: vi.fn(), startCamera: vi.fn(), start: vi.fn(), pause: vi.fn(), resume: vi.fn(), stop: vi.fn(), restart: vi.fn(), selectTarget: vi.fn().mockResolvedValue(completedSessionFixture), dispose: vi.fn() } as OperatorDataSource & { selectTarget: ReturnType<typeof vi.fn> };
 }
 
 function Harness({ initial = completedSessionFixture, source = dataSource(), withDrawer = false }: { initial?: OperatorSession; source?: ReturnType<typeof dataSource>; withDrawer?: boolean }) {

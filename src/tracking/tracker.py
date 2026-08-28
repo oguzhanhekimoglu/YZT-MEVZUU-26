@@ -251,11 +251,22 @@ class MultiTargetTracker:
         lost_stracks = getattr(self._bt, 'lost_stracks', [])
         coasting_ids: set[int] = set()
 
+        # BUG-FIX (KOKTEN - "sag panel bi F16 bi bos donuyor", tek hedefli
+        # videolarda kimlik hic kilitlenmiyordu): burada "tid == 0" gercek bir
+        # track ID'si degil, yanlislikla "gecersiz/bos" sanilan bir sentinel
+        # gibi atlaniyordu. Ama boxmot'un TrackIdAllocator'i (varsayilan
+        # start=0) SEANSTAKI ILK track'e tam olarak 0 veriyor - yani video
+        # boyunca TEK bir hedef varsa (en yaygin test senaryosu) o hedef HER
+        # ZAMAN id=0 aliyor ve bu satir onun okluzyon kurtarma/askiya alma
+        # (KALMAN_SUSPENDED_AGE) hakkini TAMAMEN atliyordu - en ufak bir
+        # anlik tespit kaybinda (diger TUM ID'ler aksine) track KALICI olarak
+        # siliniyor, yeniden gorulunce SIFIRDAN yeni bir track/kimlik
+        # basliyordu (hits surekli ~10-12'de sifirlaniyor, kimlik kilidi hic
+        # tutmuyordu). Artik id=0 diger tum track'lerle ayni kurtarma hakkina
+        # sahip.
         for strack in lost_stracks:
             tid = int(getattr(strack, 'id', strack.track_id))
-            if tid == 0:
-                continue
-            
+
             # [DEÄÄ°ÅT] SUSPENDED_AGE kullan (MAX_AGE deÄŸil)
             if strack.time_since_update > KALMAN_SUSPENDED_AGE:
                 continue

@@ -32,6 +32,10 @@ export function parseServerVideos(value: unknown): { name: string; path: string 
   return parsed;
 }
 
+export function parseVideoUploadResponse(value: unknown): string | undefined {
+  return text(record(value)?.yol);
+}
+
 function parseBackendPerformance(value: unknown): BackendPerformancePayload | undefined {
   const source = record(value);
   if (!source) return undefined;

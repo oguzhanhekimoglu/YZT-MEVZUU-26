@@ -161,8 +161,17 @@ def adapt_friend_raw_vlm_to_request(
     # VRAG/VLM'in birbirini ne kadar güçlü doğruladığı (oy oranı) hiç
     # kullanılmıyordu. "_vrag_oy_orani" pipeline.py'den "_" ile başlayan bir
     # yardımcı alan olarak geliyor (RawVLMOutput zaten bunu extra=allow ile
-    # kabul ediyor, ayrı bir şema değişikliği gerekmedi) - burada gerçek bir
-    # 3 seviyeli belirsizlik sinyaline çevriliyor.
+    # kabul ediyor, ayrı bir şema değişikliği gerekmedi).
+    #
+    # BUG-FIX (canlı testte bulundu — HER analiz 500 hatası veriyordu): ilk
+    # denemede güçlü oy oranında LOW da üretiliyordu, ama
+    # FinalVisualEvidencePackage.validate_semantics bilinçli olarak
+    # "VLM_ONLY modunda uncertainty asla LOW olamaz" kuralını zorluyor - bu
+    # yol candidate_matches=[] ile bağımsız bir retrieval doğrulaması
+    # OLMADAN çalışıyor, o yüzden şema LOW'u hiç kabul etmiyor. Artık sadece
+    # HIGH/MEDIUM arasında (zayıf oy oranı da artık HIGH'ı tetikliyor, önceden
+    # sadece iç çelişki tetikliyordu) - şemayı ihlal etmeden yine de eskisinden
+    # daha zengin bir sinyal.
     vrag_oy_orani = helper_metadata.get("_vrag_oy_orani")
     vrag_oy_orani = vrag_oy_orani if isinstance(vrag_oy_orani, (int, float)) else None
     uncertainty_flags = ["VLM_ONLY_NO_RETRIEVAL_CONFIRMATION"]
@@ -172,8 +181,6 @@ def adapt_friend_raw_vlm_to_request(
         uncertainty_flags.append("VRAG_VOTE_SHARE_WEAK")
     if conflict or (vrag_oy_orani is not None and vrag_oy_orani < 0.65):
         uncertainty_level = UncertaintyLevel.HIGH
-    elif vrag_oy_orani is not None and vrag_oy_orani >= 0.85:
-        uncertainty_level = UncertaintyLevel.LOW
     else:
         uncertainty_level = UncertaintyLevel.MEDIUM
 

@@ -2,7 +2,7 @@ import type { OperatorSession, RiskLevel, SystemPerformance, TargetAnalysis } fr
 import type { BackendAdapterConfig, OperatorDataSource, OperatorSessionListener, SelectedVideo, ServerVideoOption, Unsubscribe } from "./contracts";
 import { existingBackendCapabilities } from "./capabilities";
 import { NativeBackendTransport, type BackendTransport, type SocketLike } from "./backend-transport";
-import { parseBackendStatus, parseBackendTargets, parseServerVideos, parseTargetsEnvelope, parseVideoSummary, type BackendStatusPayload } from "./backend-parser";
+import { parseBackendStatus, parseBackendTargets, parseServerVideos, parseTargetsEnvelope, parseVideoSummary, parseVideoUploadResponse, type BackendStatusPayload } from "./backend-parser";
 import { resolveApiUrl, resolveWebSocketUrl, safeBasename } from "./backend-url";
 import { DataSourceError, unsupported } from "./data-source-error";
 
@@ -40,6 +40,9 @@ const pendingFinal = { status: "pending" as const, summary: "Video geneli nihai 
 // LLM zaman aşımı payı artık gerekli değil ama zararsız, düşürmeye gerek yok.
 const VIDEO_SUMMARY_TIMEOUT_MS = 130_000;
 const VIDEO_SUMMARY_RETRY_DELAY_MS = 3_000;
+// Video dosyaları büyük olabiliyor (yüzlerce MB) - genel 8sn'lik varsayılan
+// zaman aşımı yükleme tamamlanmadan isteği iptal ederdi.
+const VIDEO_UPLOAD_TIMEOUT_MS = 300_000;
 // BUG-FIX (kök neden araştırması): /video/ozet eskiden SADECE oturum bitince/
 // durdurulunca sorulurdu - backend'de bir hedef video ortasında kesin kimliğini
 // alsa bile arayüz bunu video/oturum bitene kadar hiç göstermiyordu ("video
@@ -113,6 +116,34 @@ export class ExistingBackendAdapter implements OperatorDataSource {
       return parseServerVideos(await this.transport.getJson(resolveApiUrl(this.config.apiBaseUrl, "/videolar")));
     } catch {
       return [];
+    }
+  }
+
+  // BUG-FIX (yeni özellik — sürükle-bırak video yükleme): tarayıcı gerçek
+  // yerel dosya yolunu veremediği için (bkz. SelectedVideo.serverPath notu),
+  // dosyanın kendisi /video/yukle'ye yüklenip sunucuda kaydediliyor; dönen
+  // yol mevcut sunucu-yolu akışıyla (selectVideo + start) aynı şekilde
+  // kullanılıyor - iki adımlı davranış (önce seç, sonra Başlat) korunuyor.
+  async uploadVideo(file: File): Promise<SelectedVideo> {
+    const path = parseVideoUploadResponse(await this.transport.postFile(resolveApiUrl(this.config.apiBaseUrl, "/video/yukle"), file, "dosya", undefined, VIDEO_UPLOAD_TIMEOUT_MS));
+    if (!path) throw new DataSourceError("INVALID_RESPONSE", "Backend video yolunu döndürmedi.", true);
+    const video: SelectedVideo = { name: file.name, serverPath: path };
+    await this.selectVideo(video);
+    return video;
+  }
+
+  // BUG-FIX (yeni özellik — canlı kamera): dosya seçimine gerek olmadığı için
+  // start()'tan farklı olarak tek adımda doğrudan oturumu başlatıyor.
+  async startCamera(index = 0): Promise<OperatorSession> {
+    this.session = { ...this.session, status: "preparing", sourceName: `Kamera ${index}`, durationSeconds: undefined };
+    this.publish();
+    try {
+      await this.transport.postJson(resolveApiUrl(this.config.apiBaseUrl, "/kamera/baslat"), { index });
+      return this.getSession();
+    } catch (error) {
+      this.session = { ...this.session, status: "idle" };
+      this.publish();
+      throw error;
     }
   }
 
