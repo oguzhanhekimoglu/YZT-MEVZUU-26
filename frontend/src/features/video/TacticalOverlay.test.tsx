@@ -6,7 +6,7 @@ describe("TacticalOverlay", () => {
   it("koordinatı bulunan hedefleri güven ve risk bilgisiyle gösterir", () => {
     const onSelectTarget = vi.fn();
     render(<TacticalOverlay session={runningSessionFixture} onSelectTarget={onSelectTarget} />);
-    fireEvent.click(screen.getByRole("button", { name: /Bilinmeyen hava aracı, Hedef 7, Risk Yüksek/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Hedef #7 · Hava aracı · %67, Risk Yüksek/ }));
     expect(onSelectTarget).toHaveBeenCalledWith(7);
     expect(screen.getByText("ANALİZ AKTİF")).toBeInTheDocument();
   });

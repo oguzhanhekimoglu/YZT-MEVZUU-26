@@ -2,7 +2,8 @@ import type { ActionRecommendation, AircraftCandidate, FinalOutput, LlmDetail, T
 import { normalizeRisk } from "./risk-normalization";
 import { referenceImageUrl } from "./backend-url";
 
-export interface BackendStatusPayload { calisiyor?: boolean; kaynak?: string; frame_no?: number; hedef_sayisi?: number; model_sayisi?: number; sure_saniye?: number; gecen_saniye?: number; }
+export interface BackendPerformancePayload { fps?: number; frame_ms?: number; slicer_ms?: number; tracker_ms?: number; ham_tespit?: number; onayli_hedef?: number; askida_hedef?: number; }
+export interface BackendStatusPayload { calisiyor?: boolean; kaynak?: string; frame_no?: number; hedef_sayisi?: number; model_sayisi?: number; sure_saniye?: number; gecen_saniye?: number; performans?: BackendPerformancePayload; kare_genislik?: number; kare_yukseklik?: number; }
 export interface BackendTargetsEnvelope { frame?: number; hedefler: unknown[]; }
 
 function record(value: unknown): Record<string, unknown> | undefined { return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined; }
@@ -31,6 +32,18 @@ export function parseServerVideos(value: unknown): { name: string; path: string 
   return parsed;
 }
 
+function parseBackendPerformance(value: unknown): BackendPerformancePayload | undefined {
+  const source = record(value);
+  if (!source) return undefined;
+  const parsed: BackendPerformancePayload = {
+    fps: finite(source.fps), frame_ms: finite(source.frame_ms),
+    slicer_ms: finite(source.slicer_ms), tracker_ms: finite(source.tracker_ms),
+    ham_tespit: integer(source.ham_tespit), onayli_hedef: integer(source.onayli_hedef),
+    askida_hedef: integer(source.askida_hedef),
+  };
+  return Object.values(parsed).some((item) => item !== undefined) ? parsed : undefined;
+}
+
 export function parseBackendStatus(value: unknown): BackendStatusPayload {
   const source = record(value);
   if (!source) return {};
@@ -39,6 +52,8 @@ export function parseBackendStatus(value: unknown): BackendStatusPayload {
     kaynak: text(source.kaynak), frame_no: integer(source.frame_no),
     hedef_sayisi: integer(source.hedef_sayisi), model_sayisi: integer(source.model_sayisi),
     sure_saniye: finite(source.sure_saniye), gecen_saniye: finite(source.gecen_saniye),
+    performans: parseBackendPerformance(source.performans),
+    kare_genislik: integer(source.kare_genislik), kare_yukseklik: integer(source.kare_yukseklik),
   };
 }
 
@@ -149,7 +164,9 @@ export function parseBackendTarget(value: unknown, apiBaseUrl: string): TargetAn
   const vlm = parseVlm(source?.vlm); const llm = parseLlm(source?.llm);
   const vragReady = Boolean(model || candidates.length); const vlmConflict = isConflict(vlm);
   return {
-    id, displayName: model ?? `${className} #${id}`, className, detectionConfidence: confidence, risk: llm?.risk ?? "unknown", selected: false, trackingBox: parseTrackingBox(source?.bbox),
+    // BUG-FIX (kullanıcı isteği): kimlik henüz bilinmiyorsa "İHA #0" gibi
+    // sınıf-bazlı bir ad yerine her yerde "Hedef #0" kullanılır.
+    id, displayName: model ?? `Hedef #${id}`, className, detectionConfidence: confidence, risk: llm?.risk ?? "unknown", selected: false, trackingBox: parseTrackingBox(source?.bbox),
     detection: { id: "detection", title: "Nesne Tespiti", status: "completed", statusText: "Tamamlandı", summary: `Hedef #${id} · ${className} · Güven %${Math.round(confidence * 100)}`, detail: { targetId: id, className, confidence, trackingStatus: "active", hits: Math.max(0, integer(source?.hits) ?? 0), speedPxS: finite(source?.hiz_px_s), zigzagScore: score(source?.zigzag) } },
     vrag: { id: "vrag", title: "VRAG Model Eşleştirmesi", status: lowConfidence ? "warning" : vragReady ? "completed" : "waiting", statusText: lowConfidence ? "Uyarılı" : vragReady ? "Tamamlandı" : "Bekliyor", summary: model ? `${model}${modelScore !== undefined ? ` · Benzerlik %${Math.round(modelScore * 100)}` : ""}` : "Model eşleştirmesi henüz mevcut değil", warning: lowConfidence ? "Düşük kimlik güveni" : undefined, detail: vrag },
     vlm: { id: "vlm", title: "VLM Görsel Doğrulama", status: vlmConflict ? "warning" : vlm ? "completed" : "waiting", statusText: vlmConflict ? "Uyarılı" : vlm ? "Tamamlandı" : "Bekliyor", summary: vlm?.visualPrediction ?? "Görsel doğrulama henüz mevcut değil", warning: vlmConflict ? "Görsel doğrulama çelişkisi" : undefined, detail: vlm ?? {} },

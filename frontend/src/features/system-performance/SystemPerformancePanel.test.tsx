@@ -5,7 +5,7 @@ import { SystemPerformancePanel } from "./SystemPerformancePanel";
 describe("SystemPerformancePanel", () => {
   it("kapalı özette canlı performansı gösterir ve açılır", () => {
     render(<SystemPerformancePanel session={runningSessionFixture} />);
-    expect(screen.getByText("24.8 FPS · 38 ms inference")).toBeInTheDocument();
+    expect(screen.getByText("24.8 FPS · 38 ms")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Sistem Performansı/ }));
     expect(screen.getByText("GPU kullanımı")).toBeInTheDocument();
     expect(screen.getByText("Stabil")).toBeInTheDocument();

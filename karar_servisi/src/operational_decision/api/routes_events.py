@@ -1,6 +1,7 @@
 """Event, trace, demo, and RAG status HTTP adapters."""
 
 import json
+from datetime import UTC, datetime
 from typing import Annotated, Any, Literal, cast
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
@@ -100,12 +101,35 @@ async def get_event_trace(
 async def get_video_summary(
     video_id: str,
     container: Annotated[ApplicationContainer, Depends(get_container)],
+    since: Annotated[
+        str | None,
+        Query(
+            description=(
+                "ISO-8601 UTC zaman damgası - verilirse yalnızca bu andan sonra "
+                "üretilmiş kayıtlar özete dahil edilir (aynı video_id önceki "
+                "oturumlarda tekrar test edilmiş olsa bile eskileri dışarıda "
+                "bırakmak için; bkz. backend/main.py oturum başlangıç zamanı)."
+            ),
+        ),
+    ] = None,
 ) -> dict[str, Any]:
     """O videoya ait tüm hedef-bazlı nihai kararlardan tek bir video-geneli özet döner."""
+    since_dt = None
+    if since is not None:
+        try:
+            since_dt = datetime.fromisoformat(since.replace("Z", "+00:00"))
+            if since_dt.tzinfo is None:
+                since_dt = since_dt.replace(tzinfo=UTC)
+            # serialize_utc (bkz. persistence/sqlite_database.py) milisaniyeden
+            # daha ince hassasiyeti reddediyor - dış çağıranın (backend/main.py)
+            # gönderdiği mikrosaniye hassasiyeti burada kırpılır.
+            since_dt = since_dt.replace(microsecond=(since_dt.microsecond // 1000) * 1000)
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail="INVALID_SINCE_TIMESTAMP") from error
     summary = await summarize_video(
         video_id=video_id,
         event_service=container.event_service,
-        llm_client=container.orchestrator.deps.llm_client,
+        since=since_dt,
     )
     return cast(dict[str, Any], jsonable_encoder(summary))
 

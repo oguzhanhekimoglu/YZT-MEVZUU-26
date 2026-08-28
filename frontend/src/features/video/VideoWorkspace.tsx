@@ -63,7 +63,7 @@ export function VideoWorkspace({ session, dataSource, onPlaybackTimeChange, onVi
           event.target.value = "";
         }}
       />
-      <VideoViewport source={viewportSource} playbackStatus={session.status} onPlaybackTimeChange={onPlaybackTimeChange} onVideoEndedChange={onVideoEndedChange} overlay={viewportSource.type === "mjpeg" ? <TacticalOverlay session={session} aspectRatio={metadata?.width && metadata.height ? metadata.width / metadata.height : 16 / 9} onSelectTarget={(id) => void dataSource.selectTarget(id)} /> : undefined}>
+      <VideoViewport source={viewportSource} playbackStatus={session.status} onPlaybackTimeChange={onPlaybackTimeChange} onVideoEndedChange={onVideoEndedChange} overlay={viewportSource.type === "mjpeg" ? <TacticalOverlay session={session} aspectRatio={session.streamAspectRatio ?? (metadata?.width && metadata.height ? metadata.width / metadata.height : 16 / 9)} onSelectTarget={(id) => void dataSource.selectTarget(id)} /> : undefined}>
         <VideoDropzone onFile={dataSource.capabilities.videoUpload ? selectFile : undefined} />
       </VideoViewport>
       {source.type === "local-preview" && <video className={styles.metadataReader} src={source.url} onLoadedMetadata={readMetadata} aria-hidden="true" />}

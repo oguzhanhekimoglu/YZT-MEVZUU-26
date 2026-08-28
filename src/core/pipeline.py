@@ -148,6 +148,9 @@ class TeknoFestPipeline:
         self._video_writer  = None
         self._frame_count   = 0
         self._prev_gray     = None
+        # /durum üzerinden okunan canlı performans telemetrisi (bkz.
+        # _update_performance_snapshot) - ilk kare işlenene kadar boş.
+        self.performans: dict = {}
 
         # INFO-3: deque ile maksimum bellekte 100 eleman tutulur (bellek sızıntısı önlendi)
         self._t_slicer:  deque[float] = deque(maxlen=100)
@@ -351,11 +354,18 @@ class TeknoFestPipeline:
                     track.vrag_is_running = False
 
                 if not track.vrag_is_running and (now - track.vrag_last_time > 1.0):
-                    # Eski karelerde takılı kalmamak için doğrudan o anki CANLI kareyi kesip kullanıyoruz
-                    x1, y1, x2, y2 = map(int, track.bbox)
+                    # BUG-FIX ("bazen kutu fazla dar"): bu blok eskiden PAYLAŞILAN
+                    # x1,y1,x2,y2 değişkenlerini (raporlanan bbox_xyxy'nin kaynağı)
+                    # geçici olarak ham/titrek track.bbox ile EZİYORDU - VRAG kırpma
+                    # kutusunun hiçbir ilgisi olmayan bu değerler, döngünün geri
+                    # kalanında yanlışlıkla ekrana gönderilen kutu haline geliyordu
+                    # (VRAG tetiklendiği ~1 saniyede bir, hedefin kutusu aniden
+                    # Kalman-yumuşatılmış boyuttan ham/dar tespit boyutuna sıçrıyordu).
+                    # Kendi yerel değişkenlerine taşındı, paylaşılan x1..y2'ye dokunmaz.
+                    vx1, vy1, vx2, vy2 = map(int, track.bbox)
                     pad_x, pad_y = int(bw * 0.15), int(bh * 0.15)
-                    cx1, cy1 = max(0, x1 - pad_x), max(0, y1 - pad_y)
-                    cx2, cy2 = min(frame_bgr.shape[1], x2 + pad_x), min(frame_bgr.shape[0], y2 + pad_y)
+                    cx1, cy1 = max(0, vx1 - pad_x), max(0, vy1 - pad_y)
+                    cx2, cy2 = min(frame_bgr.shape[1], vx2 + pad_x), min(frame_bgr.shape[0], vy2 + pad_y)
                     live_crop = frame_bgr[cy1:cy2, cx1:cx2]
 
                     if live_crop.size > 0 and self.vlm.vrag_engine:
@@ -490,6 +500,9 @@ class TeknoFestPipeline:
                     track.last_vlm_time = now
                     track.last_vlm_iqa_score = current_best_iqa
                     # Prensip 1 (Zero-Latency): Enhance (CLAHE) ve kolaj işlemleri dahil tümü ana ipliği sıfır bekletmeyle worker thread'e devredildi!
+                    # BUG-FIX: video_id burada (crop'un yakalandığı asıl an)
+                    # yakalanıp göreve taşınıyor - bkz. _async_vlm_task/_async_llm_task
+                    # içindeki notlar.
                     self.executor.submit(
                         self._async_vlm_task,
                         track,
@@ -499,16 +512,24 @@ class TeknoFestPipeline:
                         threat_score,
                         yolo_cls_name,
                         track.confidence,
+                        self.video_id,
                     )
 
             # --- [YENİ] LLM Tetikleme ---
             if getattr(track, "vlm_done", False) and getattr(track, "vlm_result", None):
-                last_llm_vlm_hash = getattr(track, "last_llm_vlm_hash", None)
                 current_vlm_hash = str(track.vlm_result)
-                if not getattr(track, "is_llm_querying", False) and last_llm_vlm_hash != current_vlm_hash:
+                if not getattr(track, "is_llm_querying", False) and self._confirm_stable_vlm_hash(
+                    track, current_vlm_hash
+                ):
                     track.is_llm_querying = True
                     track.last_llm_vlm_hash = current_vlm_hash
-                    self.executor.submit(self._async_llm_task, track, track.vlm_result)
+                    # BUG-FIX: self.video_id gorevin ICINDE degil, SUNULDUGU anda
+                    # yakalanmali - aksi halde kullanici gorev kuyrukta beklerken
+                    # baska bir videoya gecerse, bu gorev calistiginda YANLIS
+                    # (yeni) video_id ile karar_servisi'ne gonderilip o videonun
+                    # nihai kayitlarini kirletiyordu ("2. videodayken 1. videonun
+                    # cikisi geliyor" sikayeti).
+                    self.executor.submit(self._async_llm_task, track, track.vlm_result, self.video_id)
 
             clamped_box = np.array([x1, y1, x2, y2])
             raw_clamped = np.array([
@@ -565,7 +586,12 @@ class TeknoFestPipeline:
         # ======================================================
         total_ms = (time.perf_counter() - t_total) * 1000
         fps = 1000.0 / max(total_ms, 1.0)
-        self.frame_bgr = self.visualizer.draw_and_save(frame_bgr, results, raw_dets, fps, total_ms, fw, fh, self._t_slicer, self._t_tracker, len(self.tracker.suspended_tracks))
+        # BUG-FIX (mimari değişiklik): bu telemetri eskiden yalnızca kareye
+        # yakılan yeşil HUD metni olarak vardı (bkz. visualizer.py). Artık
+        # /durum üzerinden okunabilecek şekilde saklanıyor — "Canlı
+        # Performans" paneli (frontend) buradan besleniyor.
+        self._update_performance_snapshot(fps, total_ms, len(raw_dets), len(results))
+        self.frame_bgr = self.visualizer.draw_and_save(frame_bgr)
 
         return results
 
@@ -597,6 +623,43 @@ class TeknoFestPipeline:
             f"Enhance:{avg_ms(self._t_enhance):.1f}ms | "
             f"Suspended Tracks:{len(self.tracker.suspended_tracks)}"
         )
+
+    def _update_performance_snapshot(self, fps: float, total_ms: float, raw_count: int, confirmed_count: int) -> None:
+        """/durum üzerinden okunacak canlı performans telemetrisini günceller
+        (bkz. backend/main.py durum_al) - kareye çizilmez."""
+        def avg_ms(d):
+            if not d:
+                return 0.0
+            return (sum(d) / len(d)) * 1000
+
+        self.performans = {
+            "fps": round(fps, 1),
+            "frame_ms": round(total_ms, 1),
+            "slicer_ms": round(avg_ms(self._t_slicer), 1),
+            "tracker_ms": round(avg_ms(self._t_tracker), 1),
+            "ham_tespit": raw_count,
+            "onayli_hedef": confirmed_count,
+            "askida_hedef": len(self.tracker.suspended_tracks),
+        }
+
+    def _confirm_stable_vlm_hash(self, track, current_vlm_hash: str) -> bool:
+        """BUG-FIX (kökten): bir hedefin VLM hipotezi değiştiği ANDA, tek bir
+        anlık/yanlış sınıflandırma bile (ör. tek bir turda "Vestel KARAYEL")
+        hemen LLM'e gönderilip event_memory.db'ye KALICI bir nihai karar
+        olarak yazılıyordu — video-geneli özet de bu tek seferlik kaydı
+        güvenilir bir bulgu gibi raporluyordu ("10ms olsa bile nihai çıktıya
+        giriyor"). Artık yeni bir hipotez önce SADECE 'beklemede' sayılır;
+        BİR SONRAKİ turda da AYNI hipotez tekrar görülürse (yani en az 2
+        ardışık turda kararlı kalırsa) LLM tetiklenir/kaydedilir."""
+        last_hash = getattr(track, "last_llm_vlm_hash", None)
+        if current_vlm_hash == last_hash:
+            return False
+        pending_hash = getattr(track, "pending_llm_vlm_hash", None)
+        if pending_hash == current_vlm_hash:
+            track.pending_llm_vlm_hash = None
+            return True
+        track.pending_llm_vlm_hash = current_vlm_hash
+        return False
 
     def release(self):
         self.visualizer.release()
@@ -631,13 +694,25 @@ class TeknoFestPipeline:
 
                 from collections import Counter
                 top1_adlari = [m[0]["model"] for m in track.vrag_history if m]
-                secilen_model, _ = Counter(top1_adlari).most_common(1)[0]
-                # Oylanan modele ait EN SON (en güncel) eşleşme bilgisini kullan
-                secilen_match = next(
-                    (m[0] for m in reversed(track.vrag_history) if m and m[0]["model"] == secilen_model),
-                    matches[0],
-                )
-                track.vrag_matches = [secilen_match] + matches[1:]
+                secilen_model, oy_sayisi = Counter(top1_adlari).most_common(1)[0]
+                # BUG-FIX ("her şeye X diyor"): zayıf/bölünmüş bir çoğunlukla
+                # (ör. 5 oydan sadece 2'si) bile modele hemen kesin karar
+                # vermek, ayırt edici olmayan/genellenmiş görünümlü bir
+                # referansa (bkz. bazı platformların düz arka planlı, az
+                # detaylı render'ları) sık sık yanlışlıkla yakınsanmasına yol
+                # açıyordu. Kazanan model artık pencerenin en az YARISINI
+                # almadıkça kabul edilmiyor — yetersiz oyda önceki kabul
+                # edilmiş sonuç korunur (henüz hiç kabul edilmemişse ham
+                # en-son sonuç kullanılır).
+                if oy_sayisi / len(top1_adlari) >= 0.5:
+                    # Oylanan modele ait EN SON (en güncel) eşleşme bilgisini kullan
+                    secilen_match = next(
+                        (m[0] for m in reversed(track.vrag_history) if m and m[0]["model"] == secilen_model),
+                        matches[0],
+                    )
+                    track.vrag_matches = [secilen_match] + matches[1:]
+                elif not getattr(track, "vrag_matches", None):
+                    track.vrag_matches = matches
         except Exception as e:
             log.warning(f"VRAG error: {e}")
         finally:
@@ -662,7 +737,7 @@ class TeknoFestPipeline:
         finally:
             track.is_video_vlm_querying = False
 
-    def _async_vlm_task(self, track, crops, speed, zigzag, threat_score, yolo_class="bilinmeyen", yolo_conf=0.5):
+    def _async_vlm_task(self, track, crops, speed, zigzag, threat_score, yolo_class="bilinmeyen", yolo_conf=0.5, video_id=None):
         vrag_matches = getattr(track, "vrag_matches", [])
         should_reset_querying = True
         try:
@@ -738,13 +813,17 @@ class TeknoFestPipeline:
                 # kontrol de duruyor (hash+is_llm_querying ile çift tetiklemeyi zaten
                 # engelliyor) — track hâlâ aktifse o da çalışabilir, zararı yok.
                 current_vlm_hash = str(json_result)
-                if (
-                    not getattr(track, "is_llm_querying", False)
-                    and getattr(track, "last_llm_vlm_hash", None) != current_vlm_hash
+                if not getattr(track, "is_llm_querying", False) and self._confirm_stable_vlm_hash(
+                    track, current_vlm_hash
                 ):
                     track.is_llm_querying = True
                     track.last_llm_vlm_hash = current_vlm_hash
-                    self.executor.submit(self._async_llm_task, track, json_result)
+                    # BUG-FIX: burada self.video_id'yi TEKRAR okumuyoruz - VLM
+                    # analizi (bu fonksiyonun kendisi) saniyeler surebilir, o
+                    # sure icinde video degismis olabilir. video_id parametresi
+                    # crop'un asil yakalandigi ANDA (_async_vlm_task'in kendisi
+                    # sunulurken) yakalanmis olan degerdir - bkz. process_frame.
+                    self.executor.submit(self._async_llm_task, track, json_result, video_id)
 
                 # Prompt'tan guven_skoru kaldırılıp tracker/YOLO sistemine devredildiği için
                 # JSON'da olmadığında 0% basmamak adına doğrudan sistem skoru kullanılır.
@@ -812,7 +891,7 @@ class TeknoFestPipeline:
             if should_reset_querying:
                 track.is_vlm_querying = False
 
-    def _async_llm_task(self, track, vlm_result):
+    def _async_llm_task(self, track, vlm_result, video_id):
         import requests
         try:
             # 1. Adapt Raw VLM
@@ -840,7 +919,7 @@ class TeknoFestPipeline:
             current_time_offset = float(time.time() % 10000)
             adapter_payload = {
                 "raw_vlm": cleaned_vlm_result,
-                "video_id": self.video_id,
+                "video_id": video_id,
                 "track_id": str(track.track_id),
                 "first_seen_offset_seconds": current_time_offset,
                 "last_seen_offset_seconds": current_time_offset + 1.0,

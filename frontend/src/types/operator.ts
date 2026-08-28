@@ -162,14 +162,23 @@ export interface FinalOutput {
 }
 
 export interface SystemPerformance {
-  processingSeconds: number;
-  inferenceMs: number;
-  framesPerSecond: number;
-  droppedFrameRate: number;
-  memoryGb: number;
-  gpuUtilization: number;
-  queueDepth: number;
-  health: "stable" | "strained" | "critical";
+  // Gerçek backend entegrasyonu yalnızca aşağıdaki alanları doldurabiliyor
+  // (bkz. backend/main.py /durum → pipeline.performans) — GPU/bellek/health
+  // gibi hâlâ üretilmeyen alanlar isteğe bağlı kalır, sahte veri üretilmez.
+  processingSeconds?: number;
+  frameMs?: number;
+  slicerMs?: number;
+  trackerMs?: number;
+  rawDetectionCount?: number;
+  confirmedTargetCount?: number;
+  suspendedTargetCount?: number;
+  inferenceMs?: number;
+  framesPerSecond?: number;
+  droppedFrameRate?: number;
+  memoryGb?: number;
+  gpuUtilization?: number;
+  queueDepth?: number;
+  health?: "stable" | "strained" | "critical";
   eventDetectionAccuracy?: number;
   criticalEventRecall?: number;
   summaryQuality?: number;
@@ -198,6 +207,13 @@ export interface OperatorSession {
   activeTargetCount: number;
   criticalEventCount: number;
   streamUrl?: string;
+  // BUG-FIX ("bbox eskisi gibi kare içine almıyor"): TacticalOverlay'in
+  // hedef kutusu konumlandırma çerçevesi, backend'in GERÇEKTEN encode edip
+  // yayınladığı karenin (resize sonrası) en-boy oranını bilmek zorunda.
+  // <img onLoad> ile tahmin etmek MJPEG multipart akışlarında güvenilir
+  // değil (bazı tarayıcılar 'load' hiç tetiklemiyor) — bu yüzden backend
+  // /durum üzerinden kare_genislik/kare_yukseklik'i doğrudan bildiriyor.
+  streamAspectRatio?: number;
   selectedTargetId?: number;
   targets: TargetAnalysis[];
   events: TimelineEvent[];

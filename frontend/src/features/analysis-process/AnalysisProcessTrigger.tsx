@@ -40,7 +40,9 @@ export const AnalysisProcessTrigger = forwardRef<HTMLButtonElement, AnalysisProc
         aria-expanded={expanded}
         aria-controls="analysis-process-panel"
       >
-        <span className={`${styles.statusIcon} ${tone}`} aria-hidden="true" />
+        {completed
+          ? <span className={`${styles.statusIcon} ${styles.statusIconDone} ${tone}`} aria-hidden="true"><Icon name="check" size={9} /></span>
+          : <span className={`${styles.statusIcon} ${tone} ${runningStep ? styles.pulsing : ""}`} aria-hidden="true" />}
         <span className={styles.copy}><strong>{title}</strong><small>{detail}</small></span>
         <span className={styles.action}>{expanded ? "Ayrıntıları Gizle" : "Ayrıntıları Gör"}<Icon name={expanded ? "chevron-up" : "chevron-down"} size={14} /></span>
       </button>

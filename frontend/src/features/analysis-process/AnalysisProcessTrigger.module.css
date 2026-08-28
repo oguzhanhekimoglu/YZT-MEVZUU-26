@@ -63,6 +63,23 @@
   box-shadow: 0 0 7px color-mix(in srgb, currentColor 42%, transparent);
 }
 
+/* BUG-FIX (kullanıcı isteği): analiz sürerken nokta yanıp sönsün, analiz
+   tamamlanınca nokta yerine dolgulu daire içinde küçük beyaz bir tik olsun. */
+.pulsing { animation: statusPulse 1.6s ease-in-out infinite; }
+@keyframes statusPulse { 50% { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .pulsing { animation: none; } }
+
+.statusIconDone {
+  width: 15px;
+  height: 15px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px color-mix(in srgb, currentColor 45%, transparent);
+}
+.statusIconDone svg { stroke: #fff; }
+
 .running { color: var(--color-process-running); }
 .completed { color: var(--color-process-completed); }
 .warning { color: var(--color-process-warning); }

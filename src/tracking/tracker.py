@@ -54,6 +54,11 @@ class MultiTargetTracker:
         self.suspended_tracks: list[Track] = []
         self.cmc = CameraMotionCompensator()
         self._frame_count = 0
+        # reset() sonrasi track ID'leri sifirdan yeniden verilir; tuketiciler
+        # (bkz. backend/pipeline_adapter.py) bu sayaci izleyerek eski bir
+        # track_id'ye ait onbellek verisini yeni (farkli fiziksel nesneye ait)
+        # ayni ID'li track'e yanlislikla tasimadigini garanti edebilir.
+        self.reset_generation = 0
         # Prensip 1: GÃ¶rÃ¼ntÃ¼ yakalama ve netlik hesaplama iÅŸlemleri ana dÃ¶ngÃ¼yÃ¼ (main thread) asla bloke etmez!
         self._crop_pool = concurrent.futures.ThreadPoolExecutor(max_workers=2, thread_name_prefix="CropPool")
 
@@ -112,6 +117,7 @@ class MultiTargetTracker:
         self.suspended_tracks.clear()
         self._init_bytetrack()
         self.cmc = CameraMotionCompensator()
+        self.reset_generation += 1
         log.info("Tracker sÄ±fÄ±rlandÄ± (CMC dahil).")
 
     def close(self):

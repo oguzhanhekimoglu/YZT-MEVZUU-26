@@ -46,6 +46,19 @@ describe("ExistingBackendAdapter", () => {
     expect(transport.postBodies).toEqual([{ video_yolu: "C:\\videos\\video.mp4" }]);
     adapter.dispose();
   });
+  it("video-özeti iki denemede de başarısız olursa görünür bir hata durumu yayınlar (sessizce pending kalmaz)", async () => {
+    const { adapter, transport } = setup();
+    transport.sockets[0]!.message({ frame: 1, hedefler: [target] });
+    transport.getJson = (url: string) => (url.endsWith("/video/ozet") ? Promise.reject(new Error("network")) : Promise.resolve(transport.status));
+    await adapter.stop();
+    expect((await adapter.getSession()).finalOutput.status).toBe("pending");
+    await vi.advanceTimersByTimeAsync(3_000);
+    const session = await adapter.getSession();
+    expect(session.finalOutput.status).toBe("partial");
+    expect(session.finalOutput.summary).toContain("Video geneli özet alınamadı");
+    adapter.dispose();
+  });
+
   it("listServerVideos /videolar'ı çağırıp parse eder, hatada boş dizi döner", async () => {
     const { adapter, transport } = setup();
     transport.videos = { videolar: [{ ad: "f15.mp4", yol: "/data/videos/f15.mp4" }] };

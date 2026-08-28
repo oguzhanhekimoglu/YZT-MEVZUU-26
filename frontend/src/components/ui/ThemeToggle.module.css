@@ -1,23 +1,22 @@
+/* BUG-FIX (kullanıcı isteği): "Tema" yazısı kaldırıldı, yalnızca güneş/ay
+   ikonu kalıyor - buna göre dikdörtgen yerine kare, ikon-only bir buton. */
 .toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
+  width: 40px;
   height: 40px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--color-text-primary);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-button);
-  background: transparent;
+  /* BUG-FIX (kullanıcı isteği): saat kutusuyla (bkz. SystemHeader.module.css
+     .timeMetric) aynı arka plan paleti - UI tutarlılığı için. */
+  background: color-mix(in srgb, var(--color-background) 58%, transparent);
   color: var(--color-text-primary);
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-technical);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  transition: background var(--duration-hover) var(--ease-standard), color var(--duration-hover) var(--ease-standard);
-  white-space: nowrap;
+  transition: background var(--duration-hover) var(--ease-standard), border-color var(--duration-hover) var(--ease-standard), color var(--duration-hover) var(--ease-standard);
 }
 
 .toggle:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
   background: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
 }
 

@@ -357,6 +357,7 @@ export const runningSessionFixture: OperatorSession = {
   performance: {
     processingSeconds: 42,
     inferenceMs: 38,
+    frameMs: 38,
     framesPerSecond: 24.8,
     droppedFrameRate: 0.4,
     memoryGb: 4.2,

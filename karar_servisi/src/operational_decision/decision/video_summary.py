@@ -2,26 +2,52 @@
 actions} biçiminde tek bir çıktı.
 
 Yeni bir değerlendirme YAPMAZ: bir video oturumu boyunca her hedef için zaten
-üretilip event_memory.db'ye kaydedilmiş FinalDecisionOutput kayıtlarını
-(bkz. EventService.list_finalized_outputs_for_video) tek bir LLM çağrısıyla
-Türkçe bir anlatıya sentezler — özet cümlesi bu zaten var olan, hedef-bazlı
-nihai analizlere dayanır.
+üretilip event_memory.db'ye kaydedilmiş FinalDecisionOutput kayıtlarından
+gerçek zaman damgalı, DETERMİNİSTİK bir olay günlüğü (video başlatıldı ->
+her güvenilir tespit) üretir.
+
+BUG-FIX (mimari değişiklik — kullanıcı isteği): önceki sürüm bunu tek bir LLM
+çağrısıyla serbest Türkçe metne dönüştürüyordu. Bu hem yavaştı (20-40+ saniye),
+hem güvenilmezdi (zaman zaman kimlik doğrulama/zaman aşımı hatası, çok uzun
+prompt'ta JSON'un yarıda kesilmesi), hem de nihai çıktı artık "uçak ismi"
+yerine ham, gerçek zaman damgalı bir olay listesi olarak isteniyor — bunun
+için LLM'in serbest yorumuna hiç gerek yok, zaten elimizdeki veriden
+birebir üretilebilir. Bu yüzden LLM çağrısı TAMAMEN KALDIRILDI: artık ne
+zaman aşımı, ne kimlik doğrulama hatası, ne de JSON kesilmesi riski var.
 """
 
-import json
-import logging
 from datetime import datetime
 from typing import Any
 
-from operational_decision.llm.base_client import BaseLLMClient
 from operational_decision.memory.event_service import EventService
 
-log = logging.getLogger(__name__)
+# BUG-FIX: event_memory.db aynı video_id için oturumlar arası hiç
+# temizlenmiyor — aynı dosya defalarca test edildikçe kayıt sayısı sınırsız
+# büyüyebiliyordu (bir örnekte 240 kayıt). Denetim izi (audit trail)
+# korunuyor — event_memory.db'den hiçbir şey silinmiyor — sadece bu okuma en
+# yeni kayıtların oluşturduğu sınırlı bir pencereye bakıyor.
+_MAX_RAW_RECORDS = 250
 
-# BUG-FIX: sabit 800 token'lık varsayılan, birden çok hedef analizini tek
-# JSON'da birleştiren bu sentezde çıktının yarıda kesilip geçersiz JSON
-# üretmesine (JSONDecodeError: Unterminated string) yol açıyordu.
-_MAX_TOKENS = 3000
+# Ardışık tekrarları birleştirdikten sonra bile grup sayısı büyüyebilir —
+# olay listesinin sınırsız büyümesini önlemek için en fazla bu kadar grup
+# (en yenisi öncelikli) olay günlüğüne dahil edilir.
+_MAX_GROUPS_IN_EVENTS = 60
+
+# BUG-FIX ("10ms olsa bile nihai çıktıya giriyor"): bir hedefin ardışık
+# analizlerde yalnızca BİR KEZ görülen (tek seferlik, muhtemelen anlık bir
+# yanlış sınıflandırmadan kaynaklanan) hipotezi, güvenilir bir bulguymuş gibi
+# özete girmemeli. En az bu kadar ardışık tekrarla doğrulanmış gruplar
+# "güvenilir" sayılır. (pipeline.py tarafında da kaynağında bir kararlılık
+# şartı eklendi — bu, ikinci bir savunma katmanı.)
+_MIN_RELIABLE_OCCURRENCES = 2
+
+_RISK_LABELS = {
+    "LOW": "düşük",
+    "MEDIUM": "orta",
+    "HIGH": "yüksek",
+    "CRITICAL": "kritik",
+}
+_RISK_ORDER = {"LOW": 0, "MEDIUM": 1, "HIGH": 2, "CRITICAL": 3}
 
 _PENDING_RESULT: dict[str, Any] = {
     "status": "pending",
@@ -32,37 +58,14 @@ _PENDING_RESULT: dict[str, Any] = {
 }
 
 
-def _video_summary_json_schema() -> dict[str, object]:
-    return {
-        "type": "object",
-        "properties": {
-            "summary": {"type": "string"},
-            "events": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "time": {"type": "string"},
-                        "event": {"type": "string"},
-                        "critical": {"type": "boolean"},
-                    },
-                    "required": ["time", "event", "critical"],
-                },
-            },
-            "risk": {
-                "type": "string",
-                "enum": ["düşük", "orta", "yüksek", "kritik", "bilinmiyor"],
-            },
-            "actions": {"type": "array", "items": {"type": "string"}},
-        },
-        "required": ["summary", "events", "risk", "actions"],
-    }
-
-
 def _format_time(value: Any) -> str:
     if isinstance(value, datetime):
         return value.strftime("%H:%M:%S")
     return "?"
+
+
+def _risk_label(risk_level: Any) -> str:
+    return _RISK_LABELS.get(str(risk_level).upper(), "bilinmiyor")
 
 
 def _is_critical(output: dict[str, Any]) -> bool:
@@ -73,73 +76,121 @@ def _is_critical(output: dict[str, Any]) -> bool:
     return str(output.get("risk_level", "")).upper() in {"HIGH", "CRITICAL"}
 
 
-def _describe_output(row: dict[str, Any]) -> str:
+def _identity_and_risk(row: dict[str, Any]) -> tuple[str, str]:
     output = row.get("output") or {}
     identity = output.get("canonical_name") or output.get("matched_platform") or "Bilinmeyen hedef"
-    risk = output.get("risk_level", "UNKNOWN")
-    summary = output.get("summary_tr", "")
-    action_texts = [
-        action.get("reason_tr") or action.get("action_code", "")
-        for action in output.get("recommended_actions", [])
-        if isinstance(action, dict)
-    ]
-    time_label = _format_time(row.get("created_at_utc"))
-    critical_tag = " [KRİTİK]" if _is_critical(output) else ""
-    line = f"- [{time_label}]{critical_tag} {identity} — risk: {risk}. {summary}"
-    if action_texts:
-        line += f" Öneriler: {', '.join(action_texts)}"
-    return line
+    return identity, str(output.get("risk_level", "UNKNOWN")).upper()
 
 
-def _build_prompt(outputs: list[dict[str, Any]]) -> list[dict[str, str]]:
-    joined = "\n".join(_describe_output(row) for row in outputs)
-    instruction = (
-        "Aşağıda bir video oturumu boyunca tespit edilen hedeflerin, ZATEN "
-        "ÜRETİLMİŞ bireysel analiz sonuçları listeleniyor. Bu bilgilere "
-        "DAYANARAK — yeni bilgi uydurmadan, sadece verilenleri birleştirerek — "
-        "videonun genelini özetleyen TEK bir Türkçe paragraf, olayların zaman "
-        "damgalı kısa listesi, videonun genel risk seviyesi (verilen bireysel "
-        "risklerin en yükseğini yansıtmalı) ve tekrarsız, birleştirilmiş bir "
-        "aksiyon önerisi listesi üret. Her olay için 'critical' alanını SADECE "
-        "girdide '[KRİTİK]' etiketiyle işaretli bir analize karşılık geliyorsa "
-        "true yap, diğer tüm olaylarda false yap — kendi başına yeni bir "
-        "kritiklik değerlendirmesi uydurma.\n\n"
-        f"BİREYSEL ANALİZLER:\n{joined}"
+def _group_consecutive_repeats(outputs: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
+    """Collapse consecutive re-analyses of the same identity+risk into one group.
+
+    BUG-FIX: a continuously tracked object is re-analyzed every few seconds,
+    so a single video session can accumulate hundreds of near-identical
+    per-target records. Grouping only merges ADJACENT (chronologically
+    consecutive) identical identity+risk pairs, so genuinely different
+    targets/events are never collapsed together.
+    """
+    groups: list[list[dict[str, Any]]] = []
+    for row in outputs:
+        if groups and _identity_and_risk(groups[-1][-1]) == _identity_and_risk(row):
+            groups[-1].append(row)
+        else:
+            groups.append([row])
+    return groups
+
+
+def _is_reliable_group(group: list[dict[str, Any]]) -> bool:
+    """A single (non-repeated) occurrence is reliable only if it was flagged
+    critical — a lone, non-critical hit is the profile of a momentary
+    misclassification glitch, not a confirmed finding worth reporting."""
+    return len(group) >= _MIN_RELIABLE_OCCURRENCES or any(
+        _is_critical(row.get("output") or {}) for row in group
     )
-    return [{"role": "user", "content": instruction}]
+
+
+def _group_event(group: list[dict[str, Any]]) -> dict[str, Any]:
+    last = group[-1]
+    identity, risk = _identity_and_risk(last)
+    critical = any(_is_critical(row.get("output") or {}) for row in group)
+    repeat_note = f" ({len(group)} kez tespit edildi)" if len(group) > 1 else ""
+    # Olayın zamanı, o hipotezin İLK görüldüğü an — kullanıcı örneğiyle
+    # uyumlu ("23:58:59'da X tespit edildi, ..."): "ne zaman oldu" sorusunun
+    # doğal cevabı ilk gözlem anıdır, en son tekrarın anı değil.
+    return {
+        "time": _format_time(group[0].get("created_at_utc")),
+        "event": f"{identity} tespit edildi{repeat_note} — risk: {_risk_label(risk)}",
+        "critical": critical,
+    }
+
+
+def _collect_unique_actions(groups: list[list[dict[str, Any]]]) -> list[str]:
+    seen: list[str] = []
+    for group in groups:
+        output = group[-1].get("output") or {}
+        for action in output.get("recommended_actions", []):
+            if not isinstance(action, dict):
+                continue
+            text = action.get("reason_tr") or action.get("action_code", "")
+            if text and text not in seen:
+                seen.append(text)
+    return seen
+
+
+def _overall_risk_label(groups: list[list[dict[str, Any]]]) -> str:
+    levels = [_identity_and_risk(group[-1])[1] for group in groups]
+    known = [level for level in levels if level in _RISK_ORDER]
+    if not known:
+        return "bilinmiyor"
+    return _risk_label(max(known, key=lambda level: _RISK_ORDER[level]))
 
 
 async def summarize_video(
     *,
     video_id: str,
     event_service: EventService,
-    llm_client: BaseLLMClient,
+    since: datetime | None = None,
 ) -> dict[str, Any]:
-    """O videoya ait tüm hedef-bazlı nihai kararlardan tek bir video-geneli özet üretir."""
-    outputs = await event_service.list_finalized_outputs_for_video(video_id)
+    """O videoya ait tüm hedef-bazlı nihai kararlardan gerçek zaman damgalı,
+    deterministik bir olay günlüğü üretir (LLM çağrısı yapmaz).
+
+    `since` verilirse (bkz. routes_events.py - çağıran oturumun başlangıç
+    zamanı) yalnızca o andan sonraki kayıtlar kullanılır ve ilk olay olarak
+    "Video başlatıldı" eklenir; aynı video_id (dosya adı) önceki oturumlarda
+    tekrar tekrar test edilmiş olsa bile eski oturumların kayıtları bu
+    özete karışmaz.
+    """
+    outputs = await event_service.list_finalized_outputs_for_video(video_id, since=since)
+
+    events: list[dict[str, Any]] = []
+    if since is not None:
+        events.append({"time": _format_time(since), "event": "Video başlatıldı", "critical": False})
+
     if not outputs:
+        if events:
+            return {
+                "status": "final",
+                "summary": "Video başlatıldı, henüz güvenilir bir tespit yok.",
+                "events": events,
+                "risk": "bilinmiyor",
+                "actions": [],
+            }
         return dict(_PENDING_RESULT)
 
-    messages = _build_prompt(outputs)
-    try:
-        raw = await llm_client.generate(
-            messages, response_schema=_video_summary_json_schema(), max_tokens=_MAX_TOKENS
-        )
-        parsed = json.loads(raw)
-    except Exception as exc:  # noqa: BLE001 - en iyi çaba sentezi, herhangi bir hata "partial"a düşmeli
-        log.warning("[VIDEO-OZET] video_id=%s için özet üretilemedi: %s", video_id, exc)
-        return {
-            "status": "partial",
-            "summary": "Video geneli özet üretilemedi (LLM hatası).",
-            "events": [],
-            "risk": "bilinmiyor",
-            "actions": [],
-        }
+    recent = outputs[-_MAX_RAW_RECORDS:]
+    groups = _group_consecutive_repeats(recent)
+    reliable_groups = [group for group in groups if _is_reliable_group(group)]
+    # Hepsi tek seferlik/güvenilmez çıkmışsa (nadir), özeti tamamen boş
+    # bırakmak yerine yine de mevcut bulguları kullan.
+    groups = (reliable_groups or groups)[-_MAX_GROUPS_IN_EVENTS:]
+
+    events.extend(_group_event(group) for group in groups)
+    overall_risk = _overall_risk_label(groups)
 
     return {
         "status": "final",
-        "summary": parsed.get("summary", ""),
-        "events": parsed.get("events", []),
-        "risk": parsed.get("risk", "bilinmiyor"),
-        "actions": parsed.get("actions", []),
+        "summary": f"{len(groups)} güvenilir tespit kaydedildi; en yüksek risk: {overall_risk}.",
+        "events": events,
+        "risk": overall_risk,
+        "actions": _collect_unique_actions(groups),
     }

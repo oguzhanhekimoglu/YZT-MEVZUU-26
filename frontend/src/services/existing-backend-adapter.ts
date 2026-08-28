@@ -1,10 +1,31 @@
-import type { OperatorSession, RiskLevel, TargetAnalysis } from "../types";
+import type { OperatorSession, RiskLevel, SystemPerformance, TargetAnalysis } from "../types";
 import type { BackendAdapterConfig, OperatorDataSource, OperatorSessionListener, SelectedVideo, ServerVideoOption, Unsubscribe } from "./contracts";
 import { existingBackendCapabilities } from "./capabilities";
 import { NativeBackendTransport, type BackendTransport, type SocketLike } from "./backend-transport";
-import { parseBackendStatus, parseBackendTargets, parseServerVideos, parseTargetsEnvelope, parseVideoSummary } from "./backend-parser";
+import { parseBackendStatus, parseBackendTargets, parseServerVideos, parseTargetsEnvelope, parseVideoSummary, type BackendStatusPayload } from "./backend-parser";
 import { resolveApiUrl, resolveWebSocketUrl, safeBasename } from "./backend-url";
 import { DataSourceError, unsupported } from "./data-source-error";
+
+// BUG-FIX (mimari değişiklik — kullanıcı isteği): FPS/Slicer/Tracker gibi
+// canlı performans telemetrisi eskiden yalnızca video karesine yakılan yeşil
+// HUD metniydi (bkz. visualizer.py); backend artık bunu /durum içinde
+// `performans` olarak döndürüyor, burada SystemPerformance'a çevrilir.
+// Bir tur veri gelmezse (ör. pipeline henüz başlamadı) önceki değer korunur.
+function buildPerformance(payload: BackendStatusPayload, previous?: SystemPerformance): SystemPerformance | undefined {
+  const perf = payload.performans;
+  if (!perf) return previous;
+  return {
+    ...previous,
+    framesPerSecond: perf.fps ?? previous?.framesPerSecond,
+    frameMs: perf.frame_ms ?? previous?.frameMs,
+    slicerMs: perf.slicer_ms ?? previous?.slicerMs,
+    trackerMs: perf.tracker_ms ?? previous?.trackerMs,
+    rawDetectionCount: perf.ham_tespit ?? previous?.rawDetectionCount,
+    confirmedTargetCount: perf.onayli_hedef ?? previous?.confirmedTargetCount,
+    suspendedTargetCount: perf.askida_hedef ?? previous?.suspendedTargetCount,
+    processingSeconds: payload.gecen_saniye ?? previous?.processingSeconds,
+  };
+}
 
 export interface ExistingBackendAdapterOptions {
   transport?: BackendTransport;
@@ -14,6 +35,12 @@ export interface ExistingBackendAdapterOptions {
 }
 
 const pendingFinal = { status: "pending" as const, summary: "Video geneli nihai analiz mevcut backend sürümünde henüz sağlanmıyor.", events: [], risk: "unknown" as const, actions: [] };
+// Video-geneli özet, birden fazla hedef analizini tek bir LLM çağrısında
+// birleştiriyor ve backend'in kendi zaman aşımı 120sn — genel 8sn'lik
+// varsayılan bu istek için çok kısa kalıp sonucu hiç görmeden iptal ediyordu.
+const VIDEO_SUMMARY_TIMEOUT_MS = 130_000;
+const VIDEO_SUMMARY_RETRY_DELAY_MS = 3_000;
+const failedFinal = (reason: string) => ({ status: "partial" as const, summary: `Video geneli özet alınamadı: ${reason}`, events: [], risk: "unknown" as const, actions: [] });
 const riskOrder: Record<RiskLevel, number> = { critical: 5, high: 4, medium: 3, low: 2, info: 1, unknown: 0 };
 
 function initialSession(localMode: boolean): OperatorSession {
@@ -112,14 +139,23 @@ export class ExistingBackendAdapter implements OperatorDataSource {
     } finally { this.stopping = false; }
   }
 
-  private async fetchVideoSummary(): Promise<void> {
+  private async fetchVideoSummary(attempt = 1): Promise<void> {
+    const url = resolveApiUrl(this.config.apiBaseUrl, "/video/ozet");
     try {
-      const finalOutput = parseVideoSummary(await this.transport.getJson(resolveApiUrl(this.config.apiBaseUrl, "/video/ozet")));
+      const finalOutput = parseVideoSummary(await this.transport.getJson(url, undefined, VIDEO_SUMMARY_TIMEOUT_MS));
       this.session = { ...this.session, finalOutput };
       this.publish();
-    } catch {
-      // Video-geneli özet opsiyonel bir eklenti — alınamazsa sessizce pending kalır,
-      // hedef-bazlı analiz akışını etkilemez.
+    } catch (error) {
+      const reason = error instanceof DataSourceError ? error.message : "beklenmeyen hata";
+      console.warn(`[video-ozet] deneme ${attempt} başarısız (${reason}), url=${url}`, error);
+      if (attempt < 2) {
+        setTimeout(() => void this.fetchVideoSummary(attempt + 1), VIDEO_SUMMARY_RETRY_DELAY_MS);
+        return;
+      }
+      // İki deneme de başarısız oldu — sessizce "pending" bırakmak yerine
+      // arayüzde görünür bir hata durumu göster (bkz. FinalOutputStepDetail).
+      this.session = { ...this.session, finalOutput: failedFinal(reason) };
+      this.publish();
     }
   }
 
@@ -154,8 +190,16 @@ export class ExistingBackendAdapter implements OperatorDataSource {
         currentSeconds: payload.gecen_saniye ?? this.session.currentSeconds,
         durationSeconds: payload.sure_saniye ?? this.session.durationSeconds,
         streamUrl: running ? `${resolveApiUrl(this.config.apiBaseUrl, "/video")}?_=${this.streamToken}` : this.session.streamUrl,
+        // BUG-FIX (mimari değişiklik): FPS/Slicer/Tracker eskiden yalnızca
+        // video karesine yakılan HUD metniydi - artık /durum'dan okunup
+        // "Canlı Performans" panelini besliyor (bkz. buildPerformance).
+        performance: buildPerformance(payload, this.session.performance),
+        // BUG-FIX ("bbox eskisi gibi kare içine almıyor"): TacticalOverlay'in
+        // konumlandırma çerçevesi artık backend'in bildirdiği GERÇEK kare
+        // boyutundan hesaplanıyor - <img onLoad> tahminine gerek yok.
+        streamAspectRatio: payload.kare_genislik && payload.kare_yukseklik ? payload.kare_genislik / payload.kare_yukseklik : this.session.streamAspectRatio,
         events: [], finalOutput: sourceChanged ? pendingFinal : this.session.finalOutput,
-        ...(sourceChanged ? { targets: [], selectedTargetId: undefined, activeTargetCount: 0 } : {}),
+        ...(sourceChanged ? { targets: [], selectedTargetId: undefined, activeTargetCount: 0, streamAspectRatio: undefined } : {}),
       };
       this.publish();
       if (justStopped) void this.fetchVideoSummary();

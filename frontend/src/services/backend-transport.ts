@@ -9,22 +9,25 @@ export interface SocketLike {
 }
 
 export interface BackendTransport {
-  getJson(url: string, signal?: AbortSignal): Promise<unknown>;
-  postJson(url: string, body?: unknown, signal?: AbortSignal): Promise<unknown>;
+  // timeoutMs: cagiran taraf, bu istek icin varsayilan (8sn) yerine daha
+  // uzun bir zaman asimi istiyorsa gecebilir - ör. video-geneli özet gibi
+  // uzun suren LLM sentezleri icin (bkz. existing-backend-adapter.ts).
+  getJson(url: string, signal?: AbortSignal, timeoutMs?: number): Promise<unknown>;
+  postJson(url: string, body?: unknown, signal?: AbortSignal, timeoutMs?: number): Promise<unknown>;
   createSocket(url: string): SocketLike;
 }
 
 export class NativeBackendTransport implements BackendTransport {
   constructor(private readonly timeoutMs = 8_000) {}
 
-  getJson(url: string, signal?: AbortSignal): Promise<unknown> { return this.request(url, { method: "GET", signal }); }
-  postJson(url: string, body?: unknown, signal?: AbortSignal): Promise<unknown> {
-    return this.request(url, { method: "POST", headers: { "content-type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body), signal });
+  getJson(url: string, signal?: AbortSignal, timeoutMs?: number): Promise<unknown> { return this.request(url, { method: "GET", signal }, timeoutMs); }
+  postJson(url: string, body?: unknown, signal?: AbortSignal, timeoutMs?: number): Promise<unknown> {
+    return this.request(url, { method: "POST", headers: { "content-type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body), signal }, timeoutMs);
   }
   createSocket(url: string): SocketLike { return new WebSocket(url); }
 
-  private async request(url: string, init: RequestInit): Promise<unknown> {
-    const timeout = AbortSignal.timeout(this.timeoutMs);
+  private async request(url: string, init: RequestInit, timeoutMs?: number): Promise<unknown> {
+    const timeout = AbortSignal.timeout(timeoutMs ?? this.timeoutMs);
     const signal = init.signal ? AbortSignal.any([init.signal, timeout]) : timeout;
     try {
       const response = await fetch(url, { ...init, signal });

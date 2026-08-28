@@ -13,8 +13,7 @@ export function ThemeToggle() {
       aria-label={isDark ? "Aydınlık temaya geç" : "Karanlık temaya geç"}
       onClick={toggleTheme}
     >
-      <Icon name={isDark ? "moon" : "sun"} size={15} />
-      <span>Tema</span>
+      <Icon name={isDark ? "moon" : "sun"} size={16} />
     </button>
   );
 }

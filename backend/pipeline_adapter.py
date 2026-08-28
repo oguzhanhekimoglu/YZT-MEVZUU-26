@@ -19,6 +19,18 @@ class PipelineAdapter:
         print("[ADAPTER] TeknoFestPipeline başlatılıyor...", flush=True)
         self.pipeline = TeknoFestPipeline(source_fps=source_fps)
         print("[ADAPTER] Pipeline hazır.", flush=True)
+        # BUG-FIX: eskiden last_vlm_payload/last_llm_payload TEK bir global
+        # değerdi (tüm track'ler arasında paylaşılıyordu) — bir hedefin VLM/LLM
+        # sonucu, kendi analizi hiç bitmemiş BAŞKA bir (genelde yeni) hedefe
+        # sızıyor, arayüz VRAG'dan sonra VLM/LLM hiç gelmeden "nihai karar"
+        # gösteriyordu. Artık track_id başına ayrı tutuluyor.
+        self._last_vlm_payload_by_track = {}
+        self._last_llm_payload_by_track = {}
+        self._last_seen_reset_generation = self.pipeline.tracker.reset_generation
+        # Sadece "hiç hedef kalmadı" hayalet-hedef durumunda kullanılır (id=-1,
+        # frontend tarafından zaten filtreleniyor) — hangi track'in en son
+        # veri ürettiğini tutar.
+        self._most_recent_track_id = None
 
     def isle(self, frame):
         import cv2
@@ -27,9 +39,22 @@ class PipelineAdapter:
         if w > 1280:
             scale = 1280 / w
             frame = cv2.resize(frame, (1280, int(h * scale)))
+        # BUG-FIX: t.bbox_xyxy, process_frame'e verilen (yeniden boyutlandırılmış
+        # olabilecek) bu karenin piksel uzayında hesaplanıyor - normalize etmek
+        # için bu karenin KENDİ boyutları kullanılmalı, resize öncesi h/w değil.
+        frame_h, frame_w = frame.shape[:2]
 
         """Returns (annotated_bgr, hedef_json_listesi) matching the Fuzyon interface."""
         targets = self.pipeline.process_frame(frame)
+
+        # Sahne geçişi / oturum sıfırlaması: track ID'leri sıfırdan yeniden
+        # dağıtılıyor, bu yüzden eski ID'lere ait önbellek artık FARKLI bir
+        # fiziksel nesneye ait olabilir — tamamen temizle.
+        current_generation = self.pipeline.tracker.reset_generation
+        if current_generation != self._last_seen_reset_generation:
+            self._last_vlm_payload_by_track.clear()
+            self._last_llm_payload_by_track.clear()
+            self._last_seen_reset_generation = current_generation
         
         # Pipeline içinde frame_bgr üzerine çizim yapılıyor (eğer process_frame bunu tutuyorsa)
         # Mevcut pipeline yapısına bakarak, eğer frame_bgr attribute'u yoksa orijinal kareyi döndür.
@@ -40,11 +65,28 @@ class PipelineAdapter:
             
         json_listesi = []
         for t in targets:
+            # BUG-FIX (bounding box hiç görünmüyordu): t.bbox_xyxy piksel
+            # cinsinden [x1,y1,x2,y2] - frontend'in TacticalOverlay'i ise
+            # normalize edilmiş (0-1) {x,y,width,height} bekliyor
+            # (bkz. backend-parser.ts parseTrackingBox). Eskiden ham piksel
+            # dörtlüsü gönderiliyordu, frontend bunu bir DİZİ olduğu için
+            # (obje değil) tanımıyor ve sessizce hiç kutu çizmiyordu.
+            x1, y1, x2, y2 = (float(v) for v in t.bbox_xyxy)
+            x1 = max(0.0, min(x1, frame_w))
+            y1 = max(0.0, min(y1, frame_h))
+            x2 = max(0.0, min(x2, frame_w))
+            y2 = max(0.0, min(y2, frame_h))
+            bbox_normalized = {
+                "x": round(x1 / frame_w, 4) if frame_w else 0.0,
+                "y": round(y1 / frame_h, 4) if frame_h else 0.0,
+                "width": round(max(0.0, x2 - x1) / frame_w, 4) if frame_w else 0.0,
+                "height": round(max(0.0, y2 - y1) / frame_h, 4) if frame_h else 0.0,
+            }
             d = {
                 "id": int(t.track_id),
                 "sinif": t.class_name,
                 "guven": round(float(t.confidence), 3),
-                "bbox": [int(v) for v in t.bbox_xyxy],
+                "bbox": bbox_normalized,
                 "hiz_px_s": round(float(t.speed_px_s), 1),
                 "zigzag": round(float(t.zigzag_score), 3),
                 "hits": int(t.hits),
@@ -117,29 +159,32 @@ class PipelineAdapter:
                     "guvenilen_kaynak": v.get("_guvenilen_kaynak", "")
                 }
                 d["vlm"] = vlm_payload
-                self.last_vlm_payload = vlm_payload  # Durumu kaydet
-            elif hasattr(self, 'last_vlm_payload') and self.last_vlm_payload:
-                d["vlm"] = self.last_vlm_payload  # Eski durumu kullan
+                self._last_vlm_payload_by_track[t.track_id] = vlm_payload  # Bu track icin durumu kaydet
+                self._most_recent_track_id = t.track_id
+            elif t.track_id in self._last_vlm_payload_by_track:
+                d["vlm"] = self._last_vlm_payload_by_track[t.track_id]  # Ayni track'in eski durumunu kullan
                 
             # LLM Verilerini aktar
             if hasattr(t, 'llm_result') and isinstance(t.llm_result, dict):
                 d["llm"] = t.llm_result
-                self.last_llm_payload = t.llm_result  # Durumu kaydet
-            elif hasattr(self, 'last_llm_payload') and self.last_llm_payload:
-                d["llm"] = self.last_llm_payload  # Eski durumu kullan
+                self._last_llm_payload_by_track[t.track_id] = t.llm_result  # Bu track icin durumu kaydet
+                self._most_recent_track_id = t.track_id
+            elif t.track_id in self._last_llm_payload_by_track:
+                d["llm"] = self._last_llm_payload_by_track[t.track_id]  # Ayni track'in eski durumunu kullan
                 
             json_listesi.append(d)
             
-        # Eğer hiç hedef yoksa ama son bilinen VLM/LLM verisi varsa, UI'ın sıfırlanmasını 
+        # Eğer hiç hedef yoksa ama son bilinen VLM/LLM verisi varsa, UI'ın sıfırlanmasını
         # önlemek için hayalet bir hedef gönderiyoruz. (Ekranın dışına çizilmesi için bbox [0,0,0,0])
-        if not json_listesi and hasattr(self, 'last_vlm_payload') and self.last_vlm_payload:
+        last_vlm = self._last_vlm_payload_by_track.get(self._most_recent_track_id)
+        if not json_listesi and last_vlm:
             dummy = {
                 "id": -1, "sinif": "bilinmeyen", "guven": 0.0, "bbox": [0,0,0,0],
                 "hiz_px_s": 0.0, "zigzag": 0.0, "hits": 0,
                 "model": None, "model_skor": None, "dusuk_guven": False,
                 "ulke": None, "uretici": None, "rol": None, "adaylar": [],
-                "vlm": self.last_vlm_payload,
-                "llm": getattr(self, 'last_llm_payload', None)
+                "vlm": last_vlm,
+                "llm": self._last_llm_payload_by_track.get(self._most_recent_track_id)
             }
             json_listesi.append(dummy)
             

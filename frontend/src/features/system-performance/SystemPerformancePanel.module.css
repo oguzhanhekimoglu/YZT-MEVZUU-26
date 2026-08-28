@@ -42,6 +42,13 @@
 .loadTest span { color: var(--color-text-muted); letter-spacing: .08em; }
 .loadTest p { margin-top: var(--space-1); color: var(--color-text-secondary); font-family: var(--font-family-mono); font-size: var(--font-size-technical); }
 .source, .empty { margin-top: var(--space-3); color: var(--color-text-muted); font-size: var(--font-size-technical); }
+
+/* BUG-FIX (kullanıcı isteği): "Hedef Kalite Skorları" artık Operasyonel Karar
+   panelinin altında değil, burada (Kalite KPI'ları sekmesi) - sistem geneli
+   doğrulama KPI'larından ayrı bir alt bölüm. */
+.targetQuality { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-border); }
+.subHeading { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--space-2); color: var(--color-text-muted); font-size: var(--font-size-technical); letter-spacing: .06em; }
+.subHeading small { color: var(--color-text-muted); font-family: var(--font-family-mono); }
 .headerPlacement { height: var(--telemetry-height, 40px); position: relative; display: flex; align-items: stretch; margin-left: auto; translate: 0 -6px; }
 .headerPlacement .trigger { height: var(--telemetry-height, 40px); min-height: var(--telemetry-height, 40px); gap: var(--space-2); padding: 0 var(--space-2); border-color: var(--color-border); border-radius: var(--radius-card); background: color-mix(in srgb, var(--color-background) 58%, transparent); }
 .headerPlacement .pulse { width: 7px; height: 7px; border: 0; }
@@ -51,7 +58,12 @@
 .telemetrySummary strong { color: var(--color-success); font-family: var(--font-family-sans); font-weight: var(--font-weight-medium); }
 .telemetrySummary span { border-left: 1px solid var(--color-border); }
 .waiting { font-family: Arial, sans-serif; }
-.headerPlacement .panel { position: absolute; z-index: 20; top: calc(100% + var(--space-3)); right: 0; width: min(390px, calc(100vw - 24px)); max-height: min(620px, calc(100vh - 110px)); margin: 0; overflow-y: auto; border-radius: var(--radius-panel); box-shadow: var(--shadow-overlay); }
+/* BUG-FIX (Kalite KPI'ları video panelinin altında kalıyordu): panel artık
+   React portal ile document.body'ye taşınıyor, bu yüzden .headerPlacement'ın
+   İÇİNDE değil — nesting'e bağlı ".headerPlacement .panel" seçicisi artık
+   hiç eşleşmez. Konumdan bağımsız, doğrudan uygulanan bir sınıf gerekiyor;
+   top/right JS'ten (getBoundingClientRect) inline style ile gelir. */
+.headerPanel { position: fixed; z-index: 20; width: min(390px, calc(100vw - 24px)); max-height: min(620px, calc(100vh - 110px)); margin: 0; overflow-y: auto; border-radius: var(--radius-panel); box-shadow: var(--shadow-overlay); }
 
 @media (max-width: 25rem) {
   .scoreGrid { grid-template-columns: 1fr; }

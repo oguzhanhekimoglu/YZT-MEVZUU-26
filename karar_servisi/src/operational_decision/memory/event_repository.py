@@ -170,21 +170,34 @@ class EventRepository:
         row["created_at_utc"] = parse_utc(row["created_at_utc"])
         return row
 
-    async def list_finalized_outputs_for_video(self, video_id: str) -> list[dict[str, Any]]:
+    async def list_finalized_outputs_for_video(
+        self, video_id: str, *, since: datetime | None = None
+    ) -> list[dict[str, Any]]:
         """Read and decode every finalized event's output for one video, oldest first.
 
         get_final_output(event_id)'nin toplu hâli — video-geneli özet (bkz.
         decision/video_summary.py) o videoya ait tüm hedef-bazlı nihai kararları
         tek seferde okumak için kullanır.
+
+        BUG-FIX: aynı video_id (dosya adı) farklı oturumlarda tekrar tekrar test
+        edildiğinde, önceki oturumlardan kalma eski kayıtlar hâlâ aynı video_id
+        altında birikiyor ve yeni oturumun özetine karışıyordu ("eski çıktıları
+        baz alarak cevap üretiyor"). `since` verilirse yalnızca o zamandan
+        SONRA üretilmiş kayıtlar döner — çağıran taraf (routes_events.py) bunu
+        mevcut oturumun başlangıç zamanı olarak geçirip önceki oturumları
+        tamamen dışarıda bırakabilir. Denetim izi (event_memory.db) hiçbir
+        şekilde silinmiyor, sadece bu okuma sorgusu sınırlanıyor.
         """
-        async with self.database.connection() as connection:
-            cursor = await connection.execute(
-                """SELECT final_outputs.* FROM final_outputs
+        query = """SELECT final_outputs.* FROM final_outputs
                 JOIN events ON events.event_id = final_outputs.event_id
-                WHERE events.video_id = ? AND events.event_status = ?
-                ORDER BY final_outputs.created_at_utc ASC""",
-                (video_id, EventStatus.FINALIZED.value),
-            )
+                WHERE events.video_id = ? AND events.event_status = ?"""
+        params: list[Any] = [video_id, EventStatus.FINALIZED.value]
+        if since is not None:
+            query += " AND final_outputs.created_at_utc >= ?"
+            params.append(serialize_utc(since))
+        query += " ORDER BY final_outputs.created_at_utc ASC"
+        async with self.database.connection() as connection:
+            cursor = await connection.execute(query, tuple(params))
             rows = [row_to_dict(row) for row in await cursor.fetchall()]
         outputs: list[dict[str, Any]] = []
         for row in rows:

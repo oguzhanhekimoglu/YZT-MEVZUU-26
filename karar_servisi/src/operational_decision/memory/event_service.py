@@ -1,6 +1,7 @@
 """Transactional event lifecycle, audit, and idempotency service."""
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import StrEnum
 from hashlib import sha256
 from typing import Any
@@ -466,9 +467,15 @@ class EventService:
         """Read one persisted final output for API delivery."""
         return await self.repository.get_final_output(event_id)
 
-    async def list_finalized_outputs_for_video(self, video_id: str) -> list[dict[str, Any]]:
-        """Read every persisted final output for one video (video-geneli özet için)."""
-        return await self.repository.list_finalized_outputs_for_video(video_id)
+    async def list_finalized_outputs_for_video(
+        self, video_id: str, *, since: datetime | None = None
+    ) -> list[dict[str, Any]]:
+        """Read every persisted final output for one video (video-geneli özet için).
+
+        `since` verilirse yalnızca o andan sonraki kayıtlar döner - bkz.
+        EventRepository.list_finalized_outputs_for_video.
+        """
+        return await self.repository.list_finalized_outputs_for_video(video_id, since=since)
 
     async def get_active_by_fingerprint(self, fingerprint: str) -> dict[str, Any] | None:
         """Read an active event for resume checks without creating a duplicate."""

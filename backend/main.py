@@ -17,6 +17,7 @@ import logging
 import threading
 import time
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 
 import cv2
@@ -48,6 +49,13 @@ class Durum:
         self.calisiyor = False
         self.son_kare: bytes | None = None
         self.son_hedefler: list = []
+        # BUG-FIX ("bbox eskisi gibi kare içine almıyor"): frontend'in kutu
+        # konumlandırma çerçevesi, gerçekten yayınlanan (resize sonrası)
+        # karenin en-boy oranını bilmeli. <img onLoad> ile tahmin MJPEG
+        # multipart akışlarında güvenilir değil - bu yüzden backend'in kendi
+        # bildiği piksel boyutunu doğrudan /durum ile bildiriyoruz.
+        self.kare_genislik = 0
+        self.kare_yukseklik = 0
         self.frame_no = 0
         self.kaynak = ""
         self.fps = 0.0
@@ -65,6 +73,13 @@ class Durum:
         self.pipeline_kilit = threading.Lock()
         self.thread: threading.Thread | None = None
         self.meta_cache: dict = {}
+        # BUG-FIX: ayni video_id (dosya adi) farkli oturumlarda tekrar tekrar
+        # test edildiginde, karar_servisi'ndeki event_memory.db onceki
+        # oturumlarin kayitlarini hic silmiyor - video-geneli ozet bunlari da
+        # dahil edip "eski ciktilari baz alarak cevap uretiyor"du. Bu, mevcut
+        # oturumun BASLANGIC zamanini tutar; /video/ozet bunu karar_servisi'ne
+        # `since` olarak gecerek onceki oturumlari tamamen disarida birakir.
+        self.oturum_baslangic_utc: datetime | None = None
 
 
 durum = Durum()
@@ -165,14 +180,11 @@ def _video_dongu(video_yolu: str):
             # sıfırlanınca otomatik temizlenmiyordu — eski videodan kalan cevap
             # (ör. "Kaan", tutarlılık 2/2) hiç yeni analiz yapılmadan gösteriliyordu.
             durum.fuzyon.pipeline.vlm.reset_all()
-            # BUG-FIX: pipeline_adapter.py, henüz kendi tazesi olmayan hedefler için
-            # (ör. yeni track ilk birkaç karede) en son bilinen VLM/LLM sonucunu
-            # (last_vlm_payload/last_llm_payload) "hayalet" olarak gösteriyordu —
-            # bunlar PipelineAdapter nesnesinde saklandığı için (oturumlar arası
-            # yaşıyor) yeni video başlasa bile eski sonuç ekranda kalmaya devam
-            # ediyordu. Yeni oturumda bunlar da temizlenmeli.
-            durum.fuzyon.last_vlm_payload = None
-            durum.fuzyon.last_llm_payload = None
+            # BUG-FIX: pipeline_adapter.py artık track_id başına VLM/LLM önbelleği
+            # tutuyor ve tracker.reset() (yukarıda çağrıldı) her seferinde
+            # tracker.reset_generation'ı artırıyor — PipelineAdapter.isle() bu
+            # sayaç değiştiğinde önbelleği kendiliğinden temizliyor, burada
+            # elle temizlemeye gerek yok (bkz. backend/pipeline_adapter.py).
 
     # Video-geneli özet (karar_servisi tarafında video_id'ye göre gruplanıyor)
     # gerçek videoyla eşleşsin diye pipeline'a bu oturumun video adını bildiriyoruz.
@@ -216,6 +228,7 @@ def _video_dongu(video_yolu: str):
                 durum.son_kare = jpg.tobytes()
                 durum.son_hedefler = hedefler
                 durum.frame_no += 1
+                durum.kare_yukseklik, durum.kare_genislik = annotated.shape[:2]
                 
     cap.release()
     durum.calisiyor = False
@@ -239,8 +252,11 @@ def oturum_baslat(govde: dict):
         durum.frame_no = 0
         durum.fps = 0.0
         durum.sure_saniye = 0.0
+        durum.kare_genislik = 0
+        durum.kare_yukseklik = 0
     durum.calisiyor = True
     durum.kaynak = yol
+    durum.oturum_baslangic_utc = datetime.now(UTC)
     durum.thread = threading.Thread(target=_video_dongu, args=(yol,), daemon=True)
     durum.thread.start()
     return {"ok": True, "kaynak": yol}
@@ -255,10 +271,17 @@ def oturum_durdur():
 @app.get("/durum")
 def durum_al():
     gecen_saniye = (durum.frame_no / durum.fps) if durum.fps > 0 else 0.0
+    # BUG-FIX (mimari değişiklik): FPS/Slicer/Tracker gibi canlı performans
+    # telemetrisi eskiden yalnızca video karesine yakılan yeşil HUD metniydi
+    # (bkz. visualizer.py). Artık burada döndürülüyor - frontend'in "Canlı
+    # Performans" paneli bunu okuyor, video karesi artık temiz.
+    performans = durum.fuzyon.pipeline.performans if durum.fuzyon is not None else {}
     return {"calisiyor": durum.calisiyor, "kaynak": durum.kaynak,
             "frame_no": durum.frame_no, "hedef_sayisi": len(durum.son_hedefler),
             "model_sayisi": durum.meta_cache.get("model_sayisi", 0),
-            "sure_saniye": durum.sure_saniye, "gecen_saniye": gecen_saniye}
+            "sure_saniye": durum.sure_saniye, "gecen_saniye": gecen_saniye,
+            "performans": performans,
+            "kare_genislik": durum.kare_genislik, "kare_yukseklik": durum.kare_yukseklik}
 
 
 @app.get("/video/ozet")
@@ -271,9 +294,17 @@ def video_ozet():
     if not durum.kaynak:
         return {"status": "pending", "summary": "", "events": [], "risk": "bilinmiyor", "actions": []}
     video_id = Path(durum.kaynak).name
+    parametreler = {}
+    if durum.oturum_baslangic_utc is not None:
+        # BUG-FIX: ayni video_id onceki oturumlarda da test edilmis olabilir -
+        # `since` ile karar_servisi'ne sadece MEVCUT oturumun kayitlarina
+        # bakmasini soyluyoruz (bkz. Durum.oturum_baslangic_utc yorumu).
+        parametreler["since"] = durum.oturum_baslangic_utc.isoformat()
     try:
         yanit = requests.get(
-            f"http://127.0.0.1:8001/api/v1/videos/{video_id}/summary", timeout=120.0
+            f"http://127.0.0.1:8001/api/v1/videos/{video_id}/summary",
+            params=parametreler,
+            timeout=120.0,
         )
         yanit.raise_for_status()
         return yanit.json()
