@@ -1,6 +1,6 @@
 ![TEKNOFEST Logo](https://cdn.teknofest.org/media/upload/userFormUpload/KK_TF_7lLHF.png)
 
-# 🛡️ YZT-MEVZUU
+#  YZT-MEVZUU
 
 ### Gerçek Zamanlı Hava Sahası Gözetleme, İHA/Uçak Tanıma ve Operasyonel Karar Destek Sistemi
 
