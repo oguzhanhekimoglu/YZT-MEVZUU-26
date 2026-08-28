@@ -90,6 +90,19 @@
       "minimum": 0,
       "title": "Guven Skoru",
       "type": "integer"
+    },
+    "video_gozlem": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Video Gozlem"
     }
   },
   "required": [

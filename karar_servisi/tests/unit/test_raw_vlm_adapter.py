@@ -43,6 +43,7 @@ def test_only_underscore_prefixed_helper_metadata_is_removed() -> None:
         "gidis_yeri",
         "gorsel_analiz",
         "guven_skoru",
+        "video_gozlem",
     }
 
 

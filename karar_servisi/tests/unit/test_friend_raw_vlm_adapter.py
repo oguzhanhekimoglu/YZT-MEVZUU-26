@@ -135,6 +135,27 @@ def test_strong_vrag_vote_share_never_produces_low_uncertainty() -> None:
     assert visual.uncertainty_level is UncertaintyLevel.MEDIUM
 
 
+def test_video_gozlem_is_carried_to_upstream_audit_without_touching_decision_fields() -> None:
+    """BUG-FIX (kullanıcı isteği — ikincil video-VLM'i sisteme entegre et):
+    video_gozlem SADECE upstream_vlm_output'a (LLM'in Türkçe özetine ek bağlam
+    için, bkz. evidence_builder._render_visual_evidence) taşınmalı - kimlik/
+    tehdit/risk alanlarını (arac_sinifi, final_visual_hypothesis, uncertainty_
+    level) hiç etkilememeli."""
+    result = _adapt(
+        hedef_modeli="Boeing 747",
+        video_gozlem="hareket: düz uçuş, ayırt edici özellik: dört motorlu",
+    )
+    visual = result.analyze_request.visual_evidence
+    assert visual.upstream_vlm_output.video_gozlem == "hareket: düz uçuş, ayırt edici özellik: dört motorlu"
+    assert visual.final_visual_hypothesis == "Boeing 747"
+    assert visual.uncertainty_level is UncertaintyLevel.MEDIUM
+
+
+def test_missing_video_gozlem_defaults_to_none() -> None:
+    result = _adapt(hedef_modeli="Boeing 747")
+    assert result.analyze_request.visual_evidence.upstream_vlm_output.video_gozlem is None
+
+
 def test_normal_unknown_field_is_rejected() -> None:
     with pytest.raises(ValidationError, match="unknown raw VLM field"):
         RawVLMOutput.model_validate(_raw(hedef_modelli="F-16"))

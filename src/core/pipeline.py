@@ -963,9 +963,9 @@ class TeknoFestPipeline:
         try:
             # 1. Adapt Raw VLM
             allowed_vlm_keys = {
-                "arac_sinifi", "tehdit_seviyesi", "tahmini_hedef_tipi", 
-                "ulke_orjini", "hedef_modeli", "gorsel_analiz", 
-                "_celiski_var", "_vote_count", "video_events"
+                "arac_sinifi", "tehdit_seviyesi", "tahmini_hedef_tipi",
+                "ulke_orjini", "hedef_modeli", "gorsel_analiz",
+                "_celiski_var", "_vote_count", "video_events", "video_gozlem"
             }
             cleaned_vlm_result = {k: v for k, v in vlm_result.items() if k in allowed_vlm_keys or str(k).startswith("_")}
 
@@ -993,6 +993,29 @@ class TeknoFestPipeline:
             vrag_oy_orani = getattr(track, "vrag_oy_orani", None)
             if vrag_oy_orani is not None:
                 cleaned_vlm_result["_vrag_oy_orani"] = round(float(vrag_oy_orani), 3)
+
+            # BUG-FIX (kullanıcı isteği — ikincil video-kanıtı VLM'ini sisteme
+            # entegre et, SIFIR regresyon riskiyle): src/vlm/video_evidence.py
+            # (track.video_vlm_result) bilinçli olarak SADECE gözlemsel -
+            # kimlik/tehdit/risk alanı üretmiyor, bu yüzden mevcut karar
+            # alanlarına (arac_sinifi, hedef_modeli, tehdit_seviyesi vb.) hiç
+            # karıştırılmıyor. Sadece kısa, tek bir Türkçe gözlem cümlesi
+            # olarak "video_gozlem" alanına konup karar_servisi'ne taşınıyor -
+            # orada da nihai kararı DEĞİL, yalnızca LLM'in Türkçe özetine
+            # (visual_evidence satırı) ek bağlam sağlıyor.
+            video_vlm = getattr(track, "video_vlm_result", None)
+            if isinstance(video_vlm, dict):
+                video_parcalari = []
+                if video_vlm.get("hareket_tanimi"):
+                    video_parcalari.append(f"hareket: {video_vlm['hareket_tanimi']}")
+                if video_vlm.get("ayirt_edici_ozellik"):
+                    video_parcalari.append(f"ayırt edici özellik: {video_vlm['ayirt_edici_ozellik']}")
+                if video_vlm.get("model_ipucu") and video_vlm["model_ipucu"] not in ("bilinmiyor", None, ""):
+                    video_parcalari.append(f"düşük-öncelikli model ipucu: {video_vlm['model_ipucu']}")
+                if video_vlm.get("belirsizlik_notu"):
+                    video_parcalari.append(f"belirsizlik: {video_vlm['belirsizlik_notu']}")
+                if video_parcalari:
+                    cleaned_vlm_result["video_gozlem"] = ", ".join(video_parcalari)[:500]
 
             current_time_offset = float(time.time() % 10000)
             # BUG-FIX (kök neden araştırması — "guven_skoru aslında YOLO tespit

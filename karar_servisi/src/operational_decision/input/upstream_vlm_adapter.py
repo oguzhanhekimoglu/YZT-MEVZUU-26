@@ -193,6 +193,7 @@ def adapt_friend_raw_vlm_to_request(
         gidis_yeri=None,
         gorsel_analiz=raw.gorsel_analiz,
         guven_skoru=round(adapter_input.visual_confidence * 100),
+        video_gozlem=raw.video_gozlem,
     )
     visual = FinalVisualEvidencePackage(
         evidence_source_mode=EvidenceSourceMode.VLM_ONLY,

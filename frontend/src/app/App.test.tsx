@@ -7,39 +7,25 @@ function renderApp(dataSource = new TestOperatorDataSource()) {
   return { dataSource, ...render(<AppProviders dataSource={dataSource}><App /></AppProviders>) };
 }
 
-beforeEach(() => {
-  vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock-video");
-  vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => undefined);
-});
-
-afterEach(() => vi.restoreAllMocks());
-
 describe("App", () => {
-  it("ürün adını, alt başlığı ve video dropzone alanını gösterir", () => {
+  it("ürün adını, alt başlığı ve video yer tutucusunu gösterir", () => {
     renderApp();
     expect(screen.getByRole("heading", { level: 1, name: "MEVZUU" })).toBeInTheDocument();
     expect(screen.getByText("Hava Sahası Karar Destek Sistemi")).toBeInTheDocument();
-    expect(screen.getByText("Videoyu buraya sürükleyin")).toBeInTheDocument();
+    expect(screen.getByText("Video bekleniyor")).toBeInTheDocument();
   });
 
   it("geçerli video seçilince metadata ve başlat butonunu gösterir", async () => {
-    renderApp();
-    const file = new File(["video"], "gorev.mp4", { type: "video/mp4" });
-    fireEvent.change(document.getElementById("video-file-input")!, { target: { files: [file] } });
+    const { dataSource } = renderApp();
+    await act(async () => { await dataSource.selectVideo({ name: "gorev.mp4" }); });
     await waitFor(() => expect(screen.getByRole("button", { name: "Analizi Başlat" })).toBeEnabled());
     expect(screen.getByRole("button", { name: /Analizi Başlat/ })).toBeEnabled();
-  });
-
-  it("geçersiz dosya türü için Türkçe hata gösterir", () => {
-    renderApp();
-    fireEvent.change(document.getElementById("video-file-input")!, { target: { files: [new File(["x"], "not.txt", { type: "text/plain" })] } });
-    expect(screen.getByRole("alert")).toHaveTextContent("Geçersiz dosya türü");
   });
 
   it("oturum durumuna göre kontrolleri etkinleştirir", async () => {
     const { dataSource } = renderApp();
     expect(screen.queryByRole("button", { name: "Analizi Başlat" })).not.toBeInTheDocument();
-    fireEvent.change(document.getElementById("video-file-input")!, { target: { files: [new File(["x"], "gorev.mp4", { type: "video/mp4" })] } });
+    await act(async () => { await dataSource.selectVideo({ name: "gorev.mp4" }); });
     await waitFor(() => expect(screen.getByRole("button", { name: "Analizi Başlat" })).toBeEnabled());
     fireEvent.click(screen.getByRole("button", { name: "Analizi Başlat" }));
     act(() => dataSource.advance());
@@ -48,11 +34,16 @@ describe("App", () => {
   });
 
   it("Baştan Başlat onay modalını açar", async () => {
-    renderApp();
-    fireEvent.change(document.getElementById("video-file-input")!, { target: { files: [new File(["x"], "gorev.mp4", { type: "video/mp4" })] } });
+    const { dataSource } = renderApp();
+    await act(async () => { await dataSource.selectVideo({ name: "gorev.mp4" }); });
     fireEvent.click(await screen.findByRole("button", { name: "Analizi Başlat" }));
-    fireEvent.ended(await screen.findByLabelText("gorev.mp4 yerel video önizlemesi"));
-    fireEvent.click(await screen.findByRole("button", { name: /Baştan Başlat/ }));
+    // Video bitince gerçek backend'de durum "stopped" olur (bkz.
+    // existing-backend-adapter.ts pollStatus) - eskiden burada yerel <video>
+    // elementinin "ended" olayı simüle ediliyordu, o mekanizma sürükle-bırak/
+    // yerel önizleme kaldırılınca tamamen kalktı.
+    await act(async () => { await dataSource.stop(); });
+    await waitFor(() => expect(screen.getByRole("button", { name: /Baştan Başlat/ })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: /Baştan Başlat/ }));
     expect(screen.getByRole("alertdialog", { name: "Analizi baştan başlat" })).toBeInTheDocument();
   });
 
@@ -78,20 +69,10 @@ describe("App", () => {
     expect(document.body.textContent).not.toMatch(/gidiş yönü/i);
   });
 
-  it("object URL bileşen kaldırıldığında temizlenir", async () => {
-    const { unmount } = renderApp();
-    fireEvent.change(document.getElementById("video-file-input")!, { target: { files: [new File(["x"], "gorev.mp4", { type: "video/mp4" })] } });
+  it("video seçildikten sonra video seçiciyi (Video Değiştir) erişilebilir tutar", async () => {
+    const { dataSource } = renderApp();
+    await act(async () => { await dataSource.selectVideo({ name: "gorev.mp4" }); });
     await waitFor(() => expect(screen.getByRole("button", { name: "Analizi Başlat" })).toBeEnabled());
-    unmount();
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-video");
-  });
-
-  it("önizleme açıldıktan sonra video seçiciyi erişilebilir tutar", async () => {
-    renderApp();
-    const input = document.getElementById("video-file-input") as HTMLInputElement;
-    fireEvent.change(input, { target: { files: [new File(["x"], "gorev.mp4", { type: "video/mp4" })] } });
-    await waitFor(() => expect(screen.getByRole("button", { name: "Analizi Başlat" })).toBeEnabled());
-    expect(document.getElementById("video-file-input")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Video Değiştir/ })).toBeEnabled();
   });
 });

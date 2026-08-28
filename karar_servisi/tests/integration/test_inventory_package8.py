@@ -24,14 +24,6 @@ ALIASES_PATH = ROOT / "data/platforms/platform_aliases.json"
 INVENTORY_PATH = ROOT / "data/inventory/turkey_inventory.json"
 
 CORRECTED_NOT_LISTED = (
-    (
-        "PLT_HURKUS",
-        "TUSA\u015e H\u00dcRKU\u015e",
-        "HURKUS",
-        "VIDEO_RAW_HURKUS_DEFAULT",
-        "SAVAS_UCAGI",
-        "egitim ucagi",
-    ),
     ("PLT_STM_ALPAGU", "STM ALPAGU", "ALPAGU", "VIDEO_RAW_ALPAGU_DEFAULT", "SIHA", "vurucu iha"),
     (
         "PLT_TUSAS_SUPER_SIMSEK",

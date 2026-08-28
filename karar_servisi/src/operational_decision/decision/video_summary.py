@@ -139,6 +139,41 @@ def _overall_risk_label(groups: list[list[dict[str, Any]]]) -> str:
     return _risk_label(max(known, key=lambda level: _RISK_ORDER[level]))
 
 
+def _unique_identities(groups: list[list[dict[str, Any]]]) -> list[str]:
+    """Distinct hedef isimleri, ilk görülme sırasıyla, tekrarsız."""
+    seen: list[str] = []
+    for group in groups:
+        identity, _ = _identity_and_risk(group[-1])
+        if identity not in seen:
+            seen.append(identity)
+    return seen
+
+
+def _compose_summary(
+    groups: list[list[dict[str, Any]]], overall_risk_label: str, actions: list[str]
+) -> str:
+    """BUG-FIX (kullanıcı isteği — "operatör kafası karışmasın"): eskiden tek,
+    mekanik bir satırdı ("N güvenilir tespit kaydedildi; en yüksek risk: X.").
+    LLM'e GERİ DÖNMEDEN (bilinçli olarak deterministik kalıyor - bkz. modül
+    dokümantasyonu) 2-3 kısa, doğal cümleye çevrildi: hangi hedef(ler)
+    görüldü, genel risk ne, varsa öncelikli aksiyon ne."""
+    names = _unique_identities(groups)
+    if len(names) == 1:
+        hedef_cumlesi = f"Video boyunca {names[0]} güvenilir şekilde tespit edildi."
+    elif len(names) == 2:
+        hedef_cumlesi = f"Video boyunca {names[0]} ve {names[1]} olmak üzere 2 farklı hedef tespit edildi."
+    else:
+        ilk_ikisi = " ve ".join(names[:2])
+        hedef_cumlesi = f"Video boyunca {len(names)} farklı hedef tespit edildi ({ilk_ikisi} ve diğerleri)."
+
+    risk_cumlesi = f"Genel risk seviyesi {overall_risk_label} olarak belirlendi."
+
+    parcalar = [hedef_cumlesi, risk_cumlesi]
+    if actions:
+        parcalar.append(f"Önerilen aksiyon: {actions[0]}.")
+    return " ".join(parcalar)
+
+
 async def summarize_video(
     *,
     video_id: str,
@@ -176,11 +211,12 @@ async def summarize_video(
 
     events.extend(_group_event(group) for group in groups)
     overall_risk = _overall_risk_label(groups)
+    actions = _collect_unique_actions(groups)
 
     return {
         "status": "final",
-        "summary": f"{len(groups)} güvenilir tespit kaydedildi; en yüksek risk: {overall_risk}.",
+        "summary": _compose_summary(groups, overall_risk, actions),
         "events": events,
         "risk": overall_risk,
-        "actions": _collect_unique_actions(groups),
+        "actions": actions,
     }

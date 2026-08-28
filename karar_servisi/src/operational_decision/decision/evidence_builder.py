@@ -228,6 +228,11 @@ class EvidencePackageBuilder:
         if isinstance(vlm_facts, dict) and vlm_facts:
             fact_parts = [f"{key}={value}" for key, value in vlm_facts.items()]
             lines.append("VLM ham gözlemi (hipotez, kesin kimlik değil): " + ", ".join(fact_parts) + ".")
+        video_note = dumped.get("video_evidence_note")
+        if video_note:
+            lines.append(
+                f"Video kanıtı (ikincil, bağımsız gözlem — kesin kimlik/tehdit değil): {video_note}"
+            )
         return lines
 
     @staticmethod
@@ -355,6 +360,14 @@ class EvidencePackageBuilder:
             if selected_visual:
                 raw["vlm_observation_facts"] = selected_visual
                 raw["vlm_threat_is_visual_estimate_only"] = True
+            # BUG-FIX (kullanıcı isteği — video-VLM'i sisteme entegre et):
+            # ikincil, bağımsız video-kanıtı VLM'inin (src/vlm/video_evidence.py)
+            # SADECE gözlemsel notu - kimlik/risk/tehdit alanlarından TAMAMEN
+            # ayrı bir satır olarak taşınır, vlm_observation_facts'e (görsel-VLM'in
+            # kendi ham alanları) KARIŞTIRILMAZ.
+            video_gozlem = upstream.get("video_gozlem")
+            if video_gozlem:
+                raw["video_evidence_note"] = video_gozlem
                 raw["visual_rationale_finalized"] = {
                     key: raw[key]
                     for key in (

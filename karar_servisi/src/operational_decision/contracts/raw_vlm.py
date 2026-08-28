@@ -23,6 +23,10 @@ class RawVLMOutput(BaseModel):
     conflict_detected: bool = Field(default=False, alias="_celiski_var")
     vote_count: int | None = Field(default=None, alias="_vote_count", ge=0)
     video_events: list[RawVideoEvent] = Field(default_factory=list, max_length=100)
+    # BUG-FIX (kullanıcı isteği — video-VLM'i sisteme entegre et, sıfır
+    # regresyon riskiyle): ikincil, bağımsız video-kanıtı VLM'inin (src/vlm/
+    # video_evidence.py) SADECE gözlemsel notu - opsiyonel, yoksa None.
+    video_gozlem: str | None = Field(default=None, max_length=500)
 
     @model_validator(mode="before")
     @classmethod
@@ -40,6 +44,7 @@ class RawVLMOutput(BaseModel):
             "_celiski_var",
             "_vote_count",
             "video_events",
+            "video_gozlem",
         }
         invalid = [
             key

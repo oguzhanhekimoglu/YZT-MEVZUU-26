@@ -30,25 +30,27 @@
   letter-spacing: .09em;
 }
 
+/* BUG-FIX (kullanıcı isteği): Operasyonel Karar bölümü hafif kısaltıldı ve
+   küçültüldü - dikey boşluk ve yazı boyutları biraz azaltıldı. */
 .decisionBody {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 128px;
-  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr) 116px;
+  gap: var(--space-3);
   align-items: center;
-  padding: var(--space-3) var(--space-4) var(--space-4);
+  padding: var(--space-2) var(--space-4) var(--space-3);
 }
 
 .decisionCopy h2 {
   overflow-wrap: anywhere;
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
   line-height: var(--line-height-tight);
 }
 
 .decisionCopy p {
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
   color: var(--color-text-secondary);
-  font-size: var(--font-size-helper);
-  line-height: 1.55;
+  font-size: var(--font-size-technical);
+  line-height: 1.45;
 }
 
 .decisionMeta {
@@ -59,7 +61,7 @@
 .riskBox {
   display: grid;
   place-items: center;
-  min-height: 66px;
+  min-height: 54px;
   padding: var(--space-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
@@ -76,7 +78,7 @@
 
 .riskBox strong {
   color: var(--color-text-primary);
-  font-size: 1.05rem;
+  font-size: .92rem;
   text-transform: uppercase;
 }
 

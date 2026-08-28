@@ -256,6 +256,15 @@
       "service_status": "LIMITED_SERVICE",
       "active": true,
       "source_type": "DEMO_MOCK"
+    },
+    {
+      "inventory_record_id": "TR-DEMO-HURKUS-001",
+      "platform_id": "PLT_HURKUS",
+      "country_code": "TR",
+      "operator_name": "Demo Turkish Air Force Training Operator",
+      "service_status": "ACTIVE_SERVICE",
+      "active": true,
+      "source_type": "DEMO_MOCK"
     }
   ]
 }

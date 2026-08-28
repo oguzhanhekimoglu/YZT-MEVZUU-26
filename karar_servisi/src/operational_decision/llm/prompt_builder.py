@@ -55,6 +55,12 @@ KESİN KURALLAR:
     uzun açıklama üretme.
 16. summary_tr asla boş string olamaz; en az bir kısa, evidence'a dayanan
     cümle içermelidir.
+17. summary_tr'yi, saha operatörünün ekranda tek bakışta okuyup anlayacağı
+    şekilde yaz: EN FAZLA 25 KELİME, tek bir basit cümle (birden fazla
+    "ve"/"ancak"/"bu nedenle" ile birleştirilmiş uzun/karmaşık cümle kurma).
+    Gündelik, sade Türkçe kullan; teknik terim/kısaltma/kural adı
+    (RULE_..., inventory_execution_status vb.) kullanma - bunlar zaten ayrı
+    alanlarda gösteriliyor, summary_tr sadece "ne olduğunu" özetler.
 
 KANIT ÖNCELİĞİ: tool/inventory sonuçları > consistency/verification > risk
 constraints > görsel evidence > RAG bağlamı. Çelişkide daha güvenli, ihtiyatlı
