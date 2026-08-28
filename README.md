@@ -38,7 +38,7 @@ Bu proje, Bilişim Vadisi tarafından TEKNOFEST kapsamında düzenlenen **Türk�
 - **Kendi tanımladığımız KPI'lar, canlı ölçülüp raporlanıyor:** Arayüzdeki "Kalite KPI'ları" paneli (`frontend/src/features/system-performance/`) olay tespit doğruluğu, kritik olay yakalama oranı, özet kalitesi ve aksiyon doğruluğunu; "Hedef Kalite Skorları" ise seçili hedef için YOLO güveni, takip kararlılığı, VRAG/SigLIP benzerliği ve kimlik güvenini ayrı ayrı gösterir — güven sayıları gerçek altta yatan sinyallerden (ör. VRAG oy oranı) türetilir, tek bir "genel güven" sayısına indirgenmez.
 - **Girdi esnekliği:** Sunucudaki bir video dosyasını seçmek, kendi videonuzu sürükle-bırakla yüklemek veya backend'in çalıştığı makinedeki **canlı kamerayı** doğrudan açmak — üçü de aynı algı/karar hattından geçer.
 
-**Bilinen kısıt:** VLM/LLM çıkarımı ve metin gömme artık yerel değil, TEKNOFEST'in sağladığı EVREN altyapısı (`evren-llmapi`, `evren-vektor`) üzerinden çalışıyor — sistem sürekli internet bağlantısı gerektiriyor, tamamen offline çalışmıyor. Algı hattı (YOLO/SAHI/ByteTrack/VRAG) tamamen yerelde ve GPU'suz çalışabiliyor.
+**Bilinen kısıt:** VLM/LLM çıkarımı ve metin gömme artık yerel değil, TEKNOFEST'in sağladığı EVREN altyapısı (`evren-llmapi`, `evren-vektor`) üzerinden çalışıyor — sistem sürekli internet bağlantısı gerektiriyor, tamamen offline çalışmıyor. Algı hattı (YOLO/SAHI/ByteTrack/VRAG) hem normal yerel kurulumda hem Docker'da GPU'suz (CPU'da) tam olarak çalışır; NVIDIA CUDA (Windows/Linux) veya Apple Silicon MPS (macOS) varsa `src/config.py`'deki `DEVICE` otomatik algılayıp YOLO+VRAG'ı hızlandırır — elle bir ayar değiştirmek gerekmez, aynı kod her donanımda çalışır.
 
 ## Klasör Yapısı
 
@@ -59,6 +59,7 @@ Bu proje, Bilişim Vadisi tarafından TEKNOFEST kapsamında düzenlenen **Türk�
 - İnternet bağlantısı gerekiyor — VLM ve karar/rapor üretimi artık yerel bir modelle değil, EVREN üzerinden çalışıyor.
 - Python'un kendisini elle kurmanıza gerek yok — aşağıdaki `uv sync` adımı, projenin istediği **Python 3.11**'i sizin için otomatik indirip kuruyor.
 - İlk çalıştırmada VRAG'ın görsel gömme modeli (`google/siglip2-so400m-patch14-384`) Hugging Face'ten otomatik indirilir (~3-4 GB, bir kerelik) — bunun için internet gerekir. Bunun ötesinde, VLM ve karar/rapor üretimi her çağrıda EVREN'e gittiği için sistem **sürekli internet bağlantısına ihtiyaç duyar**, artık offline çalışmaz.
+- **GPU isteğe bağlıdır, elle ayar gerekmez:** YOLO+VRAG, `src/config.py`'deki `DEVICE` üzerinden NVIDIA CUDA'yı (Windows/Linux) veya Apple Silicon MPS'i (macOS) otomatik algılayıp kullanır; hiçbiri yoksa sorunsuz CPU'da çalışır. Bu, hem normal yerel kurulumda hem Docker'da (isteğe bağlı GPU eklentisiyle) aynı şekilde geçerlidir — proje **Docker'a bağımlı değildir**, aşağıdaki Windows/macOS adımlarıyla doğrudan yerel makinenizde de tam olarak test edilebilir.
 
 ---
 
@@ -165,7 +166,7 @@ Bu proje, Bilişim Vadisi tarafından TEKNOFEST kapsamında düzenlenen **Türk�
 
 ## Kurulum ve Çalıştırma — Docker (Windows / macOS / Linux)
 
-Kurulum adımlarının hiçbirini elle yapmadan (Python, `uv`, venv, bağımlılıklar dahil) tek imajla çalıştırma. Algı hattı GPU olmadan (CPU'da) tam olarak çalışır — Mac'te NVIDIA GPU pass-through zaten mümkün değildir, bu yüzden varsayılan kurulum her platformda aynıdır.
+Kurulum adımlarının hiçbirini elle yapmadan (Python, `uv`, venv, bağımlılıklar dahil) tek imajla çalıştırma — Windows/macOS/Linux'taki yukarıdaki **normal yerel kurulumun tam bir alternatifi**; ikisi de aynı kodu çalıştırır, biri diğerinden "daha doğru" değildir, sadece kurulum şeklidir. Algı hattı GPU olmadan (CPU'da) tam olarak çalışır — Mac'te Docker konteynerine NVIDIA GPU pass-through zaten mümkün değildir (Docker Desktop bunu desteklemez), bu yüzden varsayılan kurulum her platformda aynıdır. Windows/Linux'ta NVIDIA GPU'nuz varsa aşağıdaki isteğe bağlı GPU eklentisiyle container içinde de CUDA hızlandırması alabilirsiniz.
 
 1. **Docker Desktop'ı kurun** ([Windows](https://docs.docker.com/desktop/install/windows-install/) — WSL2 backend'i otomatik kullanır, ayrıca bir şey kurmanıza gerek yok / [macOS](https://docs.docker.com/desktop/install/mac-install/)) ve açık olduğundan emin olun.
 2. **Git LFS ile depoyu klonlayın** (Windows/macOS için yukarıdaki adım 1 ve 3'teki komutlarla aynı).
@@ -187,7 +188,7 @@ Kurulum adımlarının hiçbirini elle yapmadan (Python, `uv`, venv, bağımlıl
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
 ```
-Bu sadece YOLO/SAHI tespitini hızlandırır — VRAG bilinçli olarak her zaman CPU'da çalışır (`src/config.py: VRAG_DEVICE`), VLM/LLM zaten uzaktaki EVREN'de çalıştığı için ikisi de etkilenmez.
+Bu, YOLO/SAHI tespitini VE VRAG'ı (`src/config.py: DEVICE`/`VRAG_DEVICE` ikisi de aynı otomatik algılanan cihazı kullanır) birlikte hızlandırır — FPS artışı hem yerel kurulumda hem Docker'da aynı mantıkla çalışır. VLM/LLM zaten uzaktaki EVREN'de çalıştığı için GPU'dan etkilenmez.
 
 **VRAG referans veri setini genişletmek** için `data/` klasörü zaten bind-mount edildiğinden, aşağıdaki "VRAG Referans Verisini Genişletme" adımlarını container **içinde** çalıştırın:
 ```bash
@@ -236,7 +237,7 @@ Script **güvenli şekilde senkronize eder**: `data/referans/`'ın tamamını he
 
 **Farklı çözünürlüklü bir videoya geçince çöküyor:** Bu sorun çözüldü — her yeni oturumda tracker + kamera hareketi kompanzasyonu otomatik sıfırlanıyor. Hâlâ oluyorsa güncel kodda olduğunuzdan emin olun.
 
-**Hepsi birlikte (YOLO+VRAG+VLM+LLM) çalışınca donanım yetmiyor gibi görünüyor:** VRAG bilinçli olarak CPU'da çalışacak şekilde ayarlı (`src/config.py: VRAG_DEVICE = "cpu"`), bunu değiştirmeyin. VLM/LLM artık uzakta (EVREN) çalıştığı için yerel GPU/VRAM'i hiç kullanmıyor — bu tıkanıklık artık sadece YOLO+VRAG'ın kendi aralarında paylaştığı yerel kaynaklarla ilgili olabilir.
+**Hepsi birlikte (YOLO+VRAG+VLM+LLM) çalışınca donanım yetmiyor gibi görünüyor:** VLM/LLM artık uzakta (EVREN) çalıştığı için yerel GPU/VRAM'i hiç kullanmıyor — bu tıkanıklık sadece YOLO+VRAG'ın kendi aralarında paylaştığı yerel kaynaklarla ilgili olabilir. İkisi de `src/config.py`'deki `DEVICE`'ı (CUDA → Apple Silicon MPS → CPU, otomatik algılanır) paylaşır; GPU'nuz varsa ikisi de ondan faydalanır, yoksa ikisi de CPU'da güvenle çalışır — elle bir cihaz ayarı değiştirmeniz gerekmez.
 
 ## Lisans
 
