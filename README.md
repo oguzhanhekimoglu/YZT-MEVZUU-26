@@ -1,4 +1,4 @@
-<img src="https://teknofest.org/storage/uploads/page/B92oJ1iNnK5vB1OtzLh3s0v2CqO8x3hWk0iFk6N7.png" alt="TEKNOFEST Logo" width="250">
+![TEKNOFEST Logo](https://cdn.teknofest.org/media/upload/userFormUpload/KK_TF_7lLHF.png)
 
 # 🛡️ YZT-MEVZUU
 
