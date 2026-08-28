@@ -1,0 +1,16 @@
+# karar_servisi/pyproject.toml (uv.lock) zaten torch/transformers/fastapi/pydantic
+# vb. ortak bağımlılıkları kuruyor. Bunlar SADECE ana YOLO/VRAG pipeline'ının
+# ihtiyaç duyduğu, karar servisi tarafında olmayan ekstra paketler.
+#
+# BUG-FIX (Docker imajı eksikti — "henüz bozuk" notunun sebeplerinden biri):
+# boxmot (ByteTrack) hiç yoktu — src/tracking/tracker.py import'ta patlardı.
+# requests (pipeline.py'nin backend↔karar_servisi HTTP çağrıları) ve
+# python-multipart (FastAPI'nin UploadFile/File — /tani ve /video/yukle uçları
+# için zorunlu) de eksikti. README'deki manuel kurulum listesiyle eşleştirildi.
+ultralytics==8.4.115
+opencv-python-headless>=4.10
+qdrant-client==1.19.0
+pillow>=10.0
+boxmot>=19.0
+requests>=2.31
+python-multipart>=0.0.9  # FastAPI UploadFile bağımlılığı, "multipart" adıyla import edilir

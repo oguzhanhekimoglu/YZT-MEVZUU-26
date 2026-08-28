@@ -71,7 +71,7 @@ data/referans/
 .agents/
 
 # ============================================================
-# Docker — henüz bozuk/eksik (boxmot yok, NVIDIA'ya kilitli),
-# üzerinde ayrı çalışılıyor. Yerelde kalsın, repoya girmesin.
+# Docker — Dockerfile/docker-compose.yml TAKİP EDİLİYOR (paylaşılan
+# kurulum), sadece gerçek anahtarları içeren docker/.env asla git'e girmez.
 # ============================================================
-docker/
+docker/.env

@@ -1,0 +1,18 @@
+# İsteğe bağlı GPU eklentisi — SADECE NVIDIA sürücü + nvidia-container-toolkit
+# kurulu Windows/Linux'ta kullanın (Mac'te NVIDIA GPU pass-through hiç yok,
+# bu dosyayı Mac'te eklemeyin). docker-compose.yml'in üzerine bindirilir:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+#
+# Sadece YOLO/SAHI tespiti bundan faydalanır — VRAG (SigLIP2) src/config.py:
+# VRAG_DEVICE="cpu" ile bilinçli olarak her zaman CPU'da kalır, VLM/LLM zaten
+# uzaktaki EVREN'de çalışıyor, ikisi de bu ayardan etkilenmez.
+services:
+  app:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

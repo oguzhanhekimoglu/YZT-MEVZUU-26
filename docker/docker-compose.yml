@@ -1,0 +1,50 @@
+# Tüm sistem (YOLO+SAHI pipeline + VRAG + backend + karar_servisi) tek
+# container'da — VLM/LLM/embedding çıkarımı artık yerelde/GPU'da değil,
+# TEKNOFEST'in sağladığı EVREN altyapısında (evren-llmapi/evren-vektor)
+# çalışıyor. VRAG (SigLIP2) bilinçli olarak CPU'da çalışacak şekilde ayarlı
+# (src/config.py: VRAG_DEVICE = "cpu") — GPU'suz makinelerde (ör. Mac,
+# NVIDIA'sız Windows/Linux) bu dosya OLDUĞU GİBİ, hiçbir değişiklik
+# gerekmeden çalışır. Sadece YOLO/SAHI tespiti GPU'dan faydalanabilir;
+# NVIDIA'nız varsa (Windows/Linux) isteğe bağlı hızlandırma için aşağıdaki
+# "GPU ile çalıştırma" bölümüne bakın.
+#
+# Key kurulumu (bir kere, elle — asla git'e girmez, docker/.env .gitignore'da):
+#   cp docker/.env.example docker/.env
+#   docker/.env içindeki 4 değeri gerçek EVREN/Qdrant key'leriyle doldur.
+#
+# Kullanım (CPU — Mac dahil her platformda):
+#   cd docker
+#   docker compose up -d --build
+#   curl http://localhost:8000/durum                # ana backend ayakta mı
+#   curl http://localhost:8001/health                # karar servisi (EVREN/Qdrant bağlantı durumu)
+#   → web arayüzü: http://localhost:8000/goruntule/
+#
+# GPU ile çalıştırma (isteğe bağlı — sadece NVIDIA'lı Windows/Linux):
+#   Ön koşul: NVIDIA sürücü + nvidia-container-toolkit kurulu olmalı.
+#   Doğrulama: docker run --rm --gpus all nvidia/cuda:12.4.1-base nvidia-smi
+#   Çalıştırma: docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+#   ÖNEMLİ: "docker compose" (v2, boşluklu, modern Docker Desktop'a gömülü)
+#   kullan — eski/standalone "docker-compose" (v1, tireli) GPU rezervasyonunu
+#   (deploy.resources.reservations.devices) swarm dışında görmezden gelebilir.
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: uav-vrag-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - VLM_API_KEY=${VLM_API_KEY:?docker/.env içinde VLM_API_KEY eksik}
+      - OPERATIONAL_DECISION_VLLM_API_KEY=${OPERATIONAL_DECISION_VLLM_API_KEY:?docker/.env içinde OPERATIONAL_DECISION_VLLM_API_KEY eksik}
+      - OPERATIONAL_DECISION_QDRANT_API_KEY=${OPERATIONAL_DECISION_QDRANT_API_KEY:?docker/.env içinde OPERATIONAL_DECISION_QDRANT_API_KEY eksik}
+      - OPERATIONAL_DECISION_QDRANT_COLLECTION_PREFIX=${OPERATIONAL_DECISION_QDRANT_COLLECTION_PREFIX:?docker/.env içinde OPERATIONAL_DECISION_QDRANT_COLLECTION_PREFIX eksik}
+    volumes:
+      # Kod dışındaki her şey bind-mount — repo'nun kendisi zaten bu verilerle
+      # birlikte klonlanmış olacak, imaja gömmeye gerek yok. data/referans/
+      # (VRAG kaynak fotoğrafları) zaten data/'nın altında, ayrı mount gerekmez.
+      - ../output:/app/output
+      - ../models:/app/models
+      - ../data:/app/data
+      - ../karar_servisi/data:/app/karar_servisi/data
