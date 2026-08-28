@@ -33,14 +33,17 @@ _MAX_RAW_RECORDS = 250
 # (en yenisi öncelikli) olay günlüğüne dahil edilir.
 _MAX_GROUPS_IN_EVENTS = 60
 
-# BUG-FIX ("10ms olsa bile nihai çıktıya giriyor"): bir hedefin ardışık
-# analizlerde yalnızca BİR KEZ görülen (tek seferlik, muhtemelen anlık bir
-# yanlış sınıflandırmadan kaynaklanan) hipotezi, güvenilir bir bulguymuş gibi
-# özete girmemeli. En az bu kadar ardışık tekrarla doğrulanmış gruplar
-# "güvenilir" sayılır. (pipeline.py tarafında da kaynağında bir kararlılık
-# şartı eklendi — bu, ikinci bir savunma katmanı.)
-_MIN_RELIABLE_OCCURRENCES = 2
-
+# BUG-FIX ("nihai çıktı bazen hiç gelmiyor" — kök neden araştırması):
+# burada AYRICA bir "en az 2 kez görülmeli" güvenilirlik filtresi vardı, ama
+# bu filtre TÜM VİDEONUN karışık hedef akışında "ardışık komşu satır" sayıyordu
+# - videoda gerçekten var olan TEK bir uçak yalnızca BİR KEZ (kendi track'i
+# için) doğrulanıp kaydedildiğinde bu "grup boyu 1" oluyor ve (kritik
+# değilse) yanlışlıkla "güvenilmez" sayılıp özetten düşebiliyordu. Asıl
+# güvenilirlik garantisi artık KAYNAĞINDA veriliyor: pipeline.py'deki
+# _confirm_stable_vlm_hash, bir hedefin kimliği (araç sınıfı/tip/model/ülke)
+# 2 ardışık analizde DEĞİŞMEDEN kalmadıkça event_memory.db'ye hiç yazmıyor.
+# Yani buraya ulaşan her kayıt zaten kaynağında doğrulanmış - burada ikinci
+# bir (ve yanlış granülerlikte) filtre uygulamak gereksiz ve zararlıydı.
 _RISK_LABELS = {
     "LOW": "düşük",
     "MEDIUM": "orta",
@@ -98,15 +101,6 @@ def _group_consecutive_repeats(outputs: list[dict[str, Any]]) -> list[list[dict[
         else:
             groups.append([row])
     return groups
-
-
-def _is_reliable_group(group: list[dict[str, Any]]) -> bool:
-    """A single (non-repeated) occurrence is reliable only if it was flagged
-    critical — a lone, non-critical hit is the profile of a momentary
-    misclassification glitch, not a confirmed finding worth reporting."""
-    return len(group) >= _MIN_RELIABLE_OCCURRENCES or any(
-        _is_critical(row.get("output") or {}) for row in group
-    )
 
 
 def _group_event(group: list[dict[str, Any]]) -> dict[str, Any]:
@@ -178,11 +172,7 @@ async def summarize_video(
         return dict(_PENDING_RESULT)
 
     recent = outputs[-_MAX_RAW_RECORDS:]
-    groups = _group_consecutive_repeats(recent)
-    reliable_groups = [group for group in groups if _is_reliable_group(group)]
-    # Hepsi tek seferlik/güvenilmez çıkmışsa (nadir), özeti tamamen boş
-    # bırakmak yerine yine de mevcut bulguları kullan.
-    groups = (reliable_groups or groups)[-_MAX_GROUPS_IN_EVENTS:]
+    groups = _group_consecutive_repeats(recent)[-_MAX_GROUPS_IN_EVENTS:]
 
     events.extend(_group_event(group) for group in groups)
     overall_risk = _overall_risk_label(groups)

@@ -114,8 +114,6 @@ async def test_summarize_video_collapses_consecutive_repeats_of_same_target() ->
     other = {"canonical_name": "Kaan", "risk_level": "MEDIUM"}
     outputs = (
         [{"output": repeated, "created_at_utc": None} for _ in range(50)]
-        # "other" iki kez tekrarlanıyor ki güvenilirlik filtresine takılmadan
-        # (bkz. _is_reliable_group) ayrı bir olay olarak kalmaya devam etsin.
         + [{"output": other, "created_at_utc": None} for _ in range(2)]
         + [{"output": repeated, "created_at_utc": None} for _ in range(5)]
     )
@@ -178,32 +176,29 @@ async def test_summarize_video_since_excludes_previous_sessions_of_same_video_id
 
 
 @pytest.mark.asyncio
-async def test_summarize_video_drops_single_non_critical_hit_as_unreliable() -> None:
-    """BUG-FIX: bir hedefin ardışık analizlerde yalnızca BİR KEZ görülen,
-    kritik olarak işaretlenmemiş bir hipotezi (10ms'lik bir anlık yanlış
-    sınıflandırma profili) artık güvenilir bir bulgu gibi özete girmiyor —
-    ardışık en az iki kez tekrarlanan hedefler hâlâ raporlanıyor."""
-    glitch = {"canonical_name": "Anlik Yanlis Siniflandirma", "risk_level": "LOW"}
-    confirmed = {"canonical_name": "Dogrulanmis Hedef", "risk_level": "LOW"}
-    outputs = [
-        {"output": glitch, "created_at_utc": None},
-        {"output": confirmed, "created_at_utc": None},
-        {"output": confirmed, "created_at_utc": None},
-    ]
+async def test_summarize_video_keeps_single_confirmed_hit_even_when_not_critical() -> None:
+    """BUG-FIX (kök neden araştırması — "nihai çıktı bazen hiç gelmiyor"):
+    video_summary artık kendi tarafında "en az 2 kez görülmeli" gibi ikinci
+    bir güvenilirlik filtresi UYGULAMAZ. Buraya (event_memory.db'ye) ulaşan
+    her kayıt zaten pipeline.py'deki _confirm_stable_vlm_hash sayesinde
+    kaynağında doğrulanmıştır — videoda gerçekten var olan tek bir uçak
+    yalnızca BİR KEZ (kendi track'i için) kaydedilmiş olsa bile, kritik
+    olmasa dahi özetten düşmemeli."""
+    confirmed_once = {"canonical_name": "Tek Kayitli Ama Dogrulanmis Hedef", "risk_level": "LOW"}
+    outputs = [{"output": confirmed_once, "created_at_utc": None}]
     service = FakeEventService(outputs)
 
     result = await summarize_video(video_id="video-1", event_service=service)
 
     events_text = [event["event"] for event in result["events"]]
-    assert any("Dogrulanmis Hedef" in text for text in events_text)
-    assert not any("Anlik Yanlis Siniflandirma" in text for text in events_text)
+    assert any("Tek Kayitli Ama Dogrulanmis Hedef" in text for text in events_text)
 
 
 @pytest.mark.asyncio
 async def test_summarize_video_keeps_single_critical_hit() -> None:
     """Tek seferlik bile olsa kritik işaretli bir bulgu (ör. gerçekten
     düşman/yüksek riskli onaylı bir hedef, kısa süre görünüp kaybolmuş
-    olabilir) güvenilmez sayılıp atılmamalı."""
+    olabilir) özete girmeli."""
     critical_once = {"canonical_name": "Kritik Tek Gorunum", "risk_level": "HIGH"}
     outputs = [{"output": critical_once, "created_at_utc": None}]
     service = FakeEventService(outputs)

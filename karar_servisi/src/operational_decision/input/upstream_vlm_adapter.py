@@ -155,9 +155,27 @@ def adapt_friend_raw_vlm_to_request(
         visual_assessment_tr=raw.gorsel_analiz,
     )
     conflict = raw.conflict_detected
+    # BUG-FIX (kök neden araştırması — "risk analizindeki belirsizlik sinyali
+    # sağlıklı değil"): eskiden uncertainty_level yalnızca ikiliydi (MEDIUM
+    # varsayılan, VLM kendi metniyle kendi sınıflandırmasıyla çelişirse HIGH) -
+    # VRAG/VLM'in birbirini ne kadar güçlü doğruladığı (oy oranı) hiç
+    # kullanılmıyordu. "_vrag_oy_orani" pipeline.py'den "_" ile başlayan bir
+    # yardımcı alan olarak geliyor (RawVLMOutput zaten bunu extra=allow ile
+    # kabul ediyor, ayrı bir şema değişikliği gerekmedi) - burada gerçek bir
+    # 3 seviyeli belirsizlik sinyaline çevriliyor.
+    vrag_oy_orani = helper_metadata.get("_vrag_oy_orani")
+    vrag_oy_orani = vrag_oy_orani if isinstance(vrag_oy_orani, (int, float)) else None
     uncertainty_flags = ["VLM_ONLY_NO_RETRIEVAL_CONFIRMATION"]
     if conflict:
         uncertainty_flags.append("RAW_VLM_CONFLICT_REPORTED")
+    if vrag_oy_orani is not None and vrag_oy_orani < 0.65:
+        uncertainty_flags.append("VRAG_VOTE_SHARE_WEAK")
+    if conflict or (vrag_oy_orani is not None and vrag_oy_orani < 0.65):
+        uncertainty_level = UncertaintyLevel.HIGH
+    elif vrag_oy_orani is not None and vrag_oy_orani >= 0.85:
+        uncertainty_level = UncertaintyLevel.LOW
+    else:
+        uncertainty_level = UncertaintyLevel.MEDIUM
 
     upstream_audit = UpstreamVLMOutput(
         arac_sinifi=mapping_key,
@@ -178,7 +196,7 @@ def adapt_friend_raw_vlm_to_request(
         visual_evidence_status=VisualEvidenceStatus.PARTIALLY_SUPPORTED,
         visual_confidence=adapter_input.visual_confidence,
         confidence_origin=ConfidenceOrigin.VLM_SELF_REPORTED,
-        uncertainty_level=(UncertaintyLevel.HIGH if conflict else UncertaintyLevel.MEDIUM),
+        uncertainty_level=uncertainty_level,
         uncertainty_flags=uncertainty_flags,
         human_visual_review_required=True,
         track_metrics=None,

@@ -304,6 +304,16 @@ VLM_RECALL_IQA_GAIN        = 1.10   # [GÃœNCELLENDÄ°] 1.15->1.10: Yeni foto�
 VLM_VOTE_WINDOW            = 5
 VLM_COOLDOWN_S             = 0.5   # VLM Ã§aÄŸrÄ±larÄ± arasÄ± minimum sÃ¼re
 VLM_MIN_BBOX_PX            = 15    # Hedefin VLM'e gitmesi iÃ§in en az 15px olmasÄ±nÄ± bekle.
+# BUG-FIX (kok neden arastirmasi - "kucuk/uzak hedeflerde VRAG kararsiz"):
+# VLM_MIN_BBOX_PX yalnizca "VRAG/VLM'i TETIKLEMEK" icin yeterli bir esik -
+# 15-32px civarinda bir kirpimda SigLIP'in iki farkli ucak govdesini gercekten
+# ayirt etmesi guvenilir degil (loglarda F-35 ile Vestel Karayel skorlari bu
+# olcekte surekli 2-5 puan farkla yer degistiriyordu). Bu yuzden TETIKLEME
+# esigi (yukarida) ile bir oyun "GUVENILIR SAYILMASI/oylamaya girmesi" esigi
+# artik AYRI: kirpim bundan kucukse VRAG yine calisir (kullanicidan veri
+# gizlenmez) ama sonucu track'in oylama gecmisine eklenmez - kesin karar
+# hedefin gercekten yakinlasip taniyabilir boyuta gelmesini bekler.
+VRAG_MIN_RELIABLE_BBOX_PX  = 40
 VLM_MIN_CONFIDENCE_FOR_TIP = 40    # GÃ¼ven eÅŸiÄŸi (0-100), altÄ± â†’ tanÄ±msÄ±z
 VLM_MIN_TRACK_CONF         = 0.35  # Track gÃ¼veni bunun altÄ±ndaysa VLM Ã§alÄ±ÅŸmaz
 VLM_CROP_CONTEXT_RATIO     = 0.25  # Prensip 3 (Smart Crop): UÃ§aÄŸÄ±n tamamÄ±nÄ± ve Ã§evresini almak iÃ§in %25 padding
@@ -369,7 +379,18 @@ VRAG_MIN_SCORE       = 0.65  # EÅŸleÅŸme iÃ§in minimum Cosine Similarity
 # calisir, tek karenin sonucu titreyebilir (ayni hedef icin art arda farkli
 # modeller). Son VRAG_VOTE_WINDOW aramanin en sik tekrar eden top-1 modeli
 # gosterilir - VLM tarafindaki TrackVoteAggregator ile ayni mantik.
-VRAG_VOTE_WINDOW     = 5
+# BUG-FIX (kok neden arastirmasi - "VRAG cok ani karar degistirdiginde VLM/LLM
+# cikti alamiyoruz"): 5'lik pencere, LLM tetikleme kilidinin ("2 ardisik ayni
+# kimlik") saglanmasi icin cok kisaydi - pencere iki LLM-tetikleme turu
+# arasinda kolayca lider degistirebiliyordu. 15'e cikarildi (yaklasik son
+# 15 saniyelik oy gecmisi, VRAG ~saniyede bir calistigi icin).
+VRAG_VOTE_WINDOW     = 15
+# Histerezis: onaylanmis bir modelden BASKA bir modele gecmek icin, yeni
+# modelin oy orani onayli modelin oy oranini en az bu kadar (yuzde puani)
+# GECMELI - basit "kim onde" yarisi kucuk kayma/gurultude bile onayli
+# kimligi degistirip kararsizliga donebiliyordu. Ilk kez onay (henuz onayli
+# model yokken) icin bu kural gecerli degil, sadece %50 coguluk yeterli.
+VRAG_SWITCH_MARGIN   = 0.05
 
 # --- DENEYSEL: Sirali dongu modu (VRAG -> VLM -> LLM -> dur -> yeni crop -> VRAG...) ---
 # Kullanicinin acikca istedigi bir A/B testi: track basina VRAG/VLM/LLM'in her

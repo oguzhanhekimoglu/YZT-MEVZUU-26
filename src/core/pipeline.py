@@ -30,6 +30,7 @@ from src.config import (
     DISPLAY_MIN_CONF, DISPLAY_MIN_CLASS_VOTE, DISPLAY_ALLOWED_CLASSES, DISPLAY_MIN_HITS, EDGE_MARGIN_PX,
     EDGE_MAX_FRAMES, SUSPENDED_DRAW_GRACE_FRAMES, MAX_OBJECT_AREA_RATIO,
     VRAG_VOTE_WINDOW, SIRALI_DONGU_MODU, VRAG_GUVEN_ESIGI, PROC_MAX_WIDTH,
+    VRAG_SWITCH_MARGIN, VRAG_MIN_RELIABLE_BBOX_PX,
 )
 
 _LOG_FILE = Path(__file__).parent / "pipeline.log"
@@ -347,7 +348,13 @@ class TeknoFestPipeline:
                 or self.vlm.vrag_engine is None
                 or getattr(track, "dongu_asamasi", "vrag") == "vrag"
             )
-            if size_ok and len(track._crop_buffer) > 0 and dongu_vrag_sirasi:
+            # BUG-FIX (kullanıcı isteği — "kesin karara varana kadar stabil model
+            # gözüksün"): track için LLM zaten kesin bir karar verdiyse (bkz.
+            # _async_llm_task'taki decision_locked ataması), VRAG/VLM'i bir daha
+            # hiç tetikleme — ne ekrandaki kimlik ne de zaman damgası bir daha
+            # değişir, gereksiz EVREN çağrısı da yapılmaz.
+            karar_kilitli = getattr(track, "decision_locked", False)
+            if size_ok and len(track._crop_buffer) > 0 and dongu_vrag_sirasi and not karar_kilitli:
                 if not hasattr(track, "vrag_last_time"):
                     track.vrag_last_time = 0.0
                 if not hasattr(track, "vrag_is_running"):
@@ -370,7 +377,14 @@ class TeknoFestPipeline:
 
                     if live_crop.size > 0 and self.vlm.vrag_engine:
                         track.vrag_is_running = True
-                        self.executor.submit(self._async_vrag_task, track, live_crop)
+                        # BUG-FIX (kök neden araştırması — "küçük/uzak hedeflerde
+                        # VRAG kararsız"): VLM_MIN_BBOX_PX yalnızca "tetiklemeye
+                        # yeter" - bu ölçekte iki farklı uçağı gerçekten ayırt
+                        # etmek güvenilir değil. Kırpım yeterince büyük değilse
+                        # yine aranır (kullanıcıdan gizlenmez) ama sonucu track'in
+                        # oylama geçmişine EKLENMEZ (bkz. _async_vrag_task).
+                        boyut_guvenilir = max(bw, bh) >= VRAG_MIN_RELIABLE_BBOX_PX
+                        self.executor.submit(self._async_vrag_task, track, live_crop, boyut_guvenilir)
 
             # --- [YENİ] Video-kanıtı toplama (MVP) ---
             # Image (crop) yolundan bağımsız — her karede ayrı bir tampona
@@ -476,7 +490,7 @@ class TeknoFestPipeline:
                     and (not track.vlm_done or is_superior_recall)
                 )
 
-            if vlm_ready and vlm_calissin_mi:
+            if vlm_ready and vlm_calissin_mi and not karar_kilitli:
                 if is_superior_recall:
                     log.info(
                         f"[VLM-RECALL / SÜPER KARE] Track {track.track_id} → "
@@ -516,8 +530,8 @@ class TeknoFestPipeline:
                     )
 
             # --- [YENİ] LLM Tetikleme ---
-            if getattr(track, "vlm_done", False) and getattr(track, "vlm_result", None):
-                current_vlm_hash = str(track.vlm_result)
+            if not karar_kilitli and getattr(track, "vlm_done", False) and getattr(track, "vlm_result", None):
+                current_vlm_hash = self._vlm_identity_signature(track.vlm_result)
                 if not getattr(track, "is_llm_querying", False) and self._confirm_stable_vlm_hash(
                     track, current_vlm_hash
                 ):
@@ -642,6 +656,19 @@ class TeknoFestPipeline:
             "askida_hedef": len(self.tracker.suspended_tracks),
         }
 
+    # BUG-FIX (KÖKTEN — "nihai çıktı bazen hiç gelmiyor"): _confirm_stable_vlm_hash
+    # eskiden str(json_result) ile TÜM VLM çıktısını (gorsel_analiz gibi VLM'in
+    # her seferinde YENİDEN ÜRETTİĞİ serbest metni + ondalıklı skorları dahil)
+    # karşılaştırıyordu. gorsel_analiz bir dil modelinin serbest cümlesi olduğu
+    # için aynı sonuç/kimlik olsa bile kelimesi kelimesine iki kez aynı çıkması
+    # neredeyse imkansızdı — "2 ardışık kararlı sonuç" şartı pratikte hemen hiç
+    # sağlanamıyor, LLM tetiklenmiyor, event_memory.db'ye hiçbir kayıt düşmüyordu.
+    # Artık SADECE kimlik/karar açısından anlamlı, ayrık alanlar imzaya giriyor.
+    _VLM_IDENTITY_FIELDS = ("arac_sinifi", "tahmini_hedef_tipi", "hedef_modeli", "ulke_orjini", "tehdit_seviyesi")
+
+    def _vlm_identity_signature(self, vlm_result: dict) -> str:
+        return str(tuple(vlm_result.get(field) for field in self._VLM_IDENTITY_FIELDS))
+
     def _confirm_stable_vlm_hash(self, track, current_vlm_hash: str) -> bool:
         """BUG-FIX (kökten): bir hedefin VLM hipotezi değiştiği ANDA, tek bir
         anlık/yanlış sınıflandırma bile (ör. tek bir turda "Vestel KARAYEL")
@@ -673,7 +700,7 @@ class TeknoFestPipeline:
 
         log.info(f"Pipeline kapatıldı. Toplam: {self._frame_count} frame.")
 
-    def _async_vrag_task(self, track, live_crop):
+    def _async_vrag_task(self, track, live_crop, boyut_guvenilir=True):
         try:
             import time
             # VRAG kendi kilidini kullanır — VLM'in (Ollama, 120sn'ye kadar sürebilir)
@@ -681,6 +708,16 @@ class TeknoFestPipeline:
             with self._vrag_gate:
                 matches = self.vlm.vrag_engine.search_similar_vehicle(live_crop)
             if matches:
+                # BUG-FIX (kök neden araştırması — "küçük/uzak hedeflerde VRAG
+                # kararsız"): kırpım VRAG_MIN_RELIABLE_BBOX_PX'ten küçükse bu
+                # sonuç ne oylama geçmişine eklenir ne de onaylı kimliği
+                # değiştirir - hâlâ ekranda bir "bekleme" tahmini gösterilir
+                # (aşağıdaki elif) ama kalıcı/kararlı kimliğe hiç karışmaz.
+                if not boyut_guvenilir:
+                    if not getattr(track, "vrag_matches", None):
+                        track.vrag_matches = matches
+                    return
+
                 # Zamansal oylama: VRAG track başına ~saniyede bir çalışıyor, tek
                 # karenin sonucu titreyebiliyor (aynı hedef için art arda farklı
                 # modeller — örn. F-16→WZ-7→F-4E→WZ-7). Ham en-son sonucu doğrudan
@@ -694,23 +731,42 @@ class TeknoFestPipeline:
 
                 from collections import Counter
                 top1_adlari = [m[0]["model"] for m in track.vrag_history if m]
-                secilen_model, oy_sayisi = Counter(top1_adlari).most_common(1)[0]
-                # BUG-FIX ("her şeye X diyor"): zayıf/bölünmüş bir çoğunlukla
-                # (ör. 5 oydan sadece 2'si) bile modele hemen kesin karar
-                # vermek, ayırt edici olmayan/genellenmiş görünümlü bir
-                # referansa (bkz. bazı platformların düz arka planlı, az
-                # detaylı render'ları) sık sık yanlışlıkla yakınsanmasına yol
-                # açıyordu. Kazanan model artık pencerenin en az YARISINI
-                # almadıkça kabul edilmiyor — yetersiz oyda önceki kabul
-                # edilmiş sonuç korunur (henüz hiç kabul edilmemişse ham
-                # en-son sonuç kullanılır).
-                if oy_sayisi / len(top1_adlari) >= 0.5:
+                counts = Counter(top1_adlari)
+                secilen_model, oy_sayisi = counts.most_common(1)[0]
+                toplam_oy = len(top1_adlari)
+                oy_orani = oy_sayisi / toplam_oy
+
+                # BUG-FIX ("her şeye X diyor" + "VRAG çok ani karar değiştiriyor"):
+                # basit %50 çoğunluk tek başına, pencere büyütülse bile, ufak bir
+                # kayma anında onaylı kimliği başka bir modele kaydırabiliyordu -
+                # bu da VLM/LLM'in "2 ardışık aynı kimlik" kilidini (bkz.
+                # _confirm_stable_vlm_hash) hiç sağlanamaz hale getiriyordu.
+                # Artık HİSTEREZİS var: zaten onaylı bir model varsa, YENİ bir
+                # modelin onu devirmesi için sadece önde olması yetmiyor, oy
+                # oranı farkının da VRAG_SWITCH_MARGIN'i (kullanıcı tercihiyle
+                # %5) geçmesi gerekiyor - küçük gürültüde onaylı kimlik sabit
+                # kalır, gerçekten baskın bir değişiklik olursa yine geçiş yapar.
+                mevcut_onayli = getattr(track, "vrag_confirmed_model", None)
+                mevcut_oran = (counts[mevcut_onayli] / toplam_oy) if mevcut_onayli else 0.0
+                kabul_edilebilir = oy_orani >= 0.5 and (
+                    mevcut_onayli is None
+                    or secilen_model == mevcut_onayli
+                    or (oy_orani - mevcut_oran) >= VRAG_SWITCH_MARGIN
+                )
+
+                if kabul_edilebilir:
                     # Oylanan modele ait EN SON (en güncel) eşleşme bilgisini kullan
                     secilen_match = next(
                         (m[0] for m in reversed(track.vrag_history) if m and m[0]["model"] == secilen_model),
                         matches[0],
                     )
                     track.vrag_matches = [secilen_match] + matches[1:]
+                    track.vrag_confirmed_model = secilen_model
+                    # BUG-FIX (kök neden araştırması — "risk analizindeki güven
+                    # sayısı sağlıklı değil"): kimlik güveninin karar_servisi'ne
+                    # gerçekten ne kadar baskın kazanıldığını yansıtabilmesi için
+                    # oy oranı burada saklanıyor (bkz. _async_llm_task).
+                    track.vrag_oy_orani = oy_orani
                 elif not getattr(track, "vrag_matches", None):
                     track.vrag_matches = matches
         except Exception as e:
@@ -812,8 +868,8 @@ class TeknoFestPipeline:
                 # bakmaksızın LLM'i DOĞRUDAN tetikliyoruz. process_frame'deki eski
                 # kontrol de duruyor (hash+is_llm_querying ile çift tetiklemeyi zaten
                 # engelliyor) — track hâlâ aktifse o da çalışabilir, zararı yok.
-                current_vlm_hash = str(json_result)
-                if not getattr(track, "is_llm_querying", False) and self._confirm_stable_vlm_hash(
+                current_vlm_hash = self._vlm_identity_signature(json_result)
+                if not getattr(track, "decision_locked", False) and not getattr(track, "is_llm_querying", False) and self._confirm_stable_vlm_hash(
                     track, current_vlm_hash
                 ):
                     track.is_llm_querying = True
@@ -916,14 +972,40 @@ class TeknoFestPipeline:
             ):
                 cleaned_vlm_result["ulke_orjini"] = vrag_matches[0]["ulke"]
 
+            # BUG-FIX (kök neden araştırması — "risk analizindeki güven sayısı
+            # sağlıklı değil"): karar_servisi'nin RawVLMOutput'u "_" ile başlayan
+            # her alanı yardımcı metadata olarak kabul edip helper_metadata()
+            # üzerinden LLM'e taşıyor - kod tarafında yeni bir alan tanımlamaya
+            # gerek yok. VRAG'ın oy oranını (kimlik ne kadar baskın kazanıldı)
+            # buradan taşıyoruz; karar_servisi tarafında upstream_vlm_adapter.py
+            # bunu uncertainty_level'i zenginleştirmek için okuyor.
+            vrag_oy_orani = getattr(track, "vrag_oy_orani", None)
+            if vrag_oy_orani is not None:
+                cleaned_vlm_result["_vrag_oy_orani"] = round(float(vrag_oy_orani), 3)
+
             current_time_offset = float(time.time() % 10000)
+            # BUG-FIX (kök neden araştırması — "guven_skoru aslında YOLO tespit
+            # güveniydi, kimlik güveni değil"): VLM'in prompt'undan guven_skoru
+            # kaldırıldığı için (bkz. aşağıdaki json_result.get("guven_skoru"))
+            # buraya eskiden doğrudan track.confidence (YOLO/tracker tespit
+            # güveni — "burada bir hava aracı var" güveni) gönderiliyordu, "bu
+            # kesinlikle X modeli" güveniyle hiç ilgisi yok. Artık VRAG'ın asıl
+            # kimlik sinyali kullanılıyor: en iyi eşleşme skoru İLE oy oranının
+            # ZAYIF olanı (ikisi de yüksek değilse güven abartılmasın). VRAG
+            # hiç eşleşme üretmediyse (devre dışı/arıza) eski davranışa
+            # (track.confidence) geri dönülür.
+            if vrag_matches and vrag_oy_orani is not None:
+                kimlik_guveni = min(float(vrag_matches[0].get("score", 0.0)), float(vrag_oy_orani))
+            else:
+                kimlik_guveni = float(track.confidence)
+            kimlik_guveni = max(0.0, min(1.0, kimlik_guveni))
             adapter_payload = {
                 "raw_vlm": cleaned_vlm_result,
                 "video_id": video_id,
                 "track_id": str(track.track_id),
                 "first_seen_offset_seconds": current_time_offset,
                 "last_seen_offset_seconds": current_time_offset + 1.0,
-                "visual_confidence": float(track.confidence)
+                "visual_confidence": kimlik_guveni
             }
             res = requests.post("http://127.0.0.1:8001/api/v1/adapters/raw-vlm", json=adapter_payload, timeout=5.0)
             if res.status_code == 200:
@@ -937,7 +1019,14 @@ class TeknoFestPipeline:
                     )
                     if analyze_res.status_code == 200:
                         track.llm_result = analyze_res.json()
-                        log.info(f"[LLM] Track {track.track_id} için Stratejik Karar alındı.")
+                        # BUG-FIX (kullanıcı isteği — "kesin karara varana kadar
+                        # stabil model gözüksün"): bu track için artık kesin bir
+                        # karar var - VRAG/VLM/LLM bir daha tetiklenmeyecek (bkz.
+                        # process_frame'deki karar_kilitli kontrolleri), ekranda
+                        # gösterilen kimlik ve zaman damgası bundan sonra sabit
+                        # kalır.
+                        track.decision_locked = True
+                        log.info(f"[LLM] Track {track.track_id} için Stratejik Karar alındı — kimlik kilitlendi.")
                     else:
                         log.warning(f"[LLM] Analyze Error: {analyze_res.text}")
             else:

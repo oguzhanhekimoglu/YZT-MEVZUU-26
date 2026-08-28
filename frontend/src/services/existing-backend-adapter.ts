@@ -35,11 +35,17 @@ export interface ExistingBackendAdapterOptions {
 }
 
 const pendingFinal = { status: "pending" as const, summary: "Video geneli nihai analiz mevcut backend sürümünde henüz sağlanmıyor.", events: [], risk: "unknown" as const, actions: [] };
-// Video-geneli özet, birden fazla hedef analizini tek bir LLM çağrısında
-// birleştiriyor ve backend'in kendi zaman aşımı 120sn — genel 8sn'lik
-// varsayılan bu istek için çok kısa kalıp sonucu hiç görmeden iptal ediyordu.
+// BUG-FIX (kök neden araştırması — "nihai çıktı geç/hiç gelmiyor"): video_summary.py
+// artık LLM çağırmıyor, event_memory.db'den anlık (~ms) bir sorgu - eski 120sn'lik
+// LLM zaman aşımı payı artık gerekli değil ama zararsız, düşürmeye gerek yok.
 const VIDEO_SUMMARY_TIMEOUT_MS = 130_000;
 const VIDEO_SUMMARY_RETRY_DELAY_MS = 3_000;
+// BUG-FIX (kök neden araştırması): /video/ozet eskiden SADECE oturum bitince/
+// durdurulunca sorulurdu - backend'de bir hedef video ortasında kesin kimliğini
+// alsa bile arayüz bunu video/oturum bitene kadar hiç göstermiyordu ("video
+// bitince geliyor" şikayeti). Artık oturum "running" iken bu aralıkla da
+// periyodik olarak sorulup canlı olay günlüğü gerçekten canlı güncelleniyor.
+const VIDEO_SUMMARY_POLL_INTERVAL_MS = 5_000;
 const failedFinal = (reason: string) => ({ status: "partial" as const, summary: `Video geneli özet alınamadı: ${reason}`, events: [], risk: "unknown" as const, actions: [] });
 const riskOrder: Record<RiskLevel, number> = { critical: 5, high: 4, medium: 3, low: 2, info: 1, unknown: 0 };
 
@@ -66,6 +72,7 @@ export class ExistingBackendAdapter implements OperatorDataSource {
   private readonly listeners = new Set<OperatorSessionListener>();
   private session: OperatorSession;
   private pollTimer?: ReturnType<typeof setTimeout>;
+  private summaryTimer?: ReturnType<typeof setTimeout>;
   private reconnectTimer?: ReturnType<typeof setTimeout>;
   private pollController?: AbortController;
   private socket?: SocketLike;
@@ -130,6 +137,7 @@ export class ExistingBackendAdapter implements OperatorDataSource {
   async stop(): Promise<OperatorSession> {
     if (this.stopping) throw new DataSourceError("UNSUPPORTED", "Durdurma isteği zaten işleniyor.", true);
     this.stopping = true;
+    this.stopSummaryPoll();
     try {
       await this.transport.postJson(resolveApiUrl(this.config.apiBaseUrl, "/oturum/durdur"));
       this.session = { ...this.session, status: "stopped" };
@@ -137,6 +145,27 @@ export class ExistingBackendAdapter implements OperatorDataSource {
       void this.fetchVideoSummary();
       return published;
     } finally { this.stopping = false; }
+  }
+
+  // BUG-FIX (kök neden araştırması — "nihai çıktı geç/hiç gelmiyor"): önceden
+  // /video/ozet SADECE oturum bitince/durunca soruluyordu (bkz. justStopped ve
+  // stop() aşağıda) - backend'de bir hedef video ortasında kesin kimliğini
+  // alsa bile arayüz bunu oturum bitene kadar hiç göstermiyordu. Artık oturum
+  // "running" olduğu sürece kendi kendini yeniden zamanlayan bağımsız bir
+  // döngü de çalışıyor, böylece olay günlüğü videonun ortasında da güncellenir.
+  private scheduleSummaryPoll() {
+    if (this.summaryTimer || this.disposed) return;
+    this.summaryTimer = setTimeout(() => {
+      this.summaryTimer = undefined;
+      void this.fetchVideoSummary().finally(() => {
+        if (!this.disposed && this.session.status === "running") this.scheduleSummaryPoll();
+      });
+    }, VIDEO_SUMMARY_POLL_INTERVAL_MS);
+  }
+
+  private stopSummaryPoll() {
+    if (this.summaryTimer) clearTimeout(this.summaryTimer);
+    this.summaryTimer = undefined;
   }
 
   private async fetchVideoSummary(attempt = 1): Promise<void> {
@@ -171,6 +200,7 @@ export class ExistingBackendAdapter implements OperatorDataSource {
   private stopResources() {
     if (this.pollTimer) clearTimeout(this.pollTimer); if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     this.pollTimer = undefined; this.reconnectTimer = undefined; this.pollController?.abort(); this.pollController = undefined;
+    this.stopSummaryPoll();
     this.socketGeneration += 1; const socket = this.socket; this.socket = undefined; socket?.close(1000, "cleanup");
   }
 
@@ -202,6 +232,7 @@ export class ExistingBackendAdapter implements OperatorDataSource {
         ...(sourceChanged ? { targets: [], selectedTargetId: undefined, activeTargetCount: 0, streamAspectRatio: undefined } : {}),
       };
       this.publish();
+      if (running) this.scheduleSummaryPoll(); else this.stopSummaryPoll();
       if (justStopped) void this.fetchVideoSummary();
     } catch {
       if (!controller.signal.aborted && this.session.connection !== "connected") { this.session = { ...this.session, connection: "disconnected" }; this.publish(); }
